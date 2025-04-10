@@ -1,83 +1,45 @@
 <template>
-    <nav 
-        class="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
-        :class="{'bg-[#0A0A0A]/90 backdrop-blur-lg shadow-lg': isScrolled || isMobileMenuOpen, 'bg-transparent': !isScrolled && !isMobileMenuOpen}"
-    >
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16 md:h-20">
-                <!-- Logo and Brand -->
-                <a href="/" class="flex-shrink-0 flex items-center">
-                    <img 
-                        src="@/assets/logo.png" 
-                        alt="Vitain Logo" 
-                        class="h-8 w-8 md:h-10 md:w-10"
-                    />
-                    <span class="ml-2 text-xl md:text-2xl font-bold bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-transparent bg-clip-text">
+    <nav :class="['navbar', { 'scrolled': isScrolled }]">
+      <div class="nav-content">
+        <a href="/">
+        <div class="nav-logo">
+          <img src="@/assets/logo.png" alt="Vitain Logo" class="h-12 w-12" />
+          <span class="ml-2 text-xl md:text-2xl font-bold bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-transparent bg-clip-text">
                         Vitain
                     </span>
-                </a>
-
-                <!-- Desktop Navigation -->
-                <div class="hidden md:flex items-center space-x-8">
-                    <a href="/" class="nav-link" @click="closeMobileMenu">Home</a>
-                    <a href="#features" class="nav-link" @click="closeMobileMenu">Features</a>
-                    <a href="#about" class="nav-link" @click="closeMobileMenu">About</a>
-                    <a href="#contact" class="nav-link" @click="closeMobileMenu">Contact</a>
-                    <a href="/take-quiz" class="primary-button">
-                        <span>Take Quiz</span>
-                    </a>
-                </div>
-
-                <!-- Mobile Menu Button -->
-                <div class="flex md:hidden">
-                    <button 
-                        @click="toggleMobileMenu"
-                        class="text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-[#4ADE80] rounded-lg p-1"
-                        aria-label="Toggle menu"
-                    >
-                        <svg 
-                            class="h-6 w-6 transition-transform duration-200" 
-                            :class="{'rotate-180': isMobileMenuOpen}" 
-                            stroke="currentColor" 
-                            fill="none" 
-                            viewBox="0 0 24 24"
-                        >
-                            <path 
-                                v-if="!isMobileMenuOpen"
-                                stroke-linecap="round" 
-                                stroke-linejoin="round" 
-                                stroke-width="2" 
-                                d="M4 6h16M4 12h16M4 18h16"
-                            />
-                            <path 
-                                v-else
-                                stroke-linecap="round" 
-                                stroke-linejoin="round" 
-                                stroke-width="2" 
-                                d="M6 18L18 6M6 6l12 12"
-                            />
-                        </svg>
-                    </button>
-                </div>
-            </div>
         </div>
+      </a>
+  
+        <div class="nav-links-container">
+          <div class="nav-links">
+            <a href="/" class="nav-link">Home</a>
+            <a href="agents" class="nav-link">Agents</a>
+            <a href="company" class="nav-link">Company</a>
+            <a href="insights" class="nav-link">Insights</a>
+            <a href="price" class="nav-link">Price</a>
+          </div>
+        </div>
+
+        <!-- Mobile Menu Toggle -->
+        <button class="mobile-menu-toggle" @click="toggleMobileMenu" :class="{ 'active': isMobileMenuOpen }">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
 
         <!-- Mobile Menu -->
-        <div 
-            v-show="isMobileMenuOpen"
-            class="md:hidden fixed inset-0 top-16 bg-black transition-all duration-300 ease-in-out"
-            @click.self="closeMobileMenu"
-        >
-            <div class="px-4 py-6 space-y-4">
-                <a href="/" class="mobile-nav-link" @click="closeMobileMenu">Home</a>
-                <a href="#features" class="mobile-nav-link" @click="closeMobileMenu">Features</a>
-                <a href="#about" class="mobile-nav-link" @click="closeMobileMenu">About</a>
-                <a href="#contact" class="mobile-nav-link" @click="closeMobileMenu">Contact</a>
-                <a href="/take-quiz" class="mobile-primary-button" @click="closeMobileMenu">
-                    Take Quiz
-                </a>
-            </div>
+        <div class="mobile-menu" :class="{ 'active': isMobileMenuOpen }">
+          <div class="mobile-menu-links">
+            <a href="/" class="mobile-nav-link" @click="toggleMobileMenu">Home</a>
+            <a href="agents" class="mobile-nav-link" @click="toggleMobileMenu">Agents</a>
+            <a href="company" class="mobile-nav-link" @click="toggleMobileMenu">Company</a>
+            <a href="insights" class="mobile-nav-link" @click="toggleMobileMenu">Insights</a>
+            <a href="price" class="mobile-nav-link" @click="toggleMobileMenu">Price</a>
+          </div>
         </div>
+  
+        <button href="/take-quiz" class="get-started-btn">Get Started <span class="arrow">→</span></button>
+      </div>
     </nav>
 </template>
 
@@ -87,79 +49,243 @@ import { ref, onMounted, onUnmounted } from 'vue';
 const isScrolled = ref(false);
 const isMobileMenuOpen = ref(false);
 
-const handleScroll = () => {
-    isScrolled.value = window.scrollY > 20;
-};
-
 const toggleMobileMenu = () => {
-    isMobileMenuOpen.value = !isMobileMenuOpen.value;
-    if (isMobileMenuOpen.value) {
-        document.body.style.overflow = 'hidden';
-    } else {
-        document.body.style.overflow = '';
-    }
+  isMobileMenuOpen.value = !isMobileMenuOpen.value;
+  document.body.style.overflow = isMobileMenuOpen.value ? 'hidden' : '';
 };
 
-const closeMobileMenu = () => {
-    isMobileMenuOpen.value = false;
-    document.body.style.overflow = '';
-};
-
-// Close mobile menu on escape key
-const handleEscKey = (event) => {
-    if (event.key === 'Escape') {
-        closeMobileMenu();
-    }
+const handleScroll = () => {
+  isScrolled.value = window.scrollY > 20;
 };
 
 onMounted(() => {
-    window.addEventListener('scroll', handleScroll);
-    window.addEventListener('keydown', handleEscKey);
+  window.addEventListener('scroll', handleScroll);
 });
 
 onUnmounted(() => {
-    window.removeEventListener('scroll', handleScroll);
-    window.removeEventListener('keydown', handleEscKey);
-    document.body.style.overflow = '';
+  window.removeEventListener('scroll', handleScroll);
+  document.body.style.overflow = '';
 });
 </script>
 
 <style scoped>
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  padding: 1rem 2rem;
+  transition: all 0.3s ease;
+}
+
+.nav-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.nav-logo img {
+  height: 48px;
+  width: 48px;
+}
+
+.logo-text {
+  font-size: 2rem;
+  font-weight: 700;
+  background: linear-gradient(to right, #4ADE80, #3B82F6);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  transition: opacity 0.3s ease;
+}
+
+.logo-sup {
+  font-size: 1.25rem;
+  color: #736CED;
+  font-weight: 700;
+}
+
+@media (prefers-color-scheme: dark) {
+  .logo-text {
+    color: white;
+  }
+}
+
+.nav-links-container {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 100px;
+  padding: 0.5rem;
+  backdrop-filter: blur(10px);
+}
+
 .nav-link {
-    @apply text-gray-300 hover:text-white transition-colors duration-200 text-sm font-medium relative;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.95rem;
+  padding: 0.5rem 1rem;
+  opacity: 0.8;
+  transition: opacity 0.3s ease;
 }
 
-.nav-link::after {
-    content: '';
-    @apply absolute left-0 bottom-[-4px] w-0 h-[2px] bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] transition-all duration-300;
+.nav-link:hover {
+  opacity: 1;
 }
 
-.nav-link:hover::after {
-    @apply w-full;
+.get-started-btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 100px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: white;
+  border: none;
+  background: linear-gradient(90deg, #4ADE80, #3B82F6);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.get-started-btn .arrow {
+  font-size: 1.1em;
+}
+
+.get-started-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3);
+}
+
+.mobile-menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  width: 30px;
+  height: 24px;
+  position: relative;
+  z-index: 1001;
+  margin-left: auto;
+}
+
+.mobile-menu-toggle span {
+  display: block;
+  width: 100%;
+  height: 2px;
+  background-color: white;
+  position: absolute;
+  transition: all 0.3s ease;
+}
+
+.mobile-menu-toggle span:first-child {
+  top: 0;
+}
+
+.mobile-menu-toggle span:nth-child(2) {
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.mobile-menu-toggle span:last-child {
+  bottom: 0;
+}
+
+.mobile-menu-toggle.active span:first-child {
+  transform: rotate(45deg);
+  top: 11px;
+}
+
+.mobile-menu-toggle.active span:nth-child(2) {
+  opacity: 0;
+}
+
+.mobile-menu-toggle.active span:last-child {
+  transform: rotate(-45deg);
+  bottom: 11px;
+}
+
+.mobile-menu {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.95);
+  backdrop-filter: blur(10px);
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.mobile-menu.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.mobile-menu-links {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 2rem;
+  padding: 2rem;
 }
 
 .mobile-nav-link {
-    @apply block px-4 py-3 text-lg font-medium text-gray-300 hover:text-white hover:bg-white/5 rounded-xl transition-all duration-200 text-center;
+  color: white;
+  text-decoration: none;
+  font-size: 1.5rem;
+  font-weight: 500;
+  opacity: 0.8;
+  transition: all 0.3s ease;
 }
 
-.primary-button {
-    @apply relative px-6 py-2 text-sm font-medium text-white rounded-xl overflow-hidden transition-all duration-300 hover:scale-105;
+.mobile-nav-link:hover {
+  opacity: 1;
+  transform: translateY(-2px);
 }
 
-.primary-button::before {
-    content: '';
-    @apply absolute inset-0 bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] transition-transform duration-300;
-}
+@media (max-width: 1024px) {
+  .nav-links-container {
+    display: none;
+  }
 
-.primary-button:hover::before {
-    @apply scale-105;
-}
+  .mobile-menu-toggle {
+    display: block;
+  }
 
-.primary-button span {
-    @apply relative z-10;
-}
+  .mobile-menu {
+    display: block;
+  }
 
-.mobile-primary-button {
-    @apply block w-full px-6 py-4 text-lg font-medium text-white rounded-xl bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] hover:opacity-90 transition-opacity duration-200 text-center mt-8;
+  .nav-content {
+    justify-content: space-between;
+  }
+
+  .get-started-btn {
+    display: none;
+  }
 }
 </style>
