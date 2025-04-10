@@ -1,35 +1,47 @@
 <template>
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+    <div class="relative min-h-screen bg-[#0A0A0A] px-4 py-8 sm:py-12">
+        <!-- Animated background elements -->
+        <div class="absolute inset-0 z-0">
+            <!-- Gradient orbs -->
+            <div class="absolute top-0 left-[20%] w-[500px] h-[500px] bg-gradient-to-b from-[#4ADE80]/20 to-[#3B82F6]/20 rounded-full blur-[120px] animate-pulse-slow"></div>
+            <div class="absolute bottom-0 right-[20%] w-[500px] h-[500px] bg-gradient-to-t from-[#4ADE80]/20 to-[#3B82F6]/20 rounded-full blur-[120px] animate-pulse-slower"></div>
+            
+            <!-- Animated particles -->
+            <div class="particles-container">
+                <div v-for="i in 6" :key="i" class="particle" :style="{ '--delay': `${i * 2}s` }"></div>
+            </div>
+        </div>
+
         <!-- Error Message -->
         <div v-if="error" 
-            class="mb-6 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg relative animate-fade-in">
+            class="relative z-10 mb-6 bg-red-500/20 border border-red-500/30 text-red-200 px-4 py-3 rounded-lg animate-fade-in">
             {{ error }}
         </div>
 
         <!-- Progress Bar -->
-        <div class="mb-8 sm:mb-12 max-w-xl mx-auto animate-slide-down">
-            <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
-                <div class="h-full bg-primary rounded-full transition-all duration-500 ease-out" 
+        <div class="relative z-10 mb-8 sm:mb-12 max-w-xl mx-auto animate-slide-down">
+            <div class="h-2 bg-white/10 rounded-full overflow-hidden">
+                <div class="h-full bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] rounded-full transition-all duration-500 ease-out" 
                     :style="{ width: progress + '%' }"></div>
             </div>
-            <div class="flex justify-between mt-3 text-sm text-gray-500">
-                <span class="transition-all" :class="{ 'text-primary font-medium': progress >= 33 }">Basic Info</span>
-                <span class="transition-all" :class="{ 'text-primary font-medium': progress >= 66 }">Health Info</span>
-                <span class="transition-all" :class="{ 'text-primary font-medium': progress >= 100 }">Goals</span>
+            <div class="flex justify-between mt-3 text-sm">
+                <span class="transition-all" :class="{ 'text-[#4ADE80] font-medium': progress >= 33 }">Basic Info</span>
+                <span class="transition-all" :class="{ 'text-[#4ADE80] font-medium': progress >= 66 }">Health Info</span>
+                <span class="transition-all" :class="{ 'text-[#4ADE80] font-medium': progress >= 100 }">Goals</span>
             </div>
         </div>
 
         <!-- Questions Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+        <div class="relative z-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             <!-- Basic Info Column -->
             <div class="space-y-6 animate-slide-up" style="--delay: 0s">
                 <!-- Weight -->
-                <div class="bg-white/5 backdrop-blur-sm p-6 rounded-xl border border-gray-100 hover:border-primary/30 transition-all duration-300 hover:shadow-lg hover:scale-[1.02]">
-                    <label class="font-semibold text-lg block mb-4">What is your weight? (lbs)</label>
+                <div class="bg-white/5 backdrop-blur-sm p-6 rounded-xl border border-white/10 hover:border-[#4ADE80]/30 transition-all duration-300 hover:shadow-lg hover:scale-[1.02]">
+                    <label class="font-semibold text-lg block mb-4 text-white">What is your weight? (lbs)</label>
                     <input 
                         type="number" 
                         v-model="formData.weight" 
-                        class="w-full p-3 border rounded-lg bg-white/50 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all" 
+                        class="w-full p-3 border border-white/20 rounded-lg bg-white/5 text-white focus:outline-none focus:ring-2 focus:ring-[#4ADE80]/50 transition-all placeholder:text-white/50" 
                         min="0"
                         max="999"
                         placeholder="Enter your weight"
@@ -37,22 +49,22 @@
                 </div>
 
                 <!-- Height -->
-                <div class="bg-white/5 backdrop-blur-sm p-6 rounded-xl border border-gray-100 hover:border-primary/30 transition-all duration-300 hover:shadow-lg hover:scale-[1.02]">
-                    <label class="font-semibold text-lg block mb-4">What is your height? (ft)</label>
+                <div class="bg-white/5 backdrop-blur-sm p-6 rounded-xl border border-white/10 hover:border-[#4ADE80]/30 transition-all duration-300 hover:shadow-lg hover:scale-[1.02]">
+                    <label class="font-semibold text-lg block mb-4 text-white">What is your height? (ft)</label>
                     <select 
                         v-model="formData.height" 
-                        class="w-full p-3 border rounded-lg bg-white/50 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+                        class="w-full p-3 border border-white/20 rounded-lg bg-white/5 text-white focus:outline-none focus:ring-2 focus:ring-[#4ADE80]/50 transition-all"
                     >
-                        <option value="">Select height</option>
-                        <option v-for="height in heightOptions" :key="height" :value="height">
+                        <option value="" class="bg-[#0A0A0A]">Select height</option>
+                        <option v-for="height in heightOptions" :key="height" :value="height" class="bg-[#0A0A0A]">
                             {{ height }} ft
                         </option>
                     </select>
                 </div>
 
                 <!-- Gender -->
-                <div class="bg-white/5 backdrop-blur-sm p-6 rounded-xl border border-gray-100 hover:border-primary/30 transition-all duration-300 hover:shadow-lg hover:scale-[1.02]">
-                    <label class="font-semibold text-lg block mb-4">What is your gender?</label>
+                <div class="bg-white/5 backdrop-blur-sm p-6 rounded-xl border border-white/10 hover:border-[#4ADE80]/30 transition-all duration-300 hover:shadow-lg hover:scale-[1.02]">
+                    <label class="font-semibold text-lg block mb-4 text-white">What is your gender?</label>
                     <div class="flex gap-3">
                         <button 
                             v-for="option in ['Male', 'Female']"
@@ -61,8 +73,8 @@
                             :class="[
                                 'flex-1 py-3 px-4 rounded-lg transition-all duration-300 text-sm font-medium',
                                 formData.gender === option.toLowerCase()
-                                    ? 'bg-primary text-white shadow-lg scale-105'
-                                    : 'bg-white/50 hover:bg-white/80'
+                                    ? 'bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-white shadow-lg scale-105'
+                                    : 'bg-white/10 hover:bg-white/20 text-white'
                             ]"
                         >
                             {{ option }}
@@ -74,20 +86,20 @@
             <!-- Health Info Column -->
             <div class="space-y-6 animate-slide-up" style="--delay: 0.2s">
                 <!-- Age -->
-                <div class="bg-white/5 backdrop-blur-sm p-6 rounded-xl border border-gray-100 hover:border-primary/30 transition-all duration-300 hover:shadow-lg hover:scale-[1.02]">
-                    <label class="font-semibold text-lg block mb-4">How old are you?</label>
+                <div class="bg-white/5 backdrop-blur-sm p-6 rounded-xl border border-white/10 hover:border-[#4ADE80]/30 transition-all duration-300 hover:shadow-lg hover:scale-[1.02]">
+                    <label class="font-semibold text-lg block mb-4 text-white">How old are you?</label>
                     <select 
                         v-model="formData.age" 
-                        class="w-full p-3 border rounded-lg bg-white/50 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+                        class="w-full p-3 border border-white/20 rounded-lg bg-white/5 text-white focus:outline-none focus:ring-2 focus:ring-[#4ADE80]/50 transition-all"
                     >
-                        <option value="">Select age</option>
-                        <option v-for="age in ageOptions" :key="age" :value="age">{{ age }} years</option>
+                        <option value="" class="bg-[#0A0A0A]">Select age</option>
+                        <option v-for="age in ageOptions" :key="age" :value="age" class="bg-[#0A0A0A]">{{ age }} years</option>
                     </select>
                 </div>
 
                 <!-- Activity Level -->
-                <div class="bg-white/5 backdrop-blur-sm p-6 rounded-xl border border-gray-100 hover:border-primary/30 transition-all duration-300 hover:shadow-lg hover:scale-[1.02]">
-                    <label class="font-semibold text-lg block mb-4">How active are you?</label>
+                <div class="bg-white/5 backdrop-blur-sm p-6 rounded-xl border border-white/10 hover:border-[#4ADE80]/30 transition-all duration-300 hover:shadow-lg hover:scale-[1.02]">
+                    <label class="font-semibold text-lg block mb-4 text-white">How active are you?</label>
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2">
                         <button 
                             v-for="option in activityLevels"
@@ -96,8 +108,8 @@
                             :class="[
                                 'py-3 px-4 rounded-lg transition-all duration-300 text-sm font-medium flex items-center justify-center gap-2',
                                 formData.activeness === option.toLowerCase()
-                                    ? 'bg-primary text-white shadow-lg scale-105'
-                                    : 'bg-white/50 hover:bg-white/80'
+                                    ? 'bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-white shadow-lg scale-105'
+                                    : 'bg-white/10 hover:bg-white/20 text-white'
                             ]"
                         >
                             <span>{{ option }}</span>
@@ -106,23 +118,23 @@
                 </div>
 
                 <!-- Current Supplements -->
-                <div class="bg-white/5 backdrop-blur-sm p-6 rounded-xl border border-gray-100 hover:border-primary/30 transition-all duration-300 hover:shadow-lg hover:scale-[1.02]">
-                    <label class="font-semibold text-lg block mb-4">What supplements are you taking?</label>
+                <div class="bg-white/5 backdrop-blur-sm p-6 rounded-xl border border-white/10 hover:border-[#4ADE80]/30 transition-all duration-300 hover:shadow-lg hover:scale-[1.02]">
+                    <label class="font-semibold text-lg block mb-4 text-white">What supplements are you taking?</label>
                     <select 
                         v-model="formData.supplements" 
-                        class="w-full p-3 border rounded-lg bg-white/50 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+                        class="w-full p-3 border border-white/20 rounded-lg bg-white/5 text-white focus:outline-none focus:ring-2 focus:ring-[#4ADE80]/50 transition-all"
                     >
-                        <option value="none">None</option>
-                        <option v-for="supplement in commonSupplements" :key="supplement" :value="supplement">
+                        <option value="none" class="bg-[#0A0A0A]">None</option>
+                        <option v-for="supplement in commonSupplements" :key="supplement" :value="supplement" class="bg-[#0A0A0A]">
                             {{ supplement }}
                         </option>
-                        <option value="other">Other (Multiple)</option>
+                        <option value="other" class="bg-[#0A0A0A]">Other (Multiple)</option>
                     </select>
                     <input 
                         v-if="formData.supplements === 'other'"
                         v-model="customSupplements"
                         @input="updateSupplements"
-                        class="mt-3 w-full p-3 border rounded-lg bg-white/50 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+                        class="mt-3 w-full p-3 border border-white/20 rounded-lg bg-white/5 text-white focus:outline-none focus:ring-2 focus:ring-[#4ADE80]/50 transition-all placeholder:text-white/50"
                         placeholder="Enter supplements separated by commas"
                     />
                 </div>
@@ -131,51 +143,45 @@
             <!-- Additional Info Column -->
             <div class="space-y-6 animate-slide-up" style="--delay: 0.4s">
                 <!-- Allergies -->
-                <div class="bg-white/5 backdrop-blur-sm p-6 rounded-xl border border-gray-100 hover:border-primary/30 transition-all duration-300 hover:shadow-lg hover:scale-[1.02]">
-                    <label class="font-semibold text-lg block mb-4">Do you have any allergies?</label>
+                <div class="bg-white/5 backdrop-blur-sm p-6 rounded-xl border border-white/10 hover:border-[#4ADE80]/30 transition-all duration-300 hover:shadow-lg hover:scale-[1.02]">
+                    <label class="font-semibold text-lg block mb-4 text-white">Do you have any allergies?</label>
                     <select 
                         v-model="formData.allergies" 
-                        class="w-full p-3 border rounded-lg bg-white/50 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+                        class="w-full p-3 border border-white/20 rounded-lg bg-white/5 text-white focus:outline-none focus:ring-2 focus:ring-[#4ADE80]/50 transition-all"
                     >
-                        <option value="none">None</option>
-                        <option v-for="allergy in commonAllergies" :key="allergy" :value="allergy">
+                        <option value="none" class="bg-[#0A0A0A]">None</option>
+                        <option v-for="allergy in commonAllergies" :key="allergy" :value="allergy" class="bg-[#0A0A0A]">
                             {{ allergy }}
                         </option>
-                        <option value="other">Other (Multiple)</option>
+                        <option value="other" class="bg-[#0A0A0A]">Other (Multiple)</option>
                     </select>
                     <input 
                         v-if="formData.allergies === 'other'"
                         v-model="customAllergies"
                         @input="updateAllergies"
-                        class="mt-3 w-full p-3 border rounded-lg bg-white/50 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+                        class="mt-3 w-full p-3 border border-white/20 rounded-lg bg-white/5 text-white focus:outline-none focus:ring-2 focus:ring-[#4ADE80]/50 transition-all placeholder:text-white/50"
                         placeholder="Enter allergies separated by commas"
                     />
                 </div>
 
                 <!-- Goals -->
-                <div class="bg-white/5 backdrop-blur-sm p-6 rounded-xl border border-gray-100 hover:border-primary/30 transition-all duration-300 hover:shadow-lg hover:scale-[1.02]">
-                    <label class="font-semibold text-lg block mb-4">What are your health goals?</label>
+                <div class="bg-white/5 backdrop-blur-sm p-6 rounded-xl border border-white/10 hover:border-[#4ADE80]/30 transition-all duration-300 hover:shadow-lg hover:scale-[1.02]">
+                    <label class="font-semibold text-lg block mb-4 text-white">What are your health goals?</label>
                     <select 
-                        v-model="selectedGoal" 
-                        class="w-full p-3 border rounded-lg bg-white/50 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all mb-3"
+                        v-model="formData.goals" 
+                        class="w-full p-3 border border-white/20 rounded-lg bg-white/5 text-white focus:outline-none focus:ring-2 focus:ring-[#4ADE80]/50 transition-all"
                     >
-                        <option value="">Select a goal</option>
-                        <option v-for="goal in commonGoals" :key="goal" :value="goal">
+                        <option value="" class="bg-[#0A0A0A]">Select a goal</option>
+                        <option v-for="goal in commonGoals" :key="goal" :value="goal" class="bg-[#0A0A0A]">
                             {{ goal }}
                         </option>
-                        <option value="custom">Custom Goal</option>
                     </select>
-                    <textarea 
-                        v-model="formData.goals" 
-                        :placeholder="selectedGoal === 'custom' ? 'Describe your health goals...' : 'Add additional details (optional)'"
-                        class="w-full p-3 border rounded-lg bg-white/50 h-32 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all resize-none"
-                    ></textarea>
                 </div>
             </div>
         </div>
 
         <!-- Submit Button -->
-        <div class="mt-12 flex justify-center animate-slide-up" style="--delay: 0.6s">
+        <div class="relative z-10 mt-12 flex justify-center animate-slide-up" style="--delay: 0.6s">
             <button 
                 @click="submitForm"
                 class="relative overflow-hidden group text-white px-12 py-4 rounded-full text-lg transform transition-all duration-300 hover:scale-105 disabled:opacity-70 disabled:cursor-not-allowed"
@@ -183,11 +189,7 @@
             >
                 <!-- Background Image with Overlay -->
                 <div class="absolute inset-0 z-0">
-                    <img 
-                        src="@/assets/wood.png" 
-                        alt="Wood Background" 
-                        class="w-full h-full object-cover brightness-75"
-                    />
+                    <div class="absolute inset-0 bg-gradient-to-r from-[#4ADE80] to-[#3B82F6]"></div>
                     <div class="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors"></div>
                 </div>
                 
@@ -213,7 +215,6 @@ const loading = ref(false);
 const error = ref('');
 const customSupplements = ref('');
 const customAllergies = ref('');
-const selectedGoal = ref('');
 
 // Generate height options from 4'0" to 7'0" with 1" increments
 const heightOptions = Array.from({ length: 37 }, (_, i) => (4 + i/12).toFixed(1));
@@ -268,15 +269,6 @@ const formData = ref({
     supplements: 'none',
     allergies: 'none',
     goals: ''
-});
-
-// Watch for goal selection changes
-watch(selectedGoal, (newValue) => {
-    if (newValue && newValue !== 'custom') {
-        formData.value.goals = newValue;
-    } else if (newValue === 'custom') {
-        formData.value.goals = '';
-    }
 });
 
 const updateSupplements = () => {
@@ -380,15 +372,15 @@ const submitForm = async () => {
 
 <style scoped>
 .text-primary {
-    color: #FF6B35;
+    color: #4ADE80;
 }
 
 .bg-primary {
-    background-color: #FF6B35;
+    background-color: #4ADE80;
 }
 
 .ring-primary {
-    --tw-ring-color: #FF6B35;
+    --tw-ring-color: #4ADE80;
 }
 
 @keyframes slideDown {
@@ -435,6 +427,62 @@ const submitForm = async () => {
     animation: fadeIn 0.5s ease-out forwards;
 }
 
+@keyframes pulse-slow {
+    0%, 100% { opacity: 0.4; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(1.05); }
+}
+
+.animate-pulse-slow {
+    animation: pulse-slow 4s ease-in-out infinite;
+}
+
+.animate-pulse-slower {
+    animation: pulse-slow 6s ease-in-out infinite;
+}
+
+/* Floating particles animation */
+.particles-container {
+    @apply absolute inset-0 overflow-hidden;
+}
+
+.particle {
+    @apply absolute w-2 h-2 rounded-full;
+    background: linear-gradient(to right, #4ADE80, #3B82F6);
+    filter: blur(1px);
+    animation: float-particle 15s linear infinite;
+    animation-delay: var(--delay);
+}
+
+.particle:nth-child(1) { top: 20%; left: 10%; }
+.particle:nth-child(2) { top: 50%; right: 20%; }
+.particle:nth-child(3) { bottom: 30%; left: 30%; }
+.particle:nth-child(4) { top: 10%; right: 30%; }
+.particle:nth-child(5) { bottom: 20%; right: 10%; }
+.particle:nth-child(6) { top: 40%; left: 20%; }
+
+@keyframes float-particle {
+    0% {
+        transform: translate(0, 0) rotate(0deg);
+        opacity: 0.3;
+    }
+    25% {
+        transform: translate(30px, 30px) rotate(90deg);
+        opacity: 0.6;
+    }
+    50% {
+        transform: translate(0, 60px) rotate(180deg);
+        opacity: 0.3;
+    }
+    75% {
+        transform: translate(-30px, 30px) rotate(270deg);
+        opacity: 0.6;
+    }
+    100% {
+        transform: translate(0, 0) rotate(360deg);
+        opacity: 0.3;
+    }
+}
+
 /* Remove number input arrows */
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
@@ -443,21 +491,21 @@ input[type="number"]::-webkit-outer-spin-button {
 }
 
 /* Custom scrollbar */
-textarea::-webkit-scrollbar {
+select::-webkit-scrollbar {
     width: 8px;
 }
 
-textarea::-webkit-scrollbar-track {
-    background: #f1f1f1;
+select::-webkit-scrollbar-track {
+    background: #1a1a1a;
     border-radius: 4px;
 }
 
-textarea::-webkit-scrollbar-thumb {
-    background: #FF6B35;
+select::-webkit-scrollbar-thumb {
+    background: #4ADE80;
     border-radius: 4px;
 }
 
-textarea::-webkit-scrollbar-thumb:hover {
-    background: #E85A2C;
+select::-webkit-scrollbar-thumb:hover {
+    background: #3B82F6;
 }
 </style>

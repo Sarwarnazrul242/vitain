@@ -10,7 +10,7 @@
 </template>
 
 <script setup>
-import NavBar from '@/components/homepage/NavBar.vue'
+import NavBar from '@/components/common/NavBar.vue'
 import HeroSection from '@/components/homepage/HeroSection.vue'
 import FeatureSection from '@/components/homepage/FeatureSection.vue'
 import OverviewSection from '@/components/homepage/OverviewSection.vue'

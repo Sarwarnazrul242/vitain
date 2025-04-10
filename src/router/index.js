@@ -25,11 +25,6 @@ const router = createRouter({
       })
     },
     {
-      path: "/chat",
-      name: "ChatPage",
-      component: () => import("@/views/Chat.vue"),
-    },
-    {
       path: '/supplements',
       name: 'Supplements',
       component: SupplementGrid

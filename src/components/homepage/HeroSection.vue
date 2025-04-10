@@ -1,53 +1,56 @@
 <template>
-    <section class="relative min-h-screen flex items-center justify-center text-center px-4 py-20 md:py-0">
-        <!-- Background image -->
+    <section class="relative min-h-screen flex items-center justify-center text-center px-4 py-20 md:py-0 bg-[#0A0A0A]">
+        <!-- Spline Background -->
         <div class="absolute inset-0 z-0">
-            <img 
-                src="@/assets/wood.png" 
-                alt="Wood Background" 
-                class="w-full h-full object-cover brightness-75"
-            />
-            <!-- Darker overlay with gradient -->
-            <div class="absolute inset-0 bg-gradient-to-b from-black/60 via-black/60 to-black"></div>
+            <spline-viewer 
+                url="https://prod.spline.design/Gv6CVgMGSDtycZ0l/scene.splinecode"
+                class="w-full h-full"
+            ></spline-viewer>
         </div>
 
+        <!-- Background gradient overlay -->
+        <div class="absolute inset-0 z-1 bg-black/60"></div>
+
         <!-- Animated Content -->
-        <div class="relative z-10 max-w-4xl mx-auto">
-            <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 md:mb-6 animate-fade-in-down">
-                Your Journey to Better Health Starts Here
+        <div class="relative z-10 max-w-3xl mx-auto">
+            <div class="mb-12 animate-float">
+                <img src="@/assets/logo.png" alt="Vitain Logo" class="w-20 h-20 mx-auto" />
+            </div>
+            <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-transparent bg-clip-text mb-6 animate-fade-in-down leading-tight">
+                Your Journey to Better Health
             </h1>
-            <p class="text-white text-base sm:text-lg md:text-xl mb-6 md:mb-8 max-w-2xl mx-auto animate-fade-in-up delay-200">
-                Discover personalized supplement recommendations backed by AI technology. 
-                Take our comprehensive quiz and get tailored solutions for your unique health goals.
+            <p class="text-gray-300 text-lg md:text-xl mb-10 max-w-xl mx-auto animate-fade-in-up delay-200 leading-relaxed">
+                Get personalized supplement recommendations powered by AI technology.
             </p>
-            <div class="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center animate-fade-in delay-400">
+            <div class="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in delay-400 mb-20">
                 <button 
                     @click="navigateToQuiz" 
-                    class="bg-primary text-white px-6 md:px-8 py-2.5 md:py-3 rounded-full text-base md:text-lg hover:bg-primary-dark transition-all hover:scale-105"
+                    class="group relative px-8 py-3 rounded-lg text-lg overflow-hidden"
                 >
-                    Take the Quiz
+                    <span class="absolute inset-0 bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] transition-transform group-hover:scale-105"></span>
+                    <span class="relative text-white font-medium">Take the Quiz</span>
                 </button>
                 <button 
                     @click="scrollToLearnMore" 
-                    class="border-2 border-white text-white px-6 md:px-8 py-2.5 md:py-3 rounded-full text-base md:text-lg hover:bg-white/10 transition-all hover:scale-105"
+                    class="group px-8 py-3 rounded-lg text-lg border border-gray-700 text-gray-300 hover:text-white transition-all hover:border-gray-500"
                 >
                     Learn More
                 </button>
             </div>
             
-            <!-- Animated Stats -->
-            <div class="mt-12 md:mt-16 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-8 animate-fade-in-up delay-600">
-                <div class="text-white hover:scale-105 transition-transform">
-                    <div class="text-3xl md:text-4xl font-bold mb-2 animate-count">1000+</div>
-                    <div class="text-xs md:text-sm opacity-80">Satisfied Customers</div>
+            <!-- Simplified Stats -->
+            <div class="grid grid-cols-3 gap-8 animate-fade-in-up delay-600">
+                <div class="stats-card">
+                    <div class="text-3xl font-bold bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-transparent bg-clip-text">1000+</div>
+                    <div class="text-gray-400 text-sm">Users</div>
                 </div>
-                <div class="text-white hover:scale-105 transition-transform">
-                    <div class="text-3xl md:text-4xl font-bold mb-2 animate-count">50+</div>
-                    <div class="text-xs md:text-sm opacity-80">Premium Supplements</div>
+                <div class="stats-card">
+                    <div class="text-3xl font-bold bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-transparent bg-clip-text">50+</div>
+                    <div class="text-gray-400 text-sm">Products</div>
                 </div>
-                <div class="text-white hover:scale-105 transition-transform sm:col-span-2 md:col-span-1">
-                    <div class="text-3xl md:text-4xl font-bold mb-2">24/7</div>
-                    <div class="text-xs md:text-sm opacity-80">AI Support</div>
+                <div class="stats-card">
+                    <div class="text-3xl font-bold bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-transparent bg-clip-text">24/7</div>
+                    <div class="text-gray-400 text-sm">Support</div>
                 </div>
             </div>
         </div>
@@ -61,21 +64,20 @@ const router = useRouter();
 const navigateToQuiz = () => {
     router.push('/take-quiz');
 };
+
+const scrollToLearnMore = () => {
+    const nextSection = document.querySelector('#learn-more');
+    if (nextSection) {
+        nextSection.scrollIntoView({ behavior: 'smooth' });
+    }
+};
 </script>
 
 <style scoped>
-.bg-primary {
-    background-color: #A0522D; /* Brown color for the button */
-}
-
-.bg-primary-dark:hover {
-    background-color: #8B4513; /* Darker brown for hover state */
-}
-
 @keyframes fadeInDown {
     from {
         opacity: 0;
-        transform: translateY(-20px);
+        transform: translateY(-30px);
     }
     to {
         opacity: 1;
@@ -86,7 +88,7 @@ const navigateToQuiz = () => {
 @keyframes fadeInUp {
     from {
         opacity: 0;
-        transform: translateY(20px);
+        transform: translateY(30px);
     }
     to {
         opacity: 1;
@@ -103,16 +105,29 @@ const navigateToQuiz = () => {
     }
 }
 
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
 .animate-fade-in-down {
-    animation: fadeInDown 1s ease-out;
+    animation: fadeInDown 1s cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 .animate-fade-in-up {
-    animation: fadeInUp 1s ease-out;
+    animation: fadeInUp 1s cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 .animate-fade-in {
-    animation: fadeIn 1s ease-out;
+    animation: fadeIn 1s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.animate-float {
+    animation: float 3s ease-in-out infinite;
 }
 
 .delay-200 {
@@ -125,5 +140,9 @@ const navigateToQuiz = () => {
 
 .delay-600 {
     animation-delay: 600ms;
+}
+
+.stats-card {
+    @apply text-center p-4 rounded-xl backdrop-blur-lg bg-white/5 border border-gray-800 hover:border-gray-700 transition-all hover:scale-105;
 }
 </style>

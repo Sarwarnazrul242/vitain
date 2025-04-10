@@ -1,25 +1,29 @@
 <template>
-    <div class="relative min-h-screen">
-        <!-- Background image -->
+    <div class="relative min-h-screen bg-[#0A0A0A]">
+        <!-- Animated background elements -->
         <div class="absolute inset-0 z-0">
-            <img 
-                src="@/assets/wood.png" 
-                alt="Wood Background" 
-                class="w-full h-full object-cover brightness-75 fixed"
-            />
-            <div class="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/60"></div>
+            <!-- Gradient orbs -->
+            <div class="absolute top-0 left-[20%] w-[500px] h-[500px] bg-gradient-to-b from-[#4ADE80]/20 to-[#3B82F6]/20 rounded-full blur-[120px] animate-pulse-slow"></div>
+            <div class="absolute bottom-0 right-[20%] w-[500px] h-[500px] bg-gradient-to-t from-[#4ADE80]/20 to-[#3B82F6]/20 rounded-full blur-[120px] animate-pulse-slower"></div>
+            
+            <!-- Animated particles -->
+            <div class="particles-container">
+                <div v-for="i in 6" :key="i" class="particle" :style="{ '--delay': `${i * 2}s` }"></div>
+            </div>
         </div>
 
         <!-- Content -->
-        <div class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
+        <div class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 py-12 sm:py-16 mt-24">
             <!-- Header -->
             <div class="text-center mb-12 sm:mb-16 animate-fade-in">
-                <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-white">
-                    Your Recommended
-                    <span class="text-primary block mt-2">Supplements</span>
+                <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-transparent bg-clip-text">
+                    Your Personalized
+                    <span class="block mt-2">
+                        Supplement Plan
+                    </span>
                 </h1>
                 <p class="text-gray-300 text-lg md:text-xl animate-slide-up" style="--delay: 0.2s">
-                    Based on your unique health profile
+                    Based on your unique health profile and goals
                 </p>
             </div>
 
@@ -29,10 +33,10 @@
                     class="group animate-slide-up"
                     :style="{ '--delay': `${0.4 + index * 0.1}s` }"
                 >
-                    <div class="bg-white/10 backdrop-blur-lg p-6 rounded-xl border border-white/20 hover:border-primary/50 transition-all duration-300 hover:shadow-2xl hover:shadow-primary/20 hover:scale-105 h-full">
+                    <div class="bg-white/5 backdrop-blur-lg p-6 rounded-xl border border-white/10 hover:border-[#4ADE80]/30 transition-all duration-300 hover:shadow-2xl hover:shadow-[#4ADE80]/20 hover:scale-105 h-full">
                         <div class="flex flex-col items-center text-center">
                             <!-- Supplement Icon -->
-                            <div class="w-40 h-40 bg-gradient-to-br from-primary/20 to-primary/5 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 p-2">
+                            <div class="w-40 h-40 bg-gradient-to-br from-[#4ADE80]/20 to-[#3B82F6]/5 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 p-2">
                                 <img 
                                     :src="getSupplementImage(supplement)" 
                                     :alt="supplement"
@@ -41,7 +45,7 @@
                                 />
                             </div>
                             <!-- Supplement Name -->
-                            <h3 class="text-xl font-semibold mb-3 capitalize text-white group-hover:text-primary transition-colors">
+                            <h3 class="text-xl font-semibold mb-3 capitalize text-white group-hover:text-[#4ADE80] transition-colors">
                                 {{ formatSupplementName(supplement) }}
                             </h3>
                             <!-- Description -->
@@ -51,7 +55,7 @@
                             <!-- Learn More Button -->
                             <button 
                                 @click="openSupplementInfo(supplement)"
-                                class="mt-auto text-primary hover:text-white bg-primary/10 hover:bg-primary transition-all duration-300 px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2 group-hover:scale-105"
+                                class="mt-auto text-[#4ADE80] hover:text-white bg-[#4ADE80]/10 hover:bg-gradient-to-r hover:from-[#4ADE80] hover:to-[#3B82F6] transition-all duration-300 px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2 group-hover:scale-105"
                             >
                                 Learn More
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -66,24 +70,27 @@
             <!-- Action Buttons -->
             <div class="flex flex-col sm:flex-row justify-center items-center gap-4 animate-slide-up" style="--delay: 0.8s">
                 <button 
-                    @click="$router.push('/chat')"
-                    class="w-full sm:w-auto bg-gradient-to-r from-primary to-primary-dark text-white px-8 py-4 rounded-full text-lg font-medium hover:shadow-lg hover:shadow-primary/50 hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2"
-                >
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-                    </svg>
-                    Chat with AI Assistant
-                </button>
-                <button 
                     @click="$router.push('/take-quiz')"
-                    class="w-full sm:w-auto border-2 border-primary text-primary hover:text-white hover:bg-primary px-8 py-4 rounded-full text-lg font-medium transition-all duration-300 flex items-center justify-center gap-2 hover:scale-105"
+                    class="w-full sm:w-auto border-2 border-[#4ADE80] text-[#4ADE80] hover:text-white hover:bg-gradient-to-r hover:from-[#4ADE80] hover:to-[#3B82F6] px-8 py-4 rounded-full text-lg font-medium transition-all duration-300 flex items-center justify-center gap-2 hover:scale-105"
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                     </svg>
                     Retake Quiz
                 </button>
+                <button 
+                    @click="downloadPlan"
+                    class="w-full sm:w-auto bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-white hover:opacity-90 px-8 py-4 rounded-full text-lg font-medium transition-all duration-300 flex items-center justify-center gap-2 hover:scale-105"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    Download Plan
+                </button>
             </div>
+            
+            <!-- Chat Button Component -->
+            <ChatButton />
         </div>
     </div>
 </template>
@@ -91,53 +98,87 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import ChatButton from '@/components/common/ChatButton.vue';
 
 const route = useRoute();
 const router = useRouter();
 
 const supplements = ref([]);
+const supplementDetails = ref({});
 
-// Supplement images mapping
-const supplementImages = {
-    'omega-3': 'https://images.unsplash.com/photo-1535378917042-10a22c95931a?w=200', // Fish oil capsules
-    'vitamin d': 'https://images.unsplash.com/photo-1631751809139-d0fc97d99c66?w=200', // Vitamin D supplements
-    'magnesium': 'https://images.unsplash.com/photo-1633171412647-0163e2f3610e?w=200', // Magnesium tablets
-    'vitamin b12': 'https://images.unsplash.com/photo-1577636706176-fd50c6d6d697?w=200', // B12 supplements
-    'zinc': 'https://images.unsplash.com/photo-1584017911766-d451b3d0e843?w=200', // Zinc supplements
-    'iron': 'https://images.unsplash.com/photo-1633171407759-33a5f9e7b614?w=200', // Iron supplements
-    'calcium': 'https://images.unsplash.com/photo-1633171407759-33a5f9e7b614?w=200', // Calcium tablets
-    'vitamin c': 'https://images.unsplash.com/photo-1615397349754-cfa2066a298e?w=200', // Vitamin C or oranges
-    'green tea extract': 'https://images.unsplash.com/photo-1627435601361-ec25f5b1d0e5?w=200', // Green tea
-    'fiber supplements': 'https://images.unsplash.com/photo-1622484211817-92c99ec88e19?w=200', // Fiber rich foods
-    'glutamine': 'https://images.unsplash.com/photo-1593095948071-474c5cc2989d?w=200', // Protein powder
-    'protein': 'https://images.unsplash.com/photo-1593095948071-474c5cc2989d?w=200', // Protein powder
-    'creatine': 'https://images.unsplash.com/photo-1593095948071-474c5cc2989d?w=200', // Supplement powder
-    'multivitamin': 'https://images.unsplash.com/photo-1577636706176-fd50c6d6d697?w=200', // Various pills
-    'probiotics': 'https://images.unsplash.com/photo-1577636706176-fd50c6d6d697?w=200', // Probiotic supplements
-    'fish oil': 'https://images.unsplash.com/photo-1535378917042-10a22c95931a?w=200', // Fish oil capsules
-    'vitamin e': 'https://images.unsplash.com/photo-1631751809139-d0fc97d99c66?w=200', // Vitamin E supplements
-    'vitamin b': 'https://images.unsplash.com/photo-1577636706176-fd50c6d6d697?w=200' // B complex vitamins
+// Function to search Amazon for a supplement
+const searchAmazonProduct = async (supplement) => {
+    try {
+        // First search for the product
+        const searchResponse = await fetch(`https://amazon-product-search-api1.p.rapidapi.com/amz/search?query=${encodeURIComponent(supplement + ' supplement')}&page=1&country=US&sortBy=relevance`, {
+            headers: {
+                'x-rapidapi-host': 'amazon-product-search-api1.p.rapidapi.com',
+                'x-rapidapi-key': '0e712f55e6msh4448966ec770992p11841djsna7833fa7e9a6',
+                'Content-Type': 'application/json',
+                'User-Agent': 'insomnia/10.2.0'
+            }
+        });
+        
+        const searchData = await searchResponse.json();
+        console.log('Search response:', searchData);
+
+        if (searchData.results && searchData.results.length > 0) {
+            // Get the first product's ASIN and thumbnail
+            const product = searchData.results[0];
+            const asin = product.asin;
+            
+            // Get detailed product information
+            const detailResponse = await fetch(`https://amazon-product-search-api1.p.rapidapi.com/amz/productDetails?asin=${asin}&country=US`, {
+                headers: {
+                    'x-rapidapi-host': 'amazon-product-search-api1.p.rapidapi.com',
+                    'x-rapidapi-key': '0e712f55e6msh4448966ec770992p11841djsna7833fa7e9a6',
+                    'Content-Type': 'application/json',
+                    'User-Agent': 'insomnia/10.3.0'
+                }
+            });
+            
+            const detailData = await detailResponse.json();
+            console.log('Detail response:', detailData);
+
+            // Get the image URL from the response
+            const image = product.thumbnail || // Try thumbnail from search first
+                         detailData.product?.images?.[0] || 
+                         'https://images.unsplash.com/photo-1577636706176-fd50c6d6d697?w=200';
+
+            return {
+                image: image,
+                title: product.title || detailData.product?.title,
+                description: product.description || detailData.product?.description || 'Supports overall health and wellness.',
+                url: `https://www.amazon.com/dp/${asin}`
+            };
+        }
+        throw new Error('No products found');
+    } catch (error) {
+        console.error(`Error fetching product details for ${supplement}:`, error);
+        return null;
+    }
 };
 
-// Supplement descriptions
-const supplementDescriptions = {
-    'omega-3': 'Essential fatty acids that support heart and brain health.',
-    'vitamin d': 'Crucial for bone health and immune system function.',
-    'magnesium': 'Important for muscle and nerve function.',
-    'vitamin b12': 'Vital for red blood cell formation and neurological function.',
-    'zinc': 'Supports immune system and wound healing.',
-    'iron': 'Essential for blood oxygen transport.',
-    'calcium': 'Key mineral for bone and teeth health.',
-    'vitamin c': 'Antioxidant supporting immune system and skin health.',
-};
-
+// Replace getSupplementImage with this
 const getSupplementImage = (supplement) => {
-    const key = supplement.toLowerCase()
-        .replace(' fatty acids', '')
-        .replace('supplement', '')
-        .replace('supplements', '')
-        .trim();
-    return supplementImages[key] || 'https://images.unsplash.com/photo-1577636706176-fd50c6d6d697?w=200';
+    const details = supplementDetails.value[supplement.toLowerCase()];
+    return details?.image || 'https://images.unsplash.com/photo-1577636706176-fd50c6d6d697?w=200';
+};
+
+// Update openSupplementInfo to use Amazon product URL
+const openSupplementInfo = (supplement) => {
+    const details = supplementDetails.value[supplement.toLowerCase()];
+    if (details?.url) {
+        window.open(details.url, '_blank');
+    } else {
+        window.open(`https://www.google.com/search?q=${supplement}+supplement+benefits`, '_blank');
+    }
+};
+
+// Update getSupplementDescription to use Amazon product description
+const getSupplementDescription = (supplement) => {
+    const details = supplementDetails.value[supplement.toLowerCase()];
+    return details?.description || 'Supports overall health and wellness.';
 };
 
 const handleImageError = (event) => {
@@ -150,16 +191,25 @@ const formatSupplementName = (supplement) => {
     ).join(' ');
 };
 
-const getSupplementDescription = (supplement) => {
-    const key = supplement.toLowerCase().replace(' fatty acids', '');
-    return supplementDescriptions[key] || 'Supports overall health and wellness.';
+// Download plan function
+const downloadPlan = () => {
+    const plan = {
+        supplements: supplements.value,
+        details: supplementDetails.value
+    };
+    
+    const blob = new Blob([JSON.stringify(plan, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'vitain-supplement-plan.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
 };
 
-const openSupplementInfo = (supplement) => {
-    window.open(`https://www.google.com/search?q=${supplement}+supplement+benefits`, '_blank');
-};
-
-onMounted(() => {
+onMounted(async () => {
     try {
         if (!route.query.results) {
             throw new Error('No results data found');
@@ -171,6 +221,14 @@ onMounted(() => {
         if (results && results.response) {
             supplements.value = results.response.split(',').map(s => s.trim());
             console.log('Parsed supplements:', supplements.value);
+            
+            // Fetch Amazon product details for each supplement
+            for (const supplement of supplements.value) {
+                const details = await searchAmazonProduct(supplement);
+                if (details) {
+                    supplementDetails.value[supplement.toLowerCase()] = details;
+                }
+            }
         } else {
             throw new Error('Invalid response format');
         }
@@ -183,23 +241,23 @@ onMounted(() => {
 
 <style scoped>
 .text-primary {
-    color: #FF6B35;
+    color: #4ADE80;
 }
 
 .bg-primary {
-    background-color: #FF6B35;
+    background-color: #4ADE80;
 }
 
 .from-primary {
-    --tw-gradient-from: #FF6B35;
+    --tw-gradient-from: #4ADE80;
 }
 
 .to-primary-dark {
-    --tw-gradient-to: #E85A2C;
+    --tw-gradient-to: #3B82F6;
 }
 
 .border-primary {
-    border-color: #FF6B35;
+    border-color: #4ADE80;
 }
 
 @keyframes fadeIn {
@@ -222,13 +280,69 @@ onMounted(() => {
     }
 }
 
+@keyframes pulse-slow {
+    0%, 100% { opacity: 0.4; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(1.05); }
+}
+
+.animate-pulse-slow {
+    animation: pulse-slow 4s ease-in-out infinite;
+}
+
+.animate-pulse-slower {
+    animation: pulse-slow 6s ease-in-out infinite;
+}
+
 .animate-fade-in {
-    animation: fadeIn 1s ease-out forwards;
+    animation: fadeIn 1s ease-out;
 }
 
 .animate-slide-up {
-    animation: slideUp 0.8s ease-out forwards;
-    animation-delay: var(--delay, 0s);
+    animation: slideUp 0.5s ease-out;
+    animation-delay: var(--delay);
+}
+
+/* Floating particles animation */
+.particles-container {
+    @apply absolute inset-0 overflow-hidden;
+}
+
+.particle {
+    @apply absolute w-2 h-2 rounded-full;
+    background: linear-gradient(to right, #4ADE80, #3B82F6);
+    filter: blur(1px);
+    animation: float-particle 15s linear infinite;
+    animation-delay: var(--delay);
+}
+
+.particle:nth-child(1) { top: 20%; left: 10%; }
+.particle:nth-child(2) { top: 50%; right: 20%; }
+.particle:nth-child(3) { bottom: 30%; left: 30%; }
+.particle:nth-child(4) { top: 10%; right: 30%; }
+.particle:nth-child(5) { bottom: 20%; right: 10%; }
+.particle:nth-child(6) { top: 40%; left: 20%; }
+
+@keyframes float-particle {
+    0% {
+        transform: translate(0, 0) rotate(0deg);
+        opacity: 0.3;
+    }
+    25% {
+        transform: translate(30px, 30px) rotate(90deg);
+        opacity: 0.6;
+    }
+    50% {
+        transform: translate(0, 60px) rotate(180deg);
+        opacity: 0.3;
+    }
+    75% {
+        transform: translate(-30px, 30px) rotate(270deg);
+        opacity: 0.6;
+    }
+    100% {
+        transform: translate(0, 0) rotate(360deg);
+        opacity: 0.3;
+    }
 }
 
 /* Hover effect for supplement cards */
@@ -253,11 +367,11 @@ onMounted(() => {
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #FF6B35;
+    background: #4ADE80;
     border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: #E85A2C;
+    background: #3B82F6;
 }
 </style> 
