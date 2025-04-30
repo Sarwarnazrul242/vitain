@@ -135,26 +135,6 @@
           </svg>
           Retake Quiz
         </button>
-        <button
-          @click="downloadPlan"
-          class="w-full sm:w-auto bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-white hover:opacity-90 px-8 py-4 rounded-full text-lg font-medium transition-all duration-300 flex items-center justify-center gap-2 hover:scale-105"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-5 w-5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-            />
-          </svg>
-          Download Plan
-        </button>
       </div>
 
       <!-- Chat Button Component -->
@@ -216,20 +196,6 @@ const searchAmazonProduct = async (supplement) => {
       },
     };
 
-    // First search for the product
-    // const searchResponse = await fetch(
-    //   `https://amazon-product-search-api1.p.rapidapi.com/amz/search?query=${encodeURIComponent(
-    //     supplement + " supplement"
-    //   )}&page=1&country=US&sortBy=relevance`,
-    //   {
-    //     headers: {
-    //       "x-rapidapi-host": "amazon-product-search-api1.p.rapidapi.com",
-    //       "x-rapidapi-key":
-    //         "0e712f55e6msh4448966ec770992p11841djsna7833fa7e9a6",
-    //       "Content-Type": "application/json",
-    //     },
-    //   }
-    // );
     const response = await axios.request(options);
 
     const searchData = response.data;
@@ -296,26 +262,6 @@ const formatSupplementName = (supplement) => {
     .split(" ")
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
-};
-
-// Download plan function
-const downloadPlan = () => {
-  const plan = {
-    supplements: supplements.value,
-    details: supplementDetails.value,
-  };
-
-  const blob = new Blob([JSON.stringify(plan, null, 2)], {
-    type: "application/json",
-  });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "vitain-supplement-plan.json";
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
 };
 
 onMounted(async () => {

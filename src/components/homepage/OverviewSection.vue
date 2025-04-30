@@ -1,11 +1,5 @@
 <template>
-    <section class="bg-[#0A0A0A] py-16 md:py-24 px-4 relative overflow-hidden">
-        <!-- Background gradient effects -->
-        <div class="absolute inset-0 z-0">
-            <div class="absolute top-0 right-[10%] w-[400px] h-[400px] bg-gradient-to-b from-[#4ADE80]/10 to-[#3B82F6]/10 rounded-full blur-[120px]"></div>
-            <div class="absolute bottom-0 left-[10%] w-[400px] h-[400px] bg-gradient-to-t from-[#4ADE80]/10 to-[#3B82F6]/10 rounded-full blur-[120px]"></div>
-        </div>
-
+    <section class="relative py-16 md:py-24 px-4 overflow-hidden">
         <div class="max-w-7xl mx-auto relative z-10">
             <div class="text-center mb-12 md:mb-20">
                 <h2 class="text-3xl md:text-5xl font-bold mb-4 animate-fade-in">

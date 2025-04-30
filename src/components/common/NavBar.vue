@@ -1,26 +1,23 @@
 <template>
-  <nav :class="['navbar', { scrolled: isScrolled }]">
-    <div class="nav-content">
-      <a href="/">
+    <nav :class="['navbar', { 'scrolled': isScrolled }]">
+      <div class="nav-content">
+        <a href="/">
         <div class="nav-logo">
           <img src="@/assets/logo.png" alt="Vitain Logo" class="h-12 w-12" />
-          <span
-            class="ml-2 text-xl md:text-2xl font-bold bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-transparent bg-clip-text"
-          >
-            Vitain
-          </span>
+          <span class="ml-2 text-xl md:text-2xl font-bold bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-transparent bg-clip-text">
+                        Vitain
+                    </span>
         </div>
       </a>
-
-      <div class="nav-links-container">
-        <div class="nav-links">
-          <a href="/" class="nav-link">Home</a>
-          <a href="agents" class="nav-link">Take Quiz</a>
-          <!--<a href="company" class="nav-link">Company</a>
-            <a href="insights" class="nav-link">Insights</a> -->
-          <a href="price" class="nav-link"> Enterprise Solutions</a>
+  
+        <div class="nav-links-container">
+          <div class="nav-links">
+            <a href="/" class="nav-link">Home</a>
+            <a href="business" class="nav-link">Business</a>
+            <a href="how-it-works" class="nav-link">How It Works</a>
+            <a href="supplements" class="nav-link">Supplements</a>
+          </div>
         </div>
-      </div>
 
       <!-- Mobile Menu Toggle -->
       <button
@@ -33,35 +30,26 @@
         <span></span>
       </button>
 
-      <!-- Mobile Menu -->
-      <div class="mobile-menu" :class="{ active: isMobileMenuOpen }">
-        <div class="mobile-menu-links">
-          <a href="/" class="mobile-nav-link" @click="toggleMobileMenu">Home</a>
-          <a href="agents" class="mobile-nav-link" @click="toggleMobileMenu"
-            >Agents</a
-          >
-          <a href="company" class="mobile-nav-link" @click="toggleMobileMenu"
-            >Company</a
-          >
-          <a href="insights" class="mobile-nav-link" @click="toggleMobileMenu"
-            >Insights</a
-          >
-          <a href="price" class="mobile-nav-link" @click="toggleMobileMenu"
-            >Price</a
-          >
+        <!-- Mobile Menu -->
+        <div class="mobile-menu" :class="{ 'active': isMobileMenuOpen }">
+          <div class="mobile-menu-links">
+            <a href="/" class="mobile-nav-link" @click="toggleMobileMenu">Home</a>
+            <a href="business" class="mobile-nav-link" @click="toggleMobileMenu">Business</a>
+            <a href="how-it-works" class="mobile-nav-link" @click="toggleMobileMenu">How It Works</a>
+            <a href="supplements" class="mobile-nav-link" @click="toggleMobileMenu">Supplements</a>
+          </div>
         </div>
+  
+        <button href="/take-quiz" class="get-started-btn">Get Started <span class="arrow">→</span></button>
       </div>
-
-      <button href="/take-quiz" class="get-started-btn">
-        Get Started <span class="arrow">→</span>
-      </button>
-    </div>
-  </nav>
+    </nav>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from "vue";
+import { ref, onMounted, onUnmounted } from 'vue';
+import { useRouter } from 'vue-router';
 
+const router = useRouter();
 const isScrolled = ref(false);
 const isMobileMenuOpen = ref(false);
 

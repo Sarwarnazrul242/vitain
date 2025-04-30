@@ -1,6 +1,4 @@
 import { createRouter, createWebHistory } from "vue-router";
-import SupplementGrid from '@/components/supplements/SupplementGrid.vue'
-import HowItWorks from '@/components/howitworks/HowItWorks.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -27,12 +25,17 @@ const router = createRouter({
     {
       path: '/supplements',
       name: 'Supplements',
-      component: SupplementGrid
+      component: () => import("@/views/Supplements.vue")
+    },
+    {
+      path: '/business',
+      name: 'Business',
+      component: () => import("@/views/Business.vue"),
     },
     {
       path: '/how-it-works',
       name: 'HowItWorks',
-      component: HowItWorks
+      component: () => import("@/views/HowItWorks.vue"),
     }
   ],
 });
