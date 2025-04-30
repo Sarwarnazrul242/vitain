@@ -1,57 +1,73 @@
 <template>
-    <nav :class="['navbar', { 'scrolled': isScrolled }]">
-      <div class="nav-content">
-        <a href="/">
+  <nav :class="['navbar', { scrolled: isScrolled }]">
+    <div class="nav-content">
+      <a href="/">
         <div class="nav-logo">
           <img src="@/assets/logo.png" alt="Vitain Logo" class="h-12 w-12" />
-          <span class="ml-2 text-xl md:text-2xl font-bold bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-transparent bg-clip-text">
-                        Vitain
-                    </span>
+          <span
+            class="ml-2 text-xl md:text-2xl font-bold bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-transparent bg-clip-text"
+          >
+            Vitain
+          </span>
         </div>
       </a>
-  
-        <div class="nav-links-container">
-          <div class="nav-links">
-            <a href="/" class="nav-link">Home</a>
-            <a href="agents" class="nav-link">Agents</a>
-            <a href="company" class="nav-link">Company</a>
-            <a href="insights" class="nav-link">Insights</a>
-            <a href="price" class="nav-link">Price</a>
-          </div>
-        </div>
 
-        <!-- Mobile Menu Toggle -->
-        <button class="mobile-menu-toggle" @click="toggleMobileMenu" :class="{ 'active': isMobileMenuOpen }">
-          <span></span>
-          <span></span>
-          <span></span>
-        </button>
-
-        <!-- Mobile Menu -->
-        <div class="mobile-menu" :class="{ 'active': isMobileMenuOpen }">
-          <div class="mobile-menu-links">
-            <a href="/" class="mobile-nav-link" @click="toggleMobileMenu">Home</a>
-            <a href="agents" class="mobile-nav-link" @click="toggleMobileMenu">Agents</a>
-            <a href="company" class="mobile-nav-link" @click="toggleMobileMenu">Company</a>
-            <a href="insights" class="mobile-nav-link" @click="toggleMobileMenu">Insights</a>
-            <a href="price" class="mobile-nav-link" @click="toggleMobileMenu">Price</a>
-          </div>
+      <div class="nav-links-container">
+        <div class="nav-links">
+          <a href="/" class="nav-link">Home</a>
+          <a href="agents" class="nav-link">Take Quiz</a>
+          <!--<a href="company" class="nav-link">Company</a>
+            <a href="insights" class="nav-link">Insights</a> -->
+          <a href="price" class="nav-link"> Enterprise Solutions</a>
         </div>
-  
-        <button href="/take-quiz" class="get-started-btn">Get Started <span class="arrow">→</span></button>
       </div>
-    </nav>
+
+      <!-- Mobile Menu Toggle -->
+      <button
+        class="mobile-menu-toggle"
+        @click="toggleMobileMenu"
+        :class="{ active: isMobileMenuOpen }"
+      >
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <!-- Mobile Menu -->
+      <div class="mobile-menu" :class="{ active: isMobileMenuOpen }">
+        <div class="mobile-menu-links">
+          <a href="/" class="mobile-nav-link" @click="toggleMobileMenu">Home</a>
+          <a href="agents" class="mobile-nav-link" @click="toggleMobileMenu"
+            >Agents</a
+          >
+          <a href="company" class="mobile-nav-link" @click="toggleMobileMenu"
+            >Company</a
+          >
+          <a href="insights" class="mobile-nav-link" @click="toggleMobileMenu"
+            >Insights</a
+          >
+          <a href="price" class="mobile-nav-link" @click="toggleMobileMenu"
+            >Price</a
+          >
+        </div>
+      </div>
+
+      <button href="/take-quiz" class="get-started-btn">
+        Get Started <span class="arrow">→</span>
+      </button>
+    </div>
+  </nav>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted } from "vue";
 
 const isScrolled = ref(false);
 const isMobileMenuOpen = ref(false);
 
 const toggleMobileMenu = () => {
   isMobileMenuOpen.value = !isMobileMenuOpen.value;
-  document.body.style.overflow = isMobileMenuOpen.value ? 'hidden' : '';
+  document.body.style.overflow = isMobileMenuOpen.value ? "hidden" : "";
 };
 
 const handleScroll = () => {
@@ -59,12 +75,12 @@ const handleScroll = () => {
 };
 
 onMounted(() => {
-  window.addEventListener('scroll', handleScroll);
+  window.addEventListener("scroll", handleScroll);
 });
 
 onUnmounted(() => {
-  window.removeEventListener('scroll', handleScroll);
-  document.body.style.overflow = '';
+  window.removeEventListener("scroll", handleScroll);
+  document.body.style.overflow = "";
 });
 </script>
 
@@ -101,7 +117,7 @@ onUnmounted(() => {
 .logo-text {
   font-size: 2rem;
   font-weight: 700;
-  background: linear-gradient(to right, #4ADE80, #3B82F6);
+  background: linear-gradient(to right, #4ade80, #3b82f6);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -110,7 +126,7 @@ onUnmounted(() => {
 
 .logo-sup {
   font-size: 1.25rem;
-  color: #736CED;
+  color: #736ced;
   font-weight: 700;
 }
 
@@ -157,7 +173,7 @@ onUnmounted(() => {
   font-size: 0.95rem;
   color: white;
   border: none;
-  background: linear-gradient(90deg, #4ADE80, #3B82F6);
+  background: linear-gradient(90deg, #4ade80, #3b82f6);
   cursor: pointer;
   transition: all 0.3s ease;
   display: flex;
