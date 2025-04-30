@@ -36,6 +36,10 @@ const router = createRouter({
       path: '/how-it-works',
       name: 'HowItWorks',
       component: () => import("@/views/HowItWorks.vue"),
+    },
+    {
+      path: '/:pathMatch(.*)*',
+      redirect: '/'
     }
   ],
 });

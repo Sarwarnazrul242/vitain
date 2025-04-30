@@ -1,21 +1,21 @@
 <template>
     <nav :class="['navbar', { 'scrolled': isScrolled }]">
       <div class="nav-content">
-        <a href="/">
-        <div class="nav-logo">
-          <img src="@/assets/logo.png" alt="Vitain Logo" class="h-12 w-12" />
-          <span class="ml-2 text-xl md:text-2xl font-bold bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-transparent bg-clip-text">
-                        Vitain
-                    </span>
-        </div>
-      </a>
+        <router-link to="/">
+          <div class="nav-logo">
+            <img src="@/assets/logo.png" alt="Vitain Logo" class="h-12 w-12" />
+            <span class="ml-2 text-xl md:text-2xl font-bold bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-transparent bg-clip-text">
+              Vitain
+            </span>
+          </div>
+        </router-link>
   
         <div class="nav-links-container">
           <div class="nav-links">
-            <a href="/" class="nav-link">Home</a>
-            <a href="business" class="nav-link">Business</a>
-            <a href="how-it-works" class="nav-link">How It Works</a>
-            <a href="supplements" class="nav-link">Supplements</a>
+            <router-link to="/" class="nav-link">Home</router-link>
+            <router-link to="/business" class="nav-link">Business</router-link>
+            <router-link to="/how-it-works" class="nav-link">How It Works</router-link>
+            <router-link to="/supplements" class="nav-link">Supplements</router-link>
           </div>
         </div>
 
@@ -33,14 +33,14 @@
         <!-- Mobile Menu -->
         <div class="mobile-menu" :class="{ 'active': isMobileMenuOpen }">
           <div class="mobile-menu-links">
-            <a href="/" class="mobile-nav-link" @click="toggleMobileMenu">Home</a>
-            <a href="business" class="mobile-nav-link" @click="toggleMobileMenu">Business</a>
-            <a href="how-it-works" class="mobile-nav-link" @click="toggleMobileMenu">How It Works</a>
-            <a href="supplements" class="mobile-nav-link" @click="toggleMobileMenu">Supplements</a>
+            <router-link to="/" class="mobile-nav-link" @click="toggleMobileMenu">Home</router-link>
+            <router-link to="/business" class="mobile-nav-link" @click="toggleMobileMenu">Business</router-link>
+            <router-link to="/how-it-works" class="mobile-nav-link" @click="toggleMobileMenu">How It Works</router-link>
+            <router-link to="/supplements" class="mobile-nav-link" @click="toggleMobileMenu">Supplements</router-link>
           </div>
         </div>
   
-        <button href="/take-quiz" class="get-started-btn">Get Started <span class="arrow">→</span></button>
+        <router-link to="/take-quiz" class="get-started-btn">Get Started <span class="arrow">→</span></router-link>
       </div>
     </nav>
 </template>
