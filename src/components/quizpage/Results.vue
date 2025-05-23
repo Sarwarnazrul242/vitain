@@ -154,76 +154,62 @@ const router = useRouter();
 
 const supplements = ref([]);
 const supplementDetails = ref({});
-
-const options = {
-  method: "GET",
-  url: "https://real-time-amazon-data.p.rapidapi.com/search",
-  params: {
-    query: "supplements",
-    page: "1",
-    country: "US",
-    sort_by: "RELEVANCE",
-    product_condition: "ALL",
-    is_prime: "false",
-    deals_and_discounts: "NONE",
-  },
-  headers: {
-    "x-rapidapi-key": import.meta.env.VITE_API_RAPID_API_KEY,
-    "x-rapidapi-host": "real-time-amazon-data.p.rapidapi.com",
-  },
-};
-
 const finishedLoadingSupplement = ref(false);
 
-// Function to search Amazon for a supplement
-const searchAmazonProduct = async (supplement) => {
+const GOOGLE_API_KEY = import.meta.env.VITE_GOOGLE_API_KEY;
+const GOOGLE_CSE_ID = import.meta.env.VITE_GOOGLE_CSE_ID;
+
+// Function to search Google for a supplement image and buy link
+const searchGoogleProduct = async (supplement) => {
   try {
-    const options = {
-      method: "GET",
-      url: "https://real-time-amazon-data.p.rapidapi.com/search",
-      params: {
-        query: supplement + " supplement",
-        page: "1",
-        country: "US",
-        sort_by: "RELEVANCE",
-        product_condition: "ALL",
-        is_prime: "false",
-        deals_and_discounts: "NONE",
-      },
-      headers: {
-        "x-rapidapi-key": "a1cfc4a9f5msh2fab5801d66c8e8p125e38jsn0caeeebe229c",
-        "x-rapidapi-host": "real-time-amazon-data.p.rapidapi.com",
-      },
+    // Search for product images
+    const imageRes = await axios.get(
+      "https://www.googleapis.com/customsearch/v1",
+      {
+        params: {
+          key: GOOGLE_API_KEY,
+          cx: GOOGLE_CSE_ID,
+          q: `${supplement} supplement`,
+          searchType: "image",
+          num: 1,
+        },
+      }
+    );
+    const imageUrl = imageRes.data.items?.[0]?.link;
+
+    // Search for buy link (web search)
+    const webRes = await axios.get(
+      "https://www.googleapis.com/customsearch/v1",
+      {
+        params: {
+          key: GOOGLE_API_KEY,
+          cx: GOOGLE_CSE_ID,
+          q: `${supplement} supplement buy`,
+          num: 1,
+        },
+      }
+    );
+    const buyUrl = webRes.data.items?.[0]?.link;
+    const title = webRes.data.items?.[0]?.title || supplement;
+    const snippet = webRes.data.items?.[0]?.snippet || "Supports overall health and wellness.";
+
+    return {
+      image: imageUrl || "https://images.unsplash.com/photo-1577636706176-fd50c6d6d697?w=200",
+      title,
+      description: snippet,
+      url: buyUrl || `https://www.google.com/search?q=${encodeURIComponent(supplement + ' supplement buy')}`,
     };
-
-    const response = await axios.request(options);
-
-    const searchData = response.data;
-    console.log("Search response:", searchData);
-
-    if (searchData.data) {
-      // Get the first product's ASIN and thumbnail
-      const product = searchData.data.products[0];
-      const asin = product?.asin || "";
-
-      // Get the image URL from the response
-      const image = product.product_photo;
-
-      return {
-        image: image,
-        title: product.product_title,
-        description: product.product_title,
-        url: `https://www.amazon.com/dp/${asin}`,
-      };
-    }
-    throw new Error("No products found");
   } catch (error) {
-    console.error(`Error fetching product details for ${supplement}:`, error);
-    return null;
+    console.error(`Error fetching Google product details for ${supplement}:`, error);
+    return {
+      image: "https://images.unsplash.com/photo-1577636706176-fd50c6d6d697?w=200",
+      title: supplement,
+      description: "Supports overall health and wellness.",
+      url: `https://www.google.com/search?q=${encodeURIComponent(supplement + ' supplement buy')}`,
+    };
   }
 };
 
-// Replace getSupplementImage with this
 const getSupplementImage = (supplement) => {
   const details = supplementDetails.value[supplement.toLowerCase()];
   return (
@@ -232,20 +218,18 @@ const getSupplementImage = (supplement) => {
   );
 };
 
-// Update openSupplementInfo to use Amazon product URL
 const openSupplementInfo = (supplement) => {
   const details = supplementDetails.value[supplement.toLowerCase()];
   if (details?.url) {
     window.open(details.url, "_blank");
   } else {
     window.open(
-      `https://www.google.com/search?q=${supplement}+supplement+benefits`,
+      `https://www.google.com/search?q=${supplement}+supplement+buy`,
       "_blank"
     );
   }
 };
 
-// Update getSupplementDescription to use Amazon product description
 const getSupplementDescription = (supplement) => {
   const details = supplementDetails.value[supplement.toLowerCase()];
   return details?.description || "Supports overall health and wellness.";
@@ -271,20 +255,15 @@ onMounted(async () => {
     }
 
     const results = JSON.parse(route.query.results);
-    console.log("Parsed results:", results);
-
     if (results && results.response) {
       supplements.value = results.response.split(",").map((s) => s.trim());
-      console.log("Parsed supplements:", supplements.value);
-
-      // Fetch Amazon product details for each supplement
+      // Fetch Google product details for each supplement
       for (const supplement of supplements.value) {
-        const details = await searchAmazonProduct(supplement);
+        const details = await searchGoogleProduct(supplement);
         if (details) {
           supplementDetails.value[supplement.toLowerCase()] = details;
         }
       }
-
       finishedLoadingSupplement.value = true;
     } else {
       throw new Error("Invalid response format");
