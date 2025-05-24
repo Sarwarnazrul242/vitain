@@ -141,6 +141,79 @@
       <ChatButton />
     </div>
   </div>
+  <div
+    v-if="selectedSupplement"
+    class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+    @click="selectedSupplement = null"
+  >
+    <div class="max-w-2xl w-full bg-[#1A1A1A] rounded-2xl p-8" @click.stop>
+      <div class="flex justify-between items-start mb-6">
+        <h2
+          class="text-2xl font-bold bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-transparent bg-clip-text"
+        >
+          {{ selectedSupplement.title }}
+        </h2>
+        <button
+          @click="selectedSupplement = null"
+          class="text-gray-400 hover:text-white"
+        >
+          ✕
+        </button>
+      </div>
+      <img
+        :src="selectedSupplement.image"
+        :alt="selectedSupplement.name"
+        class="w-full h-64 object-cover rounded-xl mb-6"
+      />
+      <p class="text-gray-400 mb-6">{{ selectedSupplement.description }}</p>
+      <p class="text-white font-medium mb-2">Add additional Information</p>
+      <input
+        type="text"
+        class="flex-1 w-full bg-white/10 text-white rounded-xl px-4 py-2 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#4ADE80] border border-white/10"
+      />
+      <div class="grid grid-cols-2 gap-6 mt-3 mb-6">
+        <!-- <div> -->
+        <!-- <h3 class="text-white font-medium mb-2">Benefits</h3>
+          <ul class="space-y-2">
+            <li
+              v-for="benefit in selectedSupplement.benefits"
+              :key="benefit"
+              class="text-gray-400 flex items-center gap-2"
+            >
+              <span class="text-[#4ADE80]">•</span>
+              {{ benefit }}
+            </li> -->
+        <!-- </ul> -->
+        <!-- </div> -->
+        <div>
+          <h3 class="text-white font-medium mb-2">Details</h3>
+          <div class="space-y-2 text-gray-400">
+            <p>Category: Supplement</p>
+            <p>Rating: {{ selectedSupplement.rating }} ★</p>
+            <!-- <p>Price: ${{ selectedSupplement.price.toFixed(2) }}</p> -->
+          </div>
+        </div>
+      </div>
+      <button
+        @click="handleAddToCart(selectedSupplement)"
+        class="w-full relative group px-6 py-3 rounded-xl text-lg font-medium overflow-hidden"
+      >
+        <span
+          class="absolute inset-0 bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] transition-transform group-hover:scale-105"
+        ></span>
+        <span class="relative text-white">Add to Cart</span>
+      </button>
+      <button
+        @click="shopForSupplement(selectedSupplement)"
+        class="w-full relative group px-6 py-3 mt-5 rounded-xl text-lg font-medium overflow-hidden"
+      >
+        <span
+          class="absolute inset-0 bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] transition-transform group-hover:scale-105"
+        ></span>
+        <span class="relative text-white">Shop for Supplement</span>
+      </button>
+    </div>
+  </div>
 </template>
 
 <script setup>
@@ -151,6 +224,7 @@ import axios from "axios";
 
 const route = useRoute();
 const router = useRouter();
+const selectedSupplement = ref(null);
 
 const supplements = ref([]);
 const supplementDetails = ref({});
@@ -191,21 +265,35 @@ const searchGoogleProduct = async (supplement) => {
     );
     const buyUrl = webRes.data.items?.[0]?.link;
     const title = webRes.data.items?.[0]?.title || supplement;
-    const snippet = webRes.data.items?.[0]?.snippet || "Supports overall health and wellness.";
+    const snippet =
+      webRes.data.items?.[0]?.snippet ||
+      "Supports overall health and wellness.";
 
     return {
-      image: imageUrl || "https://images.unsplash.com/photo-1577636706176-fd50c6d6d697?w=200",
+      image:
+        imageUrl ||
+        "https://images.unsplash.com/photo-1577636706176-fd50c6d6d697?w=200",
       title,
       description: snippet,
-      url: buyUrl || `https://www.google.com/search?q=${encodeURIComponent(supplement + ' supplement buy')}`,
+      url:
+        buyUrl ||
+        `https://www.google.com/search?q=${encodeURIComponent(
+          supplement + " supplement buy"
+        )}`,
     };
   } catch (error) {
-    console.error(`Error fetching Google product details for ${supplement}:`, error);
+    console.error(
+      `Error fetching Google product details for ${supplement}:`,
+      error
+    );
     return {
-      image: "https://images.unsplash.com/photo-1577636706176-fd50c6d6d697?w=200",
+      image:
+        "https://images.unsplash.com/photo-1577636706176-fd50c6d6d697?w=200",
       title: supplement,
       description: "Supports overall health and wellness.",
-      url: `https://www.google.com/search?q=${encodeURIComponent(supplement + ' supplement buy')}`,
+      url: `https://www.google.com/search?q=${encodeURIComponent(
+        supplement + " supplement buy"
+      )}`,
     };
   }
 };
@@ -218,8 +306,7 @@ const getSupplementImage = (supplement) => {
   );
 };
 
-const openSupplementInfo = (supplement) => {
-  const details = supplementDetails.value[supplement.toLowerCase()];
+function shopForSupplement(details) {
   if (details?.url) {
     window.open(details.url, "_blank");
   } else {
@@ -228,6 +315,10 @@ const openSupplementInfo = (supplement) => {
       "_blank"
     );
   }
+}
+const openSupplementInfo = (supplement) => {
+  const data = supplementDetails.value[supplement.toLowerCase()];
+  selectedSupplement.value = data;
 };
 
 const getSupplementDescription = (supplement) => {
@@ -248,6 +339,9 @@ const formatSupplementName = (supplement) => {
     .join(" ");
 };
 
+function handleAddToCart(supplement) {
+  console.log("add to cart");
+}
 onMounted(async () => {
   try {
     if (!route.query.results) {
