@@ -143,75 +143,72 @@
   </div>
   <div
     v-if="selectedSupplement"
-    class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-    @click="selectedSupplement = null"
+    class="fixed inset-0 z-50 flex items-center justify-center"
+    @keydown.esc="selectedSupplement = null"
+    tabindex="0"
   >
-    <div class="max-w-2xl w-full bg-[#1A1A1A] rounded-2xl p-8" @click.stop>
-      <div class="flex justify-between items-start mb-6">
-        <h2
-          class="text-2xl font-bold bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-transparent bg-clip-text"
-        >
-          {{ selectedSupplement.title }}
-        </h2>
-        <button
-          @click="selectedSupplement = null"
-          class="text-gray-400 hover:text-white"
-        >
-          ✕
-        </button>
-      </div>
+    <!-- Modal Backdrop -->
+    <div
+      class="absolute inset-0 bg-black/70 backdrop-blur-md transition-opacity duration-300 animate-fade-in"
+      @click="selectedSupplement = null"
+    ></div>
+    <!-- Modal Card -->
+    <div
+      class="relative max-w-lg w-full bg-[#181C1F] rounded-2xl shadow-2xl p-8 z-10 animate-scale-in"
+      @click.stop
+    >
+      <!-- Close Button -->
+      <button
+        @click="selectedSupplement = null"
+        class="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl focus:outline-none focus:ring-2 focus:ring-[#4ADE80] rounded-full bg-black/30 w-10 h-10 flex items-center justify-center transition-colors"
+        aria-label="Close"
+      >
+        <span aria-hidden="true">&times;</span>
+      </button>
+      <!-- Image -->
       <img
         :src="selectedSupplement.image"
         :alt="selectedSupplement.name"
-        class="w-full h-64 object-cover rounded-xl mb-6"
+        class="w-full h-56 object-cover rounded-xl border-4 border-[#23272B] shadow-lg mb-6"
       />
-      <p class="text-gray-400 mb-6">{{ selectedSupplement.description }}</p>
-      <p class="text-white font-medium mb-2">Add additional Information</p>
-      <input
-        type="text"
-        class="flex-1 w-full bg-white/10 text-white rounded-xl px-4 py-2 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#4ADE80] border border-white/10"
-      />
-      <div class="grid grid-cols-2 gap-6 mt-3 mb-6">
-        <!-- <div> -->
-        <!-- <h3 class="text-white font-medium mb-2">Benefits</h3>
-          <ul class="space-y-2">
-            <li
-              v-for="benefit in selectedSupplement.benefits"
-              :key="benefit"
-              class="text-gray-400 flex items-center gap-2"
-            >
-              <span class="text-[#4ADE80]">•</span>
-              {{ benefit }}
-            </li> -->
-        <!-- </ul> -->
-        <!-- </div> -->
-        <div>
-          <h3 class="text-white font-medium mb-2">Details</h3>
-          <div class="space-y-2 text-gray-400">
-            <p>Category: Supplement</p>
-            <p>Rating: {{ selectedSupplement.rating }} ★</p>
-            <!-- <p>Price: ${{ selectedSupplement.price.toFixed(2) }}</p> -->
-          </div>
+      <!-- Title -->
+      <h2 class="text-2xl font-bold bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-transparent bg-clip-text mb-2 text-center">
+        {{ selectedSupplement.title }}
+      </h2>
+      <!-- Description -->
+      <p class="text-gray-300 text-base mb-6 text-center">{{ selectedSupplement.description }}</p>
+      <hr class="border-white/10 mb-6" />
+      <!-- Details Section -->
+      <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6">
+        <div class="text-gray-400 text-sm">
+          <div><span class="font-medium text-white">Category:</span> Supplement</div>
+          <div><span class="font-medium text-white">Rating:</span> {{ selectedSupplement.rating || '4.5' }} ★</div>
+        </div>
+        <div class="flex-1">
+          <input
+            type="text"
+            class="w-full bg-white/10 text-white rounded-xl px-4 py-2 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#4ADE80] border border-white/10"
+            placeholder="Add additional information..."
+          />
         </div>
       </div>
-      <button
-        @click="handleAddToCart(selectedSupplement)"
-        class="w-full relative group px-6 py-3 rounded-xl text-lg font-medium overflow-hidden"
-      >
-        <span
-          class="absolute inset-0 bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] transition-transform group-hover:scale-105"
-        ></span>
-        <span class="relative text-white">Add to Cart</span>
-      </button>
-      <button
-        @click="shopForSupplement(selectedSupplement)"
-        class="w-full relative group px-6 py-3 mt-5 rounded-xl text-lg font-medium overflow-hidden"
-      >
-        <span
-          class="absolute inset-0 bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] transition-transform group-hover:scale-105"
-        ></span>
-        <span class="relative text-white">Shop for Supplement</span>
-      </button>
+      <!-- Action Buttons -->
+      <div class="flex flex-col gap-3">
+        <button
+          @click="handleAddToCart(selectedSupplement)"
+          class="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-lg font-medium bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-white shadow-md hover:scale-105 transition-transform group"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.35 2.7A1 1 0 007.5 17h9a1 1 0 00.85-1.53L17 13M7 13V6a1 1 0 011-1h5a1 1 0 011 1v7" /></svg>
+          Add to Cart
+        </button>
+        <button
+          @click="shopForSupplement(selectedSupplement)"
+          class="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-lg font-medium bg-gradient-to-r from-[#3B82F6] to-[#4ADE80] text-white shadow-md hover:scale-105 transition-transform group"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7-7 7M5 5v14" /></svg>
+          Shop for Supplement
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -431,7 +428,7 @@ onMounted(async () => {
 }
 
 .animate-fade-in {
-  animation: fadeIn 1s ease-out;
+  animation: fadeIn 0.3s ease;
 }
 
 .animate-slide-up {
@@ -528,5 +525,13 @@ onMounted(async () => {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #3b82f6;
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+.animate-scale-in {
+  animation: scaleIn 0.3s cubic-bezier(0.4,0,0.2,1);
 }
 </style>
