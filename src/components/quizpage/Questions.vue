@@ -253,6 +253,19 @@
             </option>
           </select>
         </div>
+
+        <div
+          class="bg-white/5 backdrop-blur-sm p-6 rounded-xl border border-white/10 hover:border-[#4ADE80]/30 transition-all duration-300 hover:shadow-lg hover:scale-[1.02]"
+        >
+          <label class="font-semibold text-lg block mb-4 text-white"
+            >What other goals do you have?</label
+          >
+          <input
+            type="text"
+            class="w-full p-3 border border-white/20 rounded-lg bg-white/5 text-white focus:outline-none focus:ring-2 focus:ring-[#4ADE80]/50 transition-all placeholder:text-white/50"
+            placeholder="Enter additional goals"
+          />
+        </div>
       </div>
     </div>
 
