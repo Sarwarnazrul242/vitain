@@ -17,30 +17,35 @@ const router = createRouter({
       path: "/quiz-results",
       name: "results",
       component: () => import("@/components/quizpage/Results.vue"),
-      props: route => ({
+      props: (route) => ({
         results: route.query.results,
-        userInfo: route.query.userInfo
-      })
+        userInfo: route.query.userInfo,
+      }),
     },
     {
-      path: '/supplements',
-      name: 'Supplements',
-      component: () => import("@/views/Supplements.vue")
+      path: "/supplements",
+      name: "Supplements",
+      component: () => import("@/views/Supplements.vue"),
     },
     {
-      path: '/business',
-      name: 'Business',
+      path: "/log-in",
+      name: "Login",
+      component: () => import("@/views/Login.vue"),
+    },
+    {
+      path: "/business",
+      name: "Business",
       component: () => import("@/views/Business.vue"),
     },
     {
-      path: '/how-it-works',
-      name: 'HowItWorks',
+      path: "/how-it-works",
+      name: "HowItWorks",
       component: () => import("@/views/HowItWorks.vue"),
     },
     {
-      path: '/:pathMatch(.*)*',
-      redirect: '/'
-    }
+      path: "/:pathMatch(.*)*",
+      redirect: "/",
+    },
   ],
 });
 

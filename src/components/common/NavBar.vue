@@ -1,23 +1,30 @@
 <template>
-    <nav :class="['navbar', { 'scrolled': isScrolled }]">
-      <div class="nav-content">
-        <router-link to="/">
-          <div class="nav-logo">
-            <img src="@/assets/logo.png" alt="Vitain Logo" class="h-12 w-12" />
-            <span class="ml-2 text-xl md:text-2xl font-bold bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-transparent bg-clip-text">
-              Vitain
-            </span>
-          </div>
-        </router-link>
-  
-        <div class="nav-links-container">
-          <div class="nav-links">
-            <router-link to="/" class="nav-link">Home</router-link>
-            <router-link to="/business" class="nav-link">Business</router-link>
-            <router-link to="/how-it-works" class="nav-link">How It Works</router-link>
-            <router-link to="/supplements" class="nav-link">Supplements</router-link>
-          </div>
+  <nav :class="['navbar', { scrolled: isScrolled }]">
+    <div class="nav-content">
+      <router-link to="/">
+        <div class="nav-logo">
+          <img src="@/assets/logo.png" alt="Vitain Logo" class="h-12 w-12" />
+          <span
+            class="ml-2 text-xl md:text-2xl font-bold bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-transparent bg-clip-text"
+          >
+            Vitain
+          </span>
         </div>
+      </router-link>
+
+      <div class="nav-links-container">
+        <div class="nav-links">
+          <router-link to="/" class="nav-link">Home</router-link>
+          <router-link to="/business" class="nav-link">Business</router-link>
+          <router-link to="/how-it-works" class="nav-link"
+            >How It Works</router-link
+          >
+          <router-link to="/supplements" class="nav-link"
+            >Supplements</router-link
+          >
+          <!-- <router-link to="/log-in" class="nav-link">Log In</router-link> -->
+        </div>
+      </div>
 
       <!-- Mobile Menu Toggle -->
       <button
@@ -30,24 +37,49 @@
         <span></span>
       </button>
 
-        <!-- Mobile Menu -->
-        <div class="mobile-menu" :class="{ 'active': isMobileMenuOpen }">
-          <div class="mobile-menu-links">
-            <router-link to="/" class="mobile-nav-link" @click="toggleMobileMenu">Home</router-link>
-            <router-link to="/business" class="mobile-nav-link" @click="toggleMobileMenu">Business</router-link>
-            <router-link to="/how-it-works" class="mobile-nav-link" @click="toggleMobileMenu">How It Works</router-link>
-            <router-link to="/supplements" class="mobile-nav-link" @click="toggleMobileMenu">Supplements</router-link>
-          </div>
+      <!-- Mobile Menu -->
+      <div class="mobile-menu" :class="{ active: isMobileMenuOpen }">
+        <div class="mobile-menu-links">
+          <router-link to="/" class="mobile-nav-link" @click="toggleMobileMenu"
+            >Home</router-link
+          >
+          <router-link
+            to="/business"
+            class="mobile-nav-link"
+            @click="toggleMobileMenu"
+            >Business</router-link
+          >
+          <router-link
+            to="/how-it-works"
+            class="mobile-nav-link"
+            @click="toggleMobileMenu"
+            >How It Works</router-link
+          >
+          <router-link
+            to="/supplements"
+            class="mobile-nav-link"
+            @click="toggleMobileMenu"
+            >Supplements</router-link
+          >
+          <router-link
+            to="/log-in"
+            class="mobile-nav-link"
+            @click="toggleMobileMenu"
+            >Log In</router-link
+          >
         </div>
-  
-        <router-link to="/take-quiz" class="get-started-btn">Get Started <span class="arrow">→</span></router-link>
       </div>
-    </nav>
+
+      <router-link to="/take-quiz" class="get-started-btn"
+        >Get Started <span class="arrow">→</span></router-link
+      >
+    </div>
+  </nav>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref, onMounted, onUnmounted } from "vue";
+import { useRouter } from "vue-router";
 
 const router = useRouter();
 const isScrolled = ref(false);

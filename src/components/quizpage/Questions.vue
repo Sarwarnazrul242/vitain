@@ -436,7 +436,8 @@ const submitForm = async () => {
 
     console.log("Sending request with body:", requestBody);
 
-    const response = await fetch("https://vitain-ai.onrender.com/chat", {
+    // https://vitain-ai.onrender.com/chat
+    const response = await fetch("http://localhost:8000/chat", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
