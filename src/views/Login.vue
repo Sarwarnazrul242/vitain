@@ -137,12 +137,16 @@
 
 <script lang="ts" setup>
 import BackgroundGradient from "@/components/homepage/BackgroundGradient.vue";
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import { login, signup } from "../services/auth";
+import { useRoute } from "vue-router";
 
 const state = ref<"signup" | "login">("login");
 const email = ref<string>("");
 const password = ref<string>("");
+const route = useRoute();
+const route_to_results_after = ref<boolean>(false);
+const query_data = ref<any>();
 
 async function createAccount() {
   try {
@@ -169,4 +173,11 @@ async function logIn() {
     console.log(err);
   }
 }
+
+onMounted(() => {
+  if (route.query.results) {
+    route_to_results_after.value = true;
+    query_data.value = route.query.results;
+  }
+});
 </script>

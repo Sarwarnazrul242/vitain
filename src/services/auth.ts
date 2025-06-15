@@ -16,10 +16,10 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 
+const auth = getAuth();
+
 export async function signup(email: string, password: string) {
   try {
-    const auth = getAuth();
-
     let user_credentials = await createUserWithEmailAndPassword(
       auth,
       email,
@@ -34,8 +34,6 @@ export async function signup(email: string, password: string) {
 
 export async function login(email: string, password: string) {
   try {
-    const auth = getAuth();
-
     console.log(email);
 
     let user_credentials = await signInWithEmailAndPassword(
@@ -48,4 +46,8 @@ export async function login(email: string, password: string) {
   } catch (err) {
     throw err;
   }
+}
+
+export function retrieveAuth() {
+  return auth;
 }

@@ -307,6 +307,7 @@
 <script setup>
 import { ref, computed, watch } from "vue";
 import { useRouter } from "vue-router";
+import { retrieveAuth } from "../../services/auth";
 
 const router = useRouter();
 const loading = ref(false);
@@ -434,6 +435,8 @@ const submitForm = async () => {
       goals: formData.value.goals,
     };
 
+    const auth = retrieveAuth();
+
     console.log("Sending request with body:", requestBody);
 
     // https://vitain-ai.onrender.com/chat
@@ -454,6 +457,19 @@ const submitForm = async () => {
 
     const data = await response.json();
     console.log("API Response:", data);
+
+    console.log(auth.currentUser);
+    if (auth.currentUser === null) {
+      router.push({
+        name: "results",
+        query: {
+          results: JSON.stringify(data),
+          userInfo: JSON.stringify(requestBody),
+          showSignup: true,
+        },
+      });
+      return;
+    }
 
     router.push({
       name: "results",

@@ -1,5 +1,93 @@
 <template>
-  <div class="relative min-h-screen overflow-hidden bg-[#0A0A0A]">
+  <div
+    v-if="show_signup"
+    class="relative min-h-screen overflow-hidden bg-[#0A0A0A]"
+  >
+    <div
+      class="absolute bottom-0 right-[20%] w-[500px] h-[500px] bg-gradient-to-t from-[#4ADE80]/20 to-[#3B82F6]/20 rounded-full blur-[120px] animate-pulse-slower"
+    ></div>
+    <!-- Animated particles -->
+    <div class="particles-container">
+      <div
+        v-for="i in 6"
+        :key="i"
+        class="particle"
+        :style="{ '--delay': `${i * 2}s` }"
+      ></div>
+    </div>
+    <div
+      class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 py-12 sm:py-16 mt-24"
+    >
+      <!-- Header -->
+      <div class="text-center mb-12 sm:mb-16 animate-fade-in">
+        <h1
+          class="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-transparent bg-clip-text"
+        >
+          Create an account to view your recommendations!
+        </h1>
+      </div>
+
+      <!-- Sign up -->
+      <section class="pb-20">
+        <div class="max-w-7xl mx-auto px-4 relative z-10">
+          <div class="text-center mb-10">
+            <h1 class="text-4xl md:text-6xl font-bold mb-6"></h1>
+            <p class="text-gray-300 text-md md:text-xl max-w-3xl mx-auto">
+              Start your wellness jouney today!
+            </p>
+          </div>
+        </div>
+        <div class="z-10 flex items-center flex-col justify-center gap-10">
+          <div
+            class="bg-white/5 backdrop-blur-sm p-6 rounded-xl border border-white/10 hover:border-[#4ADE80]/30 transition-all duration-300 hover:shadow-lg hover:scale-[1.02] w-96"
+          >
+            <label class="font-semibold text-lg block mb-4 text-white"
+              >Email Address</label
+            >
+            <input
+              type="text"
+              class="w-full p-3 border border-white/20 rounded-lg bg-white/5 text-white focus:outline-none focus:ring-2 focus:ring-[#4ADE80]/50 transition-all placeholder:text-white/50"
+              placeholder="Enter your email address"
+              v-model="email"
+            />
+          </div>
+          <div
+            class="bg-white/5 backdrop-blur-sm p-6 rounded-xl border border-white/10 hover:border-[#4ADE80]/30 transition-all duration-300 hover:shadow-lg hover:scale-[1.02] w-96"
+          >
+            <label class="font-semibold text-lg block mb-4 text-white"
+              >Password</label
+            >
+            <input
+              type="password"
+              v-model="password"
+              class="w-full p-3 border border-white/20 rounded-lg bg-white/5 text-white focus:outline-none focus:ring-2 focus:ring-[#4ADE80]/50 transition-all placeholder:text-white/50"
+              placeholder="Enter your password"
+            />
+          </div>
+          <!-- <p
+            class="text-gray-600 underline cursor-pointer"
+            @click="state = 'login'"
+          >
+            Already have an account?
+          </p> -->
+          <button
+            @click="createAccount"
+            class="relative group px-8 py-3 rounded-xl text-lg md:text-xl font-medium overflow-hidden animate-fade-in-up"
+          >
+            <span
+              class="absolute inset-0 bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] transition-transform duration-300 group-hover:scale-105"
+            ></span>
+            <span
+              class="relative text-white flex text-base items-center justify-center gap-2"
+            >
+              View your results
+            </span>
+          </button>
+        </div>
+      </section>
+    </div>
+  </div>
+  <div class="relative min-h-screen overflow-hidden bg-[#0A0A0A]" v-else>
     <!-- Animated background elements -->
     <div class="absolute inset-0 z-0">
       <!-- Gradient orbs -->
@@ -172,17 +260,28 @@
         class="w-full h-56 object-cover rounded-xl border-4 border-[#23272B] shadow-lg mb-6"
       />
       <!-- Title -->
-      <h2 class="text-2xl font-bold bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-transparent bg-clip-text mb-2 text-center">
+      <h2
+        class="text-2xl font-bold bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-transparent bg-clip-text mb-2 text-center"
+      >
         {{ selectedSupplement.title }}
       </h2>
       <!-- Description -->
-      <p class="text-gray-300 text-base mb-6 text-center">{{ selectedSupplement.description }}</p>
+      <p class="text-gray-300 text-base mb-6 text-center">
+        {{ selectedSupplement.description }}
+      </p>
       <hr class="border-white/10 mb-6" />
       <!-- Details Section -->
-      <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6">
+      <div
+        class="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6"
+      >
         <div class="text-gray-400 text-sm">
-          <div><span class="font-medium text-white">Category:</span> Supplement</div>
-          <div><span class="font-medium text-white">Rating:</span> {{ selectedSupplement.rating || '4.5' }} ★</div>
+          <div>
+            <span class="font-medium text-white">Category:</span> Supplement
+          </div>
+          <div>
+            <span class="font-medium text-white">Rating:</span>
+            {{ selectedSupplement.rating || "4.5" }} ★
+          </div>
         </div>
         <div class="flex-1">
           <input
@@ -198,14 +297,40 @@
           @click="handleAddToCart(selectedSupplement)"
           class="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-lg font-medium bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-white shadow-md hover:scale-105 transition-transform group"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.35 2.7A1 1 0 007.5 17h9a1 1 0 00.85-1.53L17 13M7 13V6a1 1 0 011-1h5a1 1 0 011 1v7" /></svg>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.35 2.7A1 1 0 007.5 17h9a1 1 0 00.85-1.53L17 13M7 13V6a1 1 0 011-1h5a1 1 0 011 1v7"
+            />
+          </svg>
           Add to Cart
         </button>
         <button
           @click="shopForSupplement(selectedSupplement)"
           class="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-lg font-medium bg-gradient-to-r from-[#3B82F6] to-[#4ADE80] text-white shadow-md hover:scale-105 transition-transform group"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7-7 7M5 5v14" /></svg>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M14 5l7 7-7 7M5 5v14"
+            />
+          </svg>
           Shop for Supplement
         </button>
       </div>
@@ -218,6 +343,7 @@ import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import ChatButton from "@/components/common/ChatButton.vue";
 import axios from "axios";
+import { signup } from "../../services/auth";
 
 const route = useRoute();
 const router = useRouter();
@@ -226,9 +352,27 @@ const selectedSupplement = ref(null);
 const supplements = ref([]);
 const supplementDetails = ref({});
 const finishedLoadingSupplement = ref(false);
+const show_signup = ref(false);
+const email = ref("");
+const password = ref("");
 
 const GOOGLE_API_KEY = import.meta.env.VITE_GOOGLE_API_KEY;
 const GOOGLE_CSE_ID = import.meta.env.VITE_GOOGLE_CSE_ID;
+
+async function createAccount() {
+  try {
+    if (email.value.trim() === "" || password.value.trim() === "") {
+      alert("You have a missing input field.");
+      return;
+    }
+
+    await signup(email.value, password.value);
+
+    show_signup.value = false;
+  } catch (err) {
+    console.log(err);
+  }
+}
 
 // Function to search Google for a supplement image and buy link
 const searchGoogleProduct = async (supplement) => {
@@ -339,10 +483,15 @@ const formatSupplementName = (supplement) => {
 function handleAddToCart(supplement) {
   console.log("add to cart");
 }
+
 onMounted(async () => {
   try {
     if (!route.query.results) {
       throw new Error("No results data found");
+    }
+
+    if (route.query.showSignup) {
+      show_signup.value = true;
     }
 
     const results = JSON.parse(route.query.results);
@@ -528,10 +677,16 @@ onMounted(async () => {
 }
 
 @keyframes scaleIn {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 .animate-scale-in {
-  animation: scaleIn 0.3s cubic-bezier(0.4,0,0.2,1);
+  animation: scaleIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 </style>
