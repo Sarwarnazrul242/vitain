@@ -1,15 +1,5 @@
 <template>
-  <section class="relative py-20 md:py-32 bg-[#0A0A0A] overflow-hidden">
-    <!-- Background Effects -->
-    <div class="absolute inset-0 z-0">
-      <div
-        class="absolute top-0 right-0 w-[500px] h-[500px] bg-gradient-to-b from-[#4ADE80]/10 to-[#3B82F6]/10 rounded-full blur-[120px] animate-pulse-slow"
-      ></div>
-      <div
-        class="absolute bottom-0 left-0 w-[500px] h-[500px] bg-gradient-to-t from-[#4ADE80]/10 to-[#3B82F6]/10 rounded-full blur-[120px] animate-pulse-slower"
-      ></div>
-    </div>
-
+  <section class="relative py-20 md:py-32 overflow-hidden">
     <div class="max-w-7xl mx-auto px-4 relative z-10" id="learn-more">
       <!-- Section Header -->
       <div class="text-center mb-16 md:mb-24">
@@ -243,23 +233,5 @@ onMounted(() => {
 
 .animate-fade-in-up {
   animation: fadeInUp 1s cubic-bezier(0.23, 1, 0.32, 1);
-}
-
-@keyframes pulse-slow {
-  0%,
-  100% {
-    opacity: 0.4;
-  }
-  50% {
-    opacity: 0.7;
-  }
-}
-
-.animate-pulse-slow {
-  animation: pulse-slow 4s ease-in-out infinite;
-}
-
-.animate-pulse-slower {
-  animation: pulse-slow 6s ease-in-out infinite;
 }
 </style>

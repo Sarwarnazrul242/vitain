@@ -1,5 +1,5 @@
 <template>
-    <div class="relative">
+    <div class="relative" ref="chatContainer">
         <!-- Chat Button -->
         <button 
             @click="toggleChat"
@@ -102,7 +102,7 @@
 </template>
 
 <script setup>
-import { ref, watch, nextTick } from 'vue';
+import { ref, watch, nextTick, onMounted, onUnmounted } from 'vue';
 import axios from 'axios';
 
 const isOpen = ref(false);
@@ -110,10 +110,27 @@ const question = ref('');
 const conversation_history = ref([]);
 const isLoading = ref(false);
 const messagesContainer = ref(null);
+const chatContainer = ref(null);
 
 const toggleChat = () => {
     isOpen.value = !isOpen.value;
 };
+
+// Handle click outside to close chat
+const handleClickOutside = (event) => {
+    if (isOpen.value && chatContainer.value && !chatContainer.value.contains(event.target)) {
+        isOpen.value = false;
+    }
+};
+
+// Add and remove event listeners
+onMounted(() => {
+    document.addEventListener('click', handleClickOutside);
+});
+
+onUnmounted(() => {
+    document.removeEventListener('click', handleClickOutside);
+});
 
 // Auto-scroll to bottom when new messages arrive
 watch(conversation_history.value, async () => {

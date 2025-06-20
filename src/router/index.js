@@ -43,6 +43,16 @@ const router = createRouter({
       component: () => import("@/views/Login.vue"),
     },
     {
+      path: "/verify",
+      name: "Verify",
+      component: () => import("@/components/account/Verify.vue"),
+    },
+    {
+      path: "/questionnaire",
+      name: "Questionnaire",
+      component: () => import("@/components/account/Question.vue"),
+    },
+    {
       path: "/business",
       name: "Business",
       component: () => import("@/views/Business.vue"),
@@ -53,6 +63,26 @@ const router = createRouter({
       name: "HowItWorks",
       component: () => import("@/views/HowItWorks.vue"),
       meta: { requiresAuth: true },
+    },
+    {
+      path: "/privacy-policy",
+      name: "PrivacyPolicy",
+      component: () => import("@/components/policy/PrivacyPolicy.vue"),
+    },
+    {
+      path: "/cookie-policy",
+      name: "CookiePolicy",
+      component: () => import("@/components/policy/Cookie.vue"),
+    },
+    {
+      path: "/terms-of-service",
+      name: "TermsOfService",
+      component: () => import("@/components/policy/TOS.vue"),
+    },
+    {
+      path: "/forgot-password",
+      name: "ForgotPassword",
+      component: () => import("@/components/account/forgotpassword.vue"),
     },
     {
       path: "/:pathMatch(.*)*",

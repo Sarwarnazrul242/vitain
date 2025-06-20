@@ -22,7 +22,7 @@
           <router-link to="/supplements" class="nav-link"
             >Supplements</router-link
           >
-          <!-- <router-link to="/log-in" class="nav-link">Log In</router-link> -->
+          <router-link to="/log-in" class="nav-link">Log In</router-link>
         </div>
       </div>
 
