@@ -6,7 +6,7 @@
                 <img src="@/assets/logo.png" alt="Vitain Logo" class="w-20 h-20 mx-auto" />
             </div>
             <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-transparent bg-clip-text mb-6 animate-fade-in-down leading-tight">
-                Your Journey to Better Health
+                Your Journey to Better Health!
             </h1>
             <p class="text-gray-300 text-lg md:text-xl mb-10 max-w-xl mx-auto animate-fade-in-up delay-200 leading-relaxed">
                 Get personalized supplement recommendations powered by AI technology.
