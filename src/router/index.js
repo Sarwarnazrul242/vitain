@@ -85,6 +85,12 @@ const router = createRouter({
       component: () => import("@/components/account/forgotpassword.vue"),
     },
     {
+      path: "/dashboard",
+      name: "Dashboard",
+      component: () => import("@/views/Dashboard.vue"),
+      meta: { requiresAuth: true },
+    },
+    {
       path: "/:pathMatch(.*)*",
       redirect: "/",
     },
