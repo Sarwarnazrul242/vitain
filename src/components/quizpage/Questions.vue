@@ -340,16 +340,32 @@
   </div>
 </template>
 
-<script setup>
+<script lang='ts' setup>
 import { ref, computed, watch } from "vue";
 import { useRouter } from "vue-router";
-import { retrieveAuth } from "../../services/auth";
+import { retrieveAuth, login, signup, submitUserData } from "../../services/auth";
+import { reactive } from 'vue';
 
 const router = useRouter();
 const loading = ref(false);
 const error = ref("");
 const customSupplements = ref("");
 const customAllergies = ref("");
+
+//Error types
+const errors = reactive<{
+  general: string;
+  fill: string;
+  password: string;
+  login: string;
+  quiz: string
+}>({
+  general: "",
+  fill: "",
+  password: "",
+  login: "",
+  quiz: ""
+});
 
 // Generate height options from 4'0" to 7'0" with 1" increments
 const heightOptions = Array.from({ length: 37 }, (_, i) =>
@@ -472,6 +488,26 @@ const submitForm = async () => {
     };
 
     const auth = retrieveAuth();
+    
+    console.log("Storing quiz data")
+    try{
+      
+    await submitUserData({type: "quiz", data: formData.value})
+    } catch(err)
+    {
+      if (err.type == "login")
+      {
+        //HANDLE no user logged in error here 
+        //You can redirect or do something
+      }
+
+      else if (err.type == "quiz") {
+        errors.quiz = err.message;
+        console.log(err);
+        //Hanlde couldnt submit quiz, how to display erro emssage "...try again"
+        //and redirect user to resubmit
+      }
+    }
 
     console.log("Sending request with body:", requestBody);
 

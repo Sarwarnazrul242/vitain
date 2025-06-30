@@ -406,6 +406,7 @@
 import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import ChatButton from "@/components/common/ChatButton.vue";
+import { retrieveAuth, login, signup, storeSupplements, storeProducts } from "../../services/auth";
 // import axios from "axios"; // No longer needed
 // import { signup } from "../../services/auth"; // Commented out for now
 
@@ -489,8 +490,10 @@ const getSupplementDescription = (supplement) => {
   return "Supports overall health and wellness.";
 };
 
-// Function to get products for a specific supplement
+// Function to get products for a specific supplement 
 const getProductsForSupplement = (supplement) => {
+
+  //Retrives and stores product
   const products = [];
   for (const productGroup of supplementProducts.value) {
     for (const product of productGroup) {
@@ -536,6 +539,28 @@ function handleAddToCart(supplement) {
   console.log("add to cart");
 }
 
+const saveSupplement = async (supplement) => {
+  try{
+
+    await storeSupplements(supplement)
+  } catch(err)
+  {
+    throw new Error("Error occured in supplement submission: ", err) 
+    console.log("Error in submitting supplement: ", err);
+  }
+}
+
+const saveSupplementProduct = async (supplement, product) => {
+  try{
+
+    await storeProducts(supplement, product)
+  } catch(err)
+  {
+    throw new Error("Error occured in product submission: ", err) 
+    console.log("Error in product supplement: ", err);
+  }
+}
+
 onMounted(async () => {
   try {
     if (!route.query.results) {
@@ -554,8 +579,30 @@ onMounted(async () => {
       if (route.query.supplementProducts) {
         supplementProducts.value = JSON.parse(route.query.supplementProducts);
       }
+
       
       finishedLoadingSupplement.value = true;
+
+      //Store all info in database after all info has been retireved and loaded
+      //store supplement
+      // for (const supplement of supplements.value)
+      // {
+      //   await saveSupplement(supplement);
+      // }
+
+      //Store products
+      for (const supplement of supplements.value) {
+        await saveSupplement(supplement);
+        for (const productGroup of supplementProducts.value) {
+          for (const product of productGroup) {
+            if (product.fullName.toLowerCase().includes(supplement.toLowerCase())) {
+              
+              await saveSupplementProduct(supplement, product);
+            }
+        }
+        }
+      }
+
     } else {
       throw new Error("Invalid response format");
     }

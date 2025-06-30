@@ -233,7 +233,7 @@
   import BackgroundGradient from "@/components/homepage/BackgroundGradient.vue";
   import Footer from "@/components/common/Footer.vue";
   import { onMounted, ref } from "vue";
-  import { login, signup } from "../../services/auth";
+  import { errors, ErrorType, AppError, isAppError, login, signup } from "../../services/auth";
   import { useRoute, useRouter } from "vue-router";
   import { reactive } from 'vue';
 
@@ -250,21 +250,7 @@
   const route_to_results_after = ref<boolean>(false);
   const query_data = ref<any>();
   const errorMessage = ref("");
-
-  const errors = reactive<{
-    general: string;
-    fill: string;
-    password: string;
-     login: string;
-
-  }>(
-    {
-      general: "",
-      fill:"",
-      password:"",
-      login:""
-    }
-  )
+  
   async function createAccount() {
     try {
       errors.general = "";
@@ -301,7 +287,7 @@
    } catch (err: any){
 
      console.log(err);
-     if (err?.type && err?.message ) {
+     if (isAppError(err)){//(err?.type && err?.message ) {
       //Assing the error to the correct slot
       errors[err.type] = err.message;
      
@@ -318,26 +304,18 @@
   {
       errors.login = "";
       try{
+
+        if (email.value.trim() === "" || password.value.trim() === "") {
+        throw  {type:"fill", message: "Please fill in all required fields."};
+      }
         await login(email.value, password.value);
       } catch (err: any){
         errors.login = err.message;
+        console.log(err);
+      
       }
   }
 
-  async function logIn() {
-    try {
-      if (email.value.trim() === "" || password.value.trim() === "") {
-        throw  {type:"fill", message: "Please fill in all required fields."};
-      }
-  
-      await login(email.value, password.value);
-
-    } catch (err) {
-      console.log(err);
-      
-      
-    }
-  }
   
   onMounted(() => {
     if (route.query.results) {
