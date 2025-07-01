@@ -24,6 +24,10 @@
         </div>
         <div class="z-10 flex items-center flex-col justify-center gap-8">
           <div class="auth-container">
+            <!--- Error message below -->
+              <p v-if="errors.login" class="text-red-600 mt-2 text-sm">
+              {{ errors.login }}
+              </p>
             <div class="input-group">
               <label class="input-label">
                 <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -60,7 +64,7 @@
               <a href="/forgot-password" class="text-[#4ADE80] text-sm hover:underline hover:text-[#3B82F6] transition-colors">Forgot password?</a>
             </div>
             <button
-              @click="logIn"
+              @click="handleLogin"
               class="auth-button group"
             >
               <span class="button-bg"></span>
@@ -109,6 +113,12 @@
         </div>
         <div class="z-10 flex items-center flex-col justify-center gap-8">
           <div class="auth-container">
+            <div v-for="(msg, key) in errors" :key="key">
+            <p v-if="msg" class="text-red-600 mt-2 text-sm">
+              {{ msg }}
+            </p>
+           </div>
+              
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div class="input-group">
                 <label class="input-label">
@@ -209,6 +219,7 @@
               >
                 Sign in here
               </span>
+             
             </p>
           </div>
         </div>
@@ -222,9 +233,10 @@
   import BackgroundGradient from "@/components/homepage/BackgroundGradient.vue";
   import Footer from "@/components/common/Footer.vue";
   import { onMounted, ref } from "vue";
-  import { login, signup } from "../../services/auth";
+  import { errors, ErrorType, AppError, isAppError, login, signup } from "../../services/auth";
   import { useRoute, useRouter } from "vue-router";
-  
+  import { reactive } from 'vue';
+
   const state = ref<"signup" | "login">("login");
   const email = ref<string>("");
   const password = ref<string>("");
@@ -237,51 +249,73 @@
   const router = useRouter();
   const route_to_results_after = ref<boolean>(false);
   const query_data = ref<any>();
+  const errorMessage = ref("");
   
   async function createAccount() {
     try {
-      if (!firstName.value.trim() || !lastName.value.trim() || email.value.trim() === "" || password.value.trim() === "") {
-        alert("Please fill in all required fields.");
-        return;
-      }
+      errors.general = "";
+      errors.fill = "";
+      errors.password = "";
   
+
+      if (!firstName.value.trim() || !lastName.value.trim() || email.value.trim() === "" || password.value.trim() === "") {
+        throw  {type:"fill", message: "Please fill in all required fields."}
+      }
+     
       if (password.value !== confirmPassword.value) {
-        alert("Passwords do not match.");
-        return;
+        throw  {type:"password", message:"Passwords do not match."};
       }
   
       if (!agreeToTerms.value) {
-        alert("Please agree to the Terms of Service and Privacy Policy.");
         return;
       }
-  
-      // Simulate signup success (in real app, this would be an API call)
-      console.log("Account created successfully!");
+
+      console.log("Signing up");
       
       // Store user data for verification (in real app, this would be in a store or passed via route)
-      localStorage.setItem('pendingVerificationEmail', email.value);
-      localStorage.setItem('pendingVerificationName', `${firstName.value} ${lastName.value}`);
+     
+      await signup(firstName.value, lastName.value, email.value,password.value );
+      console.log("Sign up successful!");
+    
+   
+     
+      //localStorage.setItem('pendingVerificationEmail', email.value);
+      //localStorage.setItem('pendingVerificationName', `${firstName.value} ${lastName.value}`);
       
       // Redirect to verification page
-      router.push("/verify");
-    } catch (err) {
-      console.log(err);
-      alert("An error occurred during signup. Please try again.");
-    }
-  }
+     // router.push("/verify");
+   } catch (err: any){
+
+     console.log(err);
+     if (isAppError(err)){//(err?.type && err?.message ) {
+      //Assing the error to the correct slot
+      errors[err.type] = err.message;
+     
+     }
+     else{
+      console.log("Sign up error occured: ", err);
+      errors.general = "An error occurred during signup. Please try again."; 
+     }
   
-  async function logIn() {
-    try {
-      if (email.value.trim() === "" || password.value.trim() === "") {
-        alert("Please fill in all fields.");
-        return;
+  }
+}
+  
+  async function handleLogin()
+  {
+      errors.login = "";
+      try{
+
+        if (email.value.trim() === "" || password.value.trim() === "") {
+        throw  {type:"fill", message: "Please fill in all required fields."};
       }
-  
-      await login(email.value, password.value);
-    } catch (err) {
-      console.log(err);
-    }
+        await login(email.value, password.value);
+      } catch (err: any){
+        errors.login = err.message;
+        console.log(err);
+      
+      }
   }
+
   
   onMounted(() => {
     if (route.query.results) {
