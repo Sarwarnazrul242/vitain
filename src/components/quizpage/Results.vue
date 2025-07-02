@@ -524,7 +524,7 @@ const openSupplementInfo = (supplement) => {
 
 const handleImageError = (event) => {
   event.target.src =
-    "https://upload.wikimedia.org/wikipedia/en/0/02/Homer_Simpson_2006.png";
+    "https://png.pngtree.com/png-clipart/20191120/original/pngtree-error-file-icon-vectors-png-image_5053766.jpg";
 };
 
 const formatSupplementName = (supplement) => {

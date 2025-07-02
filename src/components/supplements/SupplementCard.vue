@@ -10,7 +10,8 @@
             <h3 class="text-xl font-bold mb-2 bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-transparent bg-clip-text">
                 {{ supplement.name }}
             </h3>
-            <p class="text-gray-400 mb-4">{{ supplement.description }}</p>
+            <p class="text-gray-400 mb-2 text-sm">{{ supplement.brandName }}</p>
+            <p class="text-gray-400 mb-4 text-sm line-clamp-2">{{ supplement.description }}</p>
             <div class="flex justify-between items-center">
                 <span class="text-[#4ADE80]">${{ supplement.price.toFixed(2) }}</span>
                 <button @click="$emit('show-details', supplement)" 
