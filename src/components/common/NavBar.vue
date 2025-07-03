@@ -16,9 +16,6 @@
         <div class="nav-links">
           <router-link to="/" class="nav-link">Home</router-link>
           <router-link to="/business" class="nav-link">Business</router-link>
-          <router-link to="/how-it-works" class="nav-link"
-            >How It Works</router-link
-          >
           <router-link to="/supplements" class="nav-link"
             >Supplements</router-link
           >
@@ -49,12 +46,6 @@
             class="mobile-nav-link"
             @click="toggleMobileMenu"
             >Business</router-link
-          >
-          <router-link
-            to="/how-it-works"
-            class="mobile-nav-link"
-            @click="toggleMobileMenu"
-            >How It Works</router-link
           >
           <router-link
             to="/supplements"

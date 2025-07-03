@@ -7,6 +7,7 @@
             <FeatureSection />
             <OverviewSection />
             <QuizSection />
+            <HowItWorks />
             <FAQ />
             <Footer />
             <ChatButton />
@@ -20,6 +21,7 @@ import HeroSection from '@/components/homepage/HeroSection.vue'
 import FeatureSection from '@/components/homepage/FeatureSection.vue'
 import OverviewSection from '@/components/homepage/OverviewSection.vue'
 import QuizSection from '@/components/homepage/QuizSection.vue'
+import HowItWorks from '@/components/homepage/HowItWorks.vue'
 import FAQ from '@/components/homepage/FAQ.vue'
 import ChatButton from '@/components/common/ChatButton.vue'
 import BackgroundGradient from '@/components/homepage/BackgroundGradient.vue'
