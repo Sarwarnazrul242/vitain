@@ -35,10 +35,11 @@
                 </div>
             </div>
             <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-transparent bg-clip-text mb-6 animate-fade-in-down leading-tight">
-                Your Journey to Better Health
+                Vitain your Vitality
             </h1>
             <p class="text-gray-300 text-lg md:text-xl mb-10 max-w-xl mx-auto animate-fade-in-up delay-200 leading-relaxed">
-                Get personalized supplement recommendations powered by AI technology.
+                We tailor supplements to your needs, help you monitor your progress, and give you full visibility into every ingredient 
+                and brand we recommend.
             </p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in delay-400 mb-20">
                 <button 

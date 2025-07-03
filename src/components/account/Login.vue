@@ -81,7 +81,7 @@
               Don't have an account? 
               <span 
                 class="text-[#4ADE80] cursor-pointer hover:underline font-medium hover:text-[#3B82F6] transition-colors"
-                @click="state = 'signup'"
+                @click="handleStateClick('signup')"
               >
                 Sign up here
               </span>
@@ -215,7 +215,7 @@
               Already have an account? 
               <span 
                 class="text-[#4ADE80] cursor-pointer hover:underline font-medium hover:text-[#3B82F6] transition-colors"
-                @click="state = 'login'"
+                @click="handleStateClick('login')"
               >
                 Sign in here
               </span>
@@ -232,10 +232,11 @@
   <script lang="ts" setup>
   import BackgroundGradient from "@/components/homepage/BackgroundGradient.vue";
   import Footer from "@/components/common/Footer.vue";
-  import { onMounted, ref } from "vue";
-  import { errors, ErrorType, AppError, isAppError, login, signup } from "../../services/auth";
+  import { watch, onMounted, ref } from "vue";
+  import { errors, ErrorType, AppError, isAppError, login, signup, submitForm } from "../../services/auth";
   import { useRoute, useRouter } from "vue-router";
   import { reactive } from 'vue';
+
 
   const state = ref<"signup" | "login">("login");
   const email = ref<string>("");
@@ -244,39 +245,71 @@
   const lastName = ref<string>("");
   const confirmPassword = ref<string>("");
   const agreeToTerms = ref<boolean>(false);
-  
   const route = useRoute();
   const router = useRouter();
   const route_to_results_after = ref<boolean>(false);
   const query_data = ref<any>();
   const errorMessage = ref("");
+  const pastError = ref<ErrorType>("general");
   
-  async function createAccount() {
+  const handleStateClick= (status) => {
+  state.value = status;
+  clearError();
+}
+  const clearError = () =>
+  {  
+    console.log("Past error is ", pastError.value)
+     errors[pastError.value] = ""
+  }
+  const createAccount = async () => {
     try {
-      errors.general = "";
-      errors.fill = "";
-      errors.password = "";
+      //Clears the error when user trys again to fill
+
   
 
       if (!firstName.value.trim() || !lastName.value.trim() || email.value.trim() === "" || password.value.trim() === "") {
         throw  {type:"fill", message: "Please fill in all required fields."}
+        return;
       }
      
       if (password.value !== confirmPassword.value) {
         throw  {type:"password", message:"Passwords do not match."};
+        return;
       }
   
       if (!agreeToTerms.value) {
         return;
       }
-
+      
+      clearError(); //Clear any errors from before
       console.log("Signing up");
       
       // Store user data for verification (in real app, this would be in a store or passed via route)
      
       await signup(firstName.value, lastName.value, email.value,password.value );
       console.log("Sign up successful!");
+      
+      const formSubmission = sessionStorage.getItem("quizData");
+      sessionStorage.removeItem("quizData"); //Clear lcal storage ebcause sessions torage has been passed abck for the quiz data
     
+
+       
+        //Handles formdat of new users who have not logged in
+        try{
+        if (formSubmission)
+       {
+          await handleFormSubmission(JSON.parse(formSubmission))
+          return
+       }
+
+       else 
+       {
+          //Should take to quiz? for them to fill out info or verification page or something
+          router.push("/take-quiz"); 
+       }} catch (err)
+       {
+        console.log("signup formsubmission error", err)
+       }
    
      
       //localStorage.setItem('pendingVerificationEmail', email.value);
@@ -289,34 +322,57 @@
      console.log(err);
      if (isAppError(err)){//(err?.type && err?.message ) {
       //Assing the error to the correct slot
+
+      pastError.value = err.type;
+      console.log("is app error", pastError.value);
       errors[err.type] = err.message;
      
      }
      else{
+      
+      pastError.value = "general"
       console.log("Sign up error occured: ", err);
-      errors.general = "An error occurred during signup. Please try again."; 
+      errors["general"]= "An error occurred during signup. Please try again."; 
      }
   
   }
 }
   
-  async function handleLogin()
-  {
-      errors.login = "";
+const handleLogin = async () =>
+  {   
+
+      errors[pastError.value] = ""
       try{
 
-        if (email.value.trim() === "" || password.value.trim() === "") {
-        throw  {type:"fill", message: "Please fill in all required fields."};
+        if (email.value.trim() === "" || password.value.trim() === "") 
+        {
+        throw  {type:"fill", message: "Please fill in all required fields."}
       }
-        await login(email.value, password.value);
+      
+      await login(email.value, password.value);
+ 
+      router.push("/dashboard"); 
+     
       } catch (err: any){
-        errors.login = err.message;
+        pastError.value = "login"
+        errors["login"]= err.message;
         console.log(err);
       
       }
+
   }
 
-  
+const handleFormSubmission = async (formSubmission) =>
+{
+  try{
+    await submitForm(formSubmission, router)
+
+  } catch (err)
+  {
+    console.log(err)
+  }
+}
+
   onMounted(() => {
     if (route.query.results) {
       route_to_results_after.value = true;

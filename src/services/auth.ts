@@ -1,13 +1,14 @@
-import { reactive } from 'vue';
+import { ref, reactive, nextTick } from 'vue';
 import { initializeApp } from "firebase/app";
 import { getFirestore, doc, setDoc, getDocs, query, where, collection, serverTimestamp } from "firebase/firestore";
-import { sendEmailVerification } from "firebase/auth";
+import { sendEmailVerification, signOut } from "firebase/auth";
 import {
   getAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  onAuthStateChanged
 } from "firebase/auth";
-
+import { loading, updateLoading } from "@/composables/useLoading";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_APIKEY,
@@ -21,10 +22,15 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 
-const auth = getAuth();
-
 const db = getFirestore(app);
-
+const auth = getAuth(app);
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    console.log("User is signed in:", user.email);
+  } else {
+    console.log("No user is signed in.");
+  }
+});
 export type ErrorType  = "general" | "fill" | "email" |  "password" | "login" | "quiz" | "data" | "product";
 
 export interface AppError {
@@ -38,13 +44,15 @@ export interface AppError {
     fill: string;
     password: string;
     login: string;
+    quiz: string;
 
   }>(
     {
       general: "",
       fill:"",
       password:"",
-      login:""
+      login:"",
+      quiz: ""
     }
   )
 
@@ -69,7 +77,7 @@ export async function signup(firstName: string, lastName: string, email: string,
     );
     const user = user_credentials.user
     
-    await sendEmailVerification(user);
+    //await sendEmailVerification(user);
 
     await setDoc(doc(db, "users", user.uid),{
       uid: user.uid,
@@ -82,8 +90,17 @@ export async function signup(firstName: string, lastName: string, email: string,
      console.log("User signed up and save: ", user);
 
   } catch (err) {
-    console.error("Sign up error: ", err)  //throw the error make the user try again comment?
-    throw err;
+
+    if (err.message.includes("auth/invalid-email"))
+     {
+      throw {type: "email", message: "Invalid email"}
+    }
+
+    else{
+          console.error("Sign up error: ", err)  //throw the error make the user try again comment?
+          throw err;
+    }
+
   }
 }
 
@@ -98,10 +115,10 @@ export async function login(email: string, password: string) {
     );
     const user = user_credentials.user;
 
-    if (!user.emailVerified)
-    {
-      throw new Error("Please verify your email before logging in.");
-    }
+    // if (!user.emailVerified)
+    // {
+    //   throw new Error("Please verify your email before logging in.");
+    // }
 
 
     console.log(user_credentials.user);
@@ -135,8 +152,57 @@ export async function login(email: string, password: string) {
   }
 }
 
+export async function logout()
+{
+
+  try
+  {
+  const auth = getAuth();
+  const user = auth.currentUser;
+     
+    if (!user)
+    {
+      throw {type: "login", message: "No user is logged in"}
+    }
+  await signOut(auth);
+    console.log("User was successfully logged out")
+  } catch (err)
+  {
+    console.log("Error occured loguot function")
+  }
+  
+}
+
 export function retrieveAuth() {
   return auth;
+}
+
+export async function detectLoginState()
+{
+  try{
+    const auth = getAuth();
+    const user = auth.currentUser;
+    
+    if (!user)
+    {
+      console.log("No user is logged in")
+      throw {type: "login", message: "No user is logged in"}
+    }
+    
+    console.log("User is logged in: ", user)
+    return user; //User is logged in
+
+    } catch(err)
+    {
+      if (err.type == "login")
+      {
+        throw(err)
+      }
+      else
+      {
+       throw {type: "general", message: "There was an error. Try again."} 
+      }
+    }
 }
 
 export async function submitUserData (payload: SubmissionPayload) {
@@ -273,3 +339,192 @@ export async function storeProducts(supplement, products)
     throw {type: "product", message: error.message}
   }
 }
+
+export async function validateForm  (formSubmission)  {
+  if (!formSubmission.weight) return "Please enter your weight";
+  if (!formSubmission.height) return "Please enter your height";
+  if (!formSubmission.gender) return "Please select your gender";
+  if (!formSubmission.age) return "Please enter your age";
+  if (!formSubmission.activeness) return "Please select your activity level";
+  if (!formSubmission.goals) return "Please enter your health goals";
+
+  formSubmission.weight = formSubmission.weight.toString();
+  formSubmission.height = formSubmission.height.toString();
+  formSubmission.age =formSubmission.age.toString();
+  formSubmission.supplements = formSubmission.supplements || "none";
+  formSubmission.allergies = formSubmission.allergies || "none";
+  return null;
+};
+
+export async function submitForm   (formSubmission, router, error: string ="") {
+  console.log("in submit form")
+  const loginState = ref(false);
+  try {
+    error = "";
+    const validationError = await validateForm(formSubmission);
+    if (validationError) {
+      error = validationError;
+
+      console.log("validation error", error);
+      return;
+    }
+
+
+  
+    console.log("detecting log in state")
+   
+    //Stores user data after taking quiz locally and Ensures user is logged in/signed up before the info is stored in db and AI is queried
+    try
+    {
+      const auth = await detectLoginState();
+    } catch (err)
+    {
+      if (err.type=="login")
+      { 
+        console.log("User needs to login: ", err)
+
+        sessionStorage.setItem("quizData",JSON.stringify(formSubmission));
+        router.push("/log-in")
+        return //route and leave this function completely
+      }
+
+      else {
+        console.log("err")
+      }
+    }
+    
+   
+
+    sessionStorage.setItem("loading", "true"); //To flag for AI loading overlah
+    window.dispatchEvent(new Event("loading-change")); //Indicate change in event based of already logged in do AI mode
+      
+    
+      
+    console.log("getting session", sessionStorage.getItem("loading"))
+  
+    //push to quiz and load the ai page
+    //Else formsubmission is unchanged and contineus
+    const requestBody = {
+    role: "user",
+    action: "list",
+    weight: formSubmission.weight,
+    height: formSubmission.height,
+    gender: formSubmission.gender,
+    age: formSubmission.age,
+    activeness: formSubmission.activeness.toLowerCase(),
+    supplements: formSubmission.supplements,
+    allergies: formSubmission.allergies,
+    goals: formSubmission.goals,
+  };
+
+    console.log("Storing quiz data")
+    try{
+      
+    await submitUserData({type: "quiz", data: formSubmission})
+    } catch(err)
+    {
+   
+      if (err.type == "quiz") {
+        errors.quiz = err.message;
+        console.log("quiz error: ", err);
+        //Hanlde couldnt submit quiz, how to display erro emssage "...try again"
+        //
+        // 
+        // eand redirect user to resubmit
+      }
+
+      else {
+        console.log("submitting user info error: ", err)
+      }
+    }
+
+    console.log("Sending request with body:", requestBody);
+
+    // First API call to get supplement recommendations
+    const response = await fetch("https://vitain-ai.onrender.com/chat", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify(requestBody),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("API Error Response:", errorText);
+      throw new Error(`Server responded with ${response.status}: ${errorText}`);
+    }
+
+    const data = await response.json();
+    console.log("API Response:", data);
+
+    // Extract supplement list from the response
+    let supplementList = [];
+    if (data && data.response) {
+      supplementList = data.response.split(",").map((s) => s.trim());
+    }
+
+    // Second API call to get supplement product information
+    let supplementProducts = [];
+    if (supplementList.length > 0) {
+      const supplementInfoRequest = {
+        action: "get_multi_products_packages",
+        list: supplementList,
+      };
+
+      console.log("Sending supplement info request:", supplementInfoRequest);
+
+      const supplementInfoResponse = await fetch(
+        "https://vitain-ai.onrender.com/v1/supplement-info",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify(supplementInfoRequest),
+        }
+      );
+
+      if (supplementInfoResponse.ok) {
+        const supplementInfoData = await supplementInfoResponse.json();
+        console.log("Supplement Info Response:", supplementInfoData);
+        supplementProducts = supplementInfoData.response || [];
+      } else {
+        console.error("Supplement info API error:", supplementInfoResponse.status);
+      }
+    }
+
+    console.log(auth.currentUser);
+    if (auth.currentUser === null) {
+      router.push({
+        name: "results",
+        query: {
+          results: JSON.stringify(data),
+          userInfo: JSON.stringify(requestBody),
+          supplementProducts: JSON.stringify(supplementProducts),
+          showSignup: true,
+        },
+      });
+      return;
+    }
+
+    router.push({
+      name: "results",
+      query: {
+        results: JSON.stringify(data),
+        userInfo: JSON.stringify(requestBody),
+        supplementProducts: JSON.stringify(supplementProducts),
+      },
+    });
+    
+    
+
+
+  } catch (error) {
+    console.error("Error details:", error);
+    error.value =
+      "There was an error processing your request. Please try again.";
+  } 
+};

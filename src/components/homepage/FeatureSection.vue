@@ -10,12 +10,11 @@
             Why Choose Vitain?
           </span>
         </h2>
-        <p
-          class="text-gray-400 text-lg md:text-xl max-w-3xl mx-auto animate-fade-in-up"
+        <p 
+          class="text-gray-300 text-lg md:text-xl max-w-3xl mx-auto animate-fade-in-up"
         >
-          Experience the future of personalized supplements with our
-          cutting-edge AI technology and expert-backed recommendations.
-        </p>
+          Discover the future of supplement wellness powered by Vitain AI grounded in data from scientific research and 
+          government health databases.        </p>
       </div>
 
       <!-- Features Grid -->
@@ -36,9 +35,9 @@
             >
               AI-Powered Analysis
             </h3>
-            <p class="text-gray-400 leading-relaxed">
-              Our advanced AI analyzes your health data to create perfectly
-              tailored supplement recommendations.
+            <p class="text-gray-300 leading-relaxed">
+              Vitain AI is fueled by state-of-the-art technology and powerful algorithms to analyze your health data alongside its 
+              data sources.
             </p>
           </div>
         </div>
@@ -58,13 +57,12 @@
               Personalized Plans
             </h3>
             <p class="text-gray-400 leading-relaxed">
-              Get custom supplement plans that adapt to your changing health
-              needs and goals.
+              Receive custom supplement suggestions that evolve with your changing health and goals..
             </p>
           </div>
         </div>
 
-        <!-- Quality Assurance -->
+        <!-- Transparent Data -->
         <div class="feature-card group" data-aos="fade-up" data-aos-delay="300">
           <div
             class="absolute inset-0 bg-gradient-to-r from-[#4ADE80]/10 to-[#3B82F6]/10 rounded-2xl blur group-hover:blur-xl transition-all duration-300"

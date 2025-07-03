@@ -407,8 +407,7 @@ import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import ChatButton from "@/components/common/ChatButton.vue";
 import { retrieveAuth, login, signup, storeSupplements, storeProducts } from "../../services/auth";
-// import axios from "axios"; // No longer needed
-// import { signup } from "../../services/auth"; // Commented out for now
+import { loading, updateLoading } from "@/composables/useLoading";
 
 const route = useRoute();
 const router = useRouter();
@@ -417,27 +416,6 @@ const selectedSupplement = ref(null);
 const supplements = ref([]);
 const supplementProducts = ref([]);
 const finishedLoadingSupplement = ref(false);
-// const show_signup = ref(false); // Commented out for now
-// const email = ref(""); // Commented out for now
-// const password = ref(""); // Commented out for now
-
-// const GOOGLE_API_KEY = import.meta.env.VITE_GOOGLE_API_KEY;
-// const GOOGLE_CSE_ID = import.meta.env.VITE_GOOGLE_CSE_ID;
-
-// async function createAccount() { // Commented out for now
-//   try {
-//     if (email.value.trim() === "" || password.value.trim() === "") {
-//       alert("You have a missing input field.");
-//       return;
-//     }
-
-//     await signup(email.value, password.value);
-
-//     show_signup.value = false;
-//   } catch (err) {
-//     console.log(err);
-//   }
-// }
 
 // Function to handle purchase button click
 const handlePurchase = (product) => {
@@ -582,7 +560,12 @@ onMounted(async () => {
 
       
       finishedLoadingSupplement.value = true;
+      
+      //Handles clearing loading screen
+      sessionStorage.setItem("loading", "false")
+      window.dispatchEvent(new Event("loading-change")); //Indicate change in event based of already logged in do AI mode
 
+      
       //Store all info in database after all info has been retireved and loaded
       //store supplement
       // for (const supplement of supplements.value)
@@ -591,6 +574,7 @@ onMounted(async () => {
       // }
 
       //Store products
+      console.log("Storing supplements and products in database")
       for (const supplement of supplements.value) {
         await saveSupplement(supplement);
         for (const productGroup of supplementProducts.value) {
