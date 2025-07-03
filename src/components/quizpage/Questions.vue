@@ -275,9 +275,9 @@
       style="--delay: 0.6s"
     >
       <button
-        @click="submitForm"
+        @click="handleFormSubmission"
         class="relative overflow-hidden group text-white px-12 py-4 rounded-full text-lg transform transition-all duration-300 hover:scale-105 disabled:opacity-70 disabled:cursor-not-allowed"
-        :disabled="loading"
+        
       >
         <!-- Background Image with Overlay -->
         <div class="absolute inset-0 z-0">
@@ -291,67 +291,31 @@
 
         <!-- Button Text -->
         <span class="relative z-10 font-bold flex items-center gap-2">
-          <span v-if="loading" class="flex items-center gap-2">
-            <span
-              class="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"
-            ></span>
-            AI is working...
-          </span>
-          <span v-else>Get Your Personalized Plan</span>
+          
+            Get Your Personalized Plan
         </span>
       </button>
     </div>
 
-    <!-- Loading Overlay -->
-    <div
-      v-if="loading"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
-    >
-      <div class="text-center max-w-md mx-auto px-6">
-        <!-- Loading Animation -->
-        <div class="mb-8 flex justify-center items-center">
-          <div class="relative flex items-center justify-center w-24 h-24">
-            <!-- Outer ring -->
-            <div class="absolute inset-0 border-4 border-white/20 rounded-full animate-pulse"></div>
-            <!-- Inner ring -->
-            <div class="absolute inset-2 border-4 border-[#4ADE80] rounded-full animate-spin"></div>
-            <!-- Center dot -->
-            <div class="absolute inset-1/2 w-3 h-3 bg-[#3B82F6] rounded-full animate-pulse transform -translate-x-1/2 -translate-y-1/2"></div>
-          </div>
-        </div>
-
-        <!-- Loading Messages -->
-        <div class="space-y-4">
-          <h2 class="text-2xl font-bold bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-transparent bg-clip-text">
-            AI is Working Magic! ✨
-          </h2>
-          
-          <div class="space-y-2">
-            <p class="text-white text-lg font-medium">
-              Analyzing your health profile and creating personalized recommendations...
-            </p>
-            <p class="text-gray-300 text-sm">
-              This may take a few moments while our AI processes your unique needs
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
+    
   </div>
 </template>
 
 <script lang='ts' setup>
-import { ref, computed, watch } from "vue";
+
+import { ref, computed, onMounted, onBeforeUnmount, watch } from "vue";
 import { useRouter } from "vue-router";
-import { retrieveAuth, login, signup, submitUserData } from "../../services/auth";
+import { submitForm, errors, login, signup, detectLoginState, submitUserData } from "../../services/auth";
 import { reactive } from 'vue';
 
 const router = useRouter();
-const loading = ref(false);
+const loading =  ref<string>(""); //
 const error = ref("");
 const customSupplements = ref("");
 const customAllergies = ref("");
 
+const formSubmission = ref<string | null>(null);
+const quizData = ref<string | null>(null);
 //Error types
 const errors = reactive<{
   general: string;
@@ -446,157 +410,46 @@ const progress = computed(() => {
   return Math.round((filled / total) * 100);
 });
 
-const validateForm = () => {
-  if (!formData.value.weight) return "Please enter your weight";
-  if (!formData.value.height) return "Please enter your height";
-  if (!formData.value.gender) return "Please select your gender";
-  if (!formData.value.age) return "Please enter your age";
-  if (!formData.value.activeness) return "Please select your activity level";
-  if (!formData.value.goals) return "Please enter your health goals";
 
-  formData.value.weight = formData.value.weight.toString();
-  formData.value.height = formData.value.height.toString();
-  formData.value.age = formData.value.age.toString();
-  formData.value.supplements = formData.value.supplements || "none";
-  formData.value.allergies = formData.value.allergies || "none";
+//Determine if user is logged in or not and take the user ot be logged if the latter
+const handleLoginState = async () => {
+  try{
 
-  return "";
-};
-
-const submitForm = async () => {
-  try {
-    error.value = "";
-    const validationError = validateForm();
-    if (validationError) {
-      error.value = validationError;
-      return;
-    }
-
-    loading.value = true;
-
-    const requestBody = {
-      role: "user",
-      action: "list",
-      weight: formData.value.weight,
-      height: formData.value.height,
-      gender: formData.value.gender,
-      age: formData.value.age,
-      activeness: formData.value.activeness.toLowerCase(),
-      supplements: formData.value.supplements,
-      allergies: formData.value.allergies,
-      goals: formData.value.goals,
-    };
-
-    const auth = retrieveAuth();
+    const auth = await detectLoginState();
+    return auth;
+  } catch (err)
+  {
     
-    console.log("Storing quiz data")
-    try{
-      
-    await submitUserData({type: "quiz", data: formData.value})
-    } catch(err)
-    {
-      if (err.type == "login")
-      {
-        //HANDLE no user logged in error here 
-        //You can redirect or do something
-      }
-
-      else if (err.type == "quiz") {
-        errors.quiz = err.message;
-        console.log(err);
-        //Hanlde couldnt submit quiz, how to display erro emssage "...try again"
-        //and redirect user to resubmit
-      }
+    if (err.type == "login")
+    { 
+      //Stores formData.value
+      sessionStorage.setItem("quizData",JSON.stringify(formData.value));
+      router.push("/log-in");
     }
 
-    console.log("Sending request with body:", requestBody);
-
-    // First API call to get supplement recommendations
-    const response = await fetch("https://vitain-ai.onrender.com/chat", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-      body: JSON.stringify(requestBody),
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("API Error Response:", errorText);
-      throw new Error(`Server responded with ${response.status}: ${errorText}`);
+    else{
+      console.log("Handlelogin state error", err)
     }
-
-    const data = await response.json();
-    console.log("API Response:", data);
-
-    // Extract supplement list from the response
-    let supplementList = [];
-    if (data && data.response) {
-      supplementList = data.response.split(",").map((s) => s.trim());
-    }
-
-    // Second API call to get supplement product information
-    let supplementProducts = [];
-    if (supplementList.length > 0) {
-      const supplementInfoRequest = {
-        action: "get_multi_products_packages",
-        list: supplementList,
-      };
-
-      console.log("Sending supplement info request:", supplementInfoRequest);
-
-      const supplementInfoResponse = await fetch(
-        "https://vitain-ai.onrender.com/v1/supplement-info",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-          body: JSON.stringify(supplementInfoRequest),
-        }
-      );
-
-      if (supplementInfoResponse.ok) {
-        const supplementInfoData = await supplementInfoResponse.json();
-        console.log("Supplement Info Response:", supplementInfoData);
-        supplementProducts = supplementInfoData.response || [];
-      } else {
-        console.error("Supplement info API error:", supplementInfoResponse.status);
-      }
-    }
-
-    console.log(auth.currentUser);
-    if (auth.currentUser === null) {
-      router.push({
-        name: "results",
-        query: {
-          results: JSON.stringify(data),
-          userInfo: JSON.stringify(requestBody),
-          supplementProducts: JSON.stringify(supplementProducts),
-          showSignup: true,
-        },
-      });
-      return;
-    }
-
-    router.push({
-      name: "results",
-      query: {
-        results: JSON.stringify(data),
-        userInfo: JSON.stringify(requestBody),
-        supplementProducts: JSON.stringify(supplementProducts),
-      },
-    });
-  } catch (error) {
-    console.error("Error details:", error);
-    error.value =
-      "There was an error processing your request. Please try again.";
-  } finally {
-    loading.value = false;
   }
-};
+}
+
+const handleFormSubmission = async () =>
+{
+  try{
+     
+    console.log("about to handle form")
+    error.value=""
+    await submitForm(formData.value, router, error)
+    console.log("In handle form submission")
+
+  } catch(err)
+  {
+    console.log("Handleform submission", err)
+  }
+}
+
+
+
 </script>
 
 <style scoped>

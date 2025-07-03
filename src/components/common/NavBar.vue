@@ -23,6 +23,7 @@
             >Supplements</router-link
           >
           <router-link to="/log-in" class="nav-link">Log In</router-link>
+          <a href @click="handleLogout" class="nav-link">Log out</a> <!-- removeeee-->
         </div>
       </div>
 
@@ -80,6 +81,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
+  import { logout } from "../../services/auth";
 
 const router = useRouter();
 const isScrolled = ref(false);
@@ -93,6 +95,17 @@ const toggleMobileMenu = () => {
 const handleScroll = () => {
   isScrolled.value = window.scrollY > 20;
 };
+
+const handleLogout = async () => {
+
+  try{
+      await logout()
+  } catch(err)
+  {
+     console.log(err)
+  }
+
+}
 
 onMounted(() => {
   window.addEventListener("scroll", handleScroll);
