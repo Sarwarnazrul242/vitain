@@ -1,6 +1,6 @@
 <template>
     <div class="bg-[#ffffff] min-h-screen">
-        <NavBar />
+        <NavBar v-if="!isDashboardRoute" />
         <!-- Force re-mount on route change -->
         <router-view></router-view>
     </div>
@@ -43,11 +43,18 @@
 </template>
 
 <script lang='ts' setup>
-import { ref, onMounted, onBeforeUnmount, defineAsyncComponent } from 'vue';
+import { ref, onMounted, onBeforeUnmount, defineAsyncComponent, computed } from 'vue';
+import { useRoute } from 'vue-router';
 import { loading, updateLoading } from "@/composables/useLoading";
 
 const NavBar = defineAsyncComponent(() => import('@/components/common/NavBar.vue'));
 
+const route = useRoute();
+
+// Check if current route is dashboard
+const isDashboardRoute = computed(() => {
+  return route.name === 'Dashboard' || route.path === '/dashboard';
+});
 
 onMounted(() => {
   window.addEventListener("loading-change", updateLoading);
