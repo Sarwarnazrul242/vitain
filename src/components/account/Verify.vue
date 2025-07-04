@@ -30,7 +30,6 @@
               <button
                 @click="checkVerification"
                 class="auth-button group"
-                :disabled="isChecking"
               >
                 <span class="button-bg"></span>
                 <span class="button-text">
@@ -40,7 +39,7 @@
                   I've Verified
                 </span>
               </button>
-              <p v-if="errorMessage" class="text-red-400 mt-4">{{ errorMessage }}</p>
+              <p v-if="errors['verify']" class="text-red-400 mt-4">{{ errors['verify'] }}</p>
             </div>
             <div class="text-center mt-6">
               <p class="text-gray-400">
@@ -65,64 +64,102 @@ import BackgroundGradient from "@/components/homepage/BackgroundGradient.vue";
 import Footer from "@/components/common/Footer.vue";
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
-import { getAuth, sendEmailVerification } from "firebase/auth";
+import { errors, ErrorType, AppError, isAppError, pastError, submitForm, checkEmailVerification } from "../../services/auth";
 
 const router = useRouter();
 const email = ref<string>("");
 const isChecking = ref(false);
 const errorMessage = ref("");
+const verifyFlag =  ref(false);
 
 onMounted(async () => {
   // Load email from localStorage
-  const storedEmail = localStorage.getItem('pendingVerificationEmail');
+  const storedEmail = localStorage.getItem('email');
   if (storedEmail) {
     email.value = storedEmail;
-  } else {
-    router.push("/login");
-    return;
-  }
+  // } else {
+  //   router.push("/login");
+  //   return;
+  // }
 
-  // Send verification email if not already sent
-  const auth = getAuth();
-  if (auth.currentUser && !auth.currentUser.emailVerified) {
-    try {
-      await sendEmailVerification(auth.currentUser);
-    } catch (e) {
-      // Ignore if already sent
-    }
+  // // Send verification email if not already sent
+  // const auth = getAuth();
+  // if (auth.currentUser && !auth.currentUser.emailVerified) {
+  //   try {
+  //     await sendEmailVerification(auth.currentUser);
+  //   } catch (e) {
+  //     // Ignore if already sent
+  //   }
+  // }
   }
 });
 
 const checkVerification = async () => {
   errorMessage.value = "";
-  isChecking.value = true;
-  const auth = getAuth();
+
   try {
-    if (auth.currentUser) {
-      await auth.currentUser.reload();
-      if (auth.currentUser.emailVerified) {
-        // Set email verification flag
-        localStorage.setItem('emailVerified', 'true');
-        localStorage.removeItem('pendingVerificationEmail');
-        localStorage.removeItem('pendingVerificationName');
-        router.push("/questionnaire");
-        return;
-      } else {
-        errorMessage.value = "Your email is not verified yet. Please check your inbox and click the verification link.";
-      }
-    } else {
-      errorMessage.value = "No user is currently signed in.";
+    console.log("check verification clicked")
+    verifyFlag.value = await checkEmailVerification();
+  
+    if (!verifyFlag.value)
+    {   
+      console.log("email not verified")
+      throw {type:"verify", message:"Please verify your email."}
+      return;
     }
-  } catch (e) {
-    errorMessage.value = "An error occurred. Please try again.";
-  } finally {
-    isChecking.value = false;
-  }
+
+    console.log("email verified")
+    const formSubmission = sessionStorage.getItem("quizData");
+       
+    //Handles formdat of new users who have not logged in
+    try{
+    if (formSubmission)
+    {  
+     sessionStorage.removeItem("quizData"); //Clear lcal storage ebcause sessions torage has been passed abck for the quiz data
+      await handleFormSubmission(JSON.parse(formSubmission))
+      return
+    }
+
+    else 
+    {
+      //Should take to quiz? for them to fill out info or verification page or something
+      router.push("/take-quiz"); 
+    }} catch (err)
+    {
+    console.log("signup formsubmission error", err)
+    }
+      
+  } catch (err) {
+    
+    if (isAppError(err)){
+      //Assing the error to the correct slot
+
+      pastError.value = err.type;
+      errors[err.type] = err.message;
+      console.log(errors[err.type]);
+     }
+
+     else{
+      console.log("Verification Check Error: ", err)
+     }
+  } 
 };
 
 const goBackToLogin = () => {
   router.push("/login");
 };
+
+
+const handleFormSubmission = async (formSubmission) =>
+{
+  try{
+    await submitForm(formSubmission, router)
+
+  } catch (err)
+  {
+    console.log(err)
+  }
+}
 </script>
 
 <style scoped>

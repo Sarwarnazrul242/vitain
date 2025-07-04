@@ -5,8 +5,7 @@
       <div class="max-w-7xl mx-auto px-4 relative z-10">
         <div class="flex items-center justify-center">
           <div class="auth-container w-full max-w-md">
-            <!-- Step 1: Email Input -->
-            <div v-if="currentStep === 1" class="forgot-step">
+            <!-- S Email Input -->
               <h3 class="text-3xl font-bold mb-6 text-center">
                 <span class="bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-transparent bg-clip-text">
                   Forgot Password
@@ -14,7 +13,8 @@
               </h3>
               
               <p class="text-gray-400 text-center mb-8">
-                Enter your email address and we'll send you a verification code to reset your password.
+                Enter your email address and we'll send you an email with a link and instuctions on how to reset your password.<br><br>
+                You can login with your new password after following the instructions in the email.
               </p>
               
               <div class="input-group">
@@ -30,12 +30,10 @@
               </div>
               
               <button
-                @click="sendOTP"
+                @click="handlePassword"
                 class="submit-button"
-                :disabled="!isEmailValid || isSending"
               >
-                <span v-if="isSending" class="loading-spinner"></span>
-                {{ isSending ? 'Sending...' : 'Send Verification Code' }}
+              Get Password Reset Instructions
               </button>
               
               <div class="text-center mt-6">
@@ -44,186 +42,10 @@
                 </router-link>
               </div>
             </div>
-
-            <!-- Step 2: OTP Verification -->
-            <div v-if="currentStep === 2" class="forgot-step">
-              <h3 class="text-3xl font-bold mb-6 text-center">
-                <span class="bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-transparent bg-clip-text">
-                  Verify Code
-                </span>
-              </h3>
-              
-              <p class="text-gray-400 text-center mb-8">
-                We've sent a 6-digit verification code to <strong>{{ formData.email }}</strong>
-              </p>
-              
-              <div class="input-group">
-                <label class="input-label">Verification Code</label>
-                <div class="otp-container">
-                  <input
-                    v-for="(digit, index) in 6"
-                    :key="index"
-                    type="text"
-                    v-model="otpDigits[index]"
-                    class="otp-input"
-                    maxlength="1"
-                    @input="handleOTPInput(index, $event)"
-                    @keydown="handleOTPKeydown(index, $event)"
-                    @paste="handleOTPPaste"
-                    ref="otpInputs"
-                  />
-                </div>
-                <span v-if="otpError" class="error-message">{{ otpError }}</span>
-              </div>
-              
-              <div class="resend-section">
-                <p class="text-gray-400 text-center">
-                  Didn't receive the code? 
-                  <button 
-                    @click="resendOTP" 
-                    class="resend-link"
-                    :disabled="resendCountdown > 0"
-                  >
-                    {{ resendCountdown > 0 ? `Resend in ${resendCountdown}s` : 'Resend Code' }}
-                  </button>
-                </p>
-              </div>
-              
-              <button
-                @click="verifyOTP"
-                class="submit-button"
-                :disabled="!isOTPComplete || isVerifying"
-              >
-                <span v-if="isVerifying" class="loading-spinner"></span>
-                {{ isVerifying ? 'Verifying...' : 'Verify Code' }}
-              </button>
-              
-              <div class="text-center mt-6">
-                <button @click="goBack" class="back-link">
-                  ← Back to Email
-                </button>
-              </div>
-            </div>
-
-            <!-- Step 3: New Password -->
-            <div v-if="currentStep === 3" class="forgot-step">
-              <h3 class="text-3xl font-bold mb-6 text-center">
-                <span class="bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-transparent bg-clip-text">
-                  Reset Password
-                </span>
-              </h3>
-              
-              <p class="text-gray-400 text-center mb-8">
-                Create a new password for your account.
-              </p>
-              
-              <div class="input-group">
-                <label class="input-label">New Password</label>
-                <div class="password-input-container">
-                  <input
-                    :type="showPassword ? 'text' : 'password'"
-                    v-model="formData.newPassword"
-                    class="input-field pr-12"
-                    placeholder="Enter new password"
-                    @input="validatePassword"
-                  />
-                  <button
-                    @click="togglePassword"
-                    type="button"
-                    class="password-toggle"
-                  >
-                    <svg v-if="showPassword" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
-                    </svg>
-                    <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
-                  </button>
-                </div>
-                <div class="password-strength">
-                  <div class="strength-bar">
-                    <div 
-                      class="strength-fill"
-                      :class="passwordStrengthClass"
-                      :style="{ width: passwordStrength + '%' }"
-                    ></div>
-                  </div>
-                  <span class="strength-text" :class="passwordStrengthClass">
-                    {{ passwordStrengthText }}
-                  </span>
-                </div>
-                <span v-if="passwordError" class="error-message">{{ passwordError }}</span>
-              </div>
-              
-              <div class="input-group">
-                <label class="input-label">Confirm Password</label>
-                <div class="password-input-container">
-                  <input
-                    :type="showConfirmPassword ? 'text' : 'password'"
-                    v-model="formData.confirmPassword"
-                    class="input-field pr-12"
-                    placeholder="Confirm new password"
-                    @input="validateConfirmPassword"
-                  />
-                  <button
-                    @click="toggleConfirmPassword"
-                    type="button"
-                    class="password-toggle"
-                  >
-                    <svg v-if="showConfirmPassword" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
-                    </svg>
-                    <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
-                  </button>
-                </div>
-                <span v-if="confirmPasswordError" class="error-message">{{ confirmPasswordError }}</span>
-              </div>
-              
-              <button
-                @click="resetPassword"
-                class="submit-button"
-                :disabled="!canResetPassword || isResetting"
-              >
-                <span v-if="isResetting" class="loading-spinner"></span>
-                {{ isResetting ? 'Resetting...' : 'Reset Password' }}
-              </button>
-              
-              <div class="text-center mt-6">
-                <button @click="goBack" class="back-link">
-                  ← Back to Verification
-                </button>
-              </div>
-            </div>
-
-            <!-- Step 4: Success -->
-            <div v-if="currentStep === 4" class="forgot-step">
-              <div class="success-container">
-                <div class="success-icon">
-                  <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div>
-                
-                <h3 class="text-3xl font-bold mb-4 text-center text-white">
-                  Password Reset Successfully!
-                </h3>
-                
-                <p class="text-gray-400 text-center mb-8">
-                  Your password has been updated. You can now log in with your new password.
-                </p>
-                
-                <router-link to="/log-in" class="submit-button">
-                  Go to Login
-                </router-link>
-              </div>
-            </div>
           </div>
         </div>
-      </div>
+          
+
     </section>
     
     <Footer />
@@ -235,34 +57,11 @@ import BackgroundGradient from "@/components/homepage/BackgroundGradient.vue";
 import Footer from "@/components/common/Footer.vue";
 import { ref, computed, onMounted, nextTick } from "vue";
 import { useRouter } from "vue-router";
-
+import { errors, ErrorType, AppError, isAppError, pastError, submitForm, resetPassword } from "../../services/auth";
 const router = useRouter();
-const currentStep = ref(1);
-
-// Form data
-const formData = ref({
-  email: '',
-  newPassword: '',
-  confirmPassword: ''
-});
-
-// OTP handling
-const otpDigits = ref(['', '', '', '', '', '']);
-const otpInputs = ref<HTMLInputElement[]>([]);
-
-// UI states
-const isSending = ref(false);
-const isVerifying = ref(false);
-const isResetting = ref(false);
-const showPassword = ref(false);
-const showConfirmPassword = ref(false);
-const resendCountdown = ref(0);
-
 // Error messages
 const emailError = ref('');
-const otpError = ref('');
-const passwordError = ref('');
-const confirmPasswordError = ref('');
+
 
 // Computed properties
 const isEmailValid = computed(() => {
@@ -270,45 +69,11 @@ const isEmailValid = computed(() => {
   return emailRegex.test(formData.value.email);
 });
 
-const isOTPComplete = computed(() => {
-  return otpDigits.value.every(digit => digit !== '');
+// Form data
+const formData = ref({
+  email: '', 
 });
 
-const passwordStrength = computed(() => {
-  const password = formData.value.newPassword;
-  if (!password) return 0;
-  
-  let strength = 0;
-  if (password.length >= 8) strength += 25;
-  if (/[a-z]/.test(password)) strength += 25;
-  if (/[A-Z]/.test(password)) strength += 25;
-  if (/[0-9]/.test(password)) strength += 25;
-  
-  return strength;
-});
-
-const passwordStrengthClass = computed(() => {
-  if (passwordStrength.value <= 25) return 'weak';
-  if (passwordStrength.value <= 50) return 'fair';
-  if (passwordStrength.value <= 75) return 'good';
-  return 'strong';
-});
-
-const passwordStrengthText = computed(() => {
-  if (passwordStrength.value <= 25) return 'Weak';
-  if (passwordStrength.value <= 50) return 'Fair';
-  if (passwordStrength.value <= 75) return 'Good';
-  return 'Strong';
-});
-
-const canResetPassword = computed(() => {
-  return formData.value.newPassword && 
-         formData.value.confirmPassword && 
-         formData.value.newPassword === formData.value.confirmPassword &&
-         passwordStrength.value >= 75 &&
-         !passwordError.value &&
-         !confirmPasswordError.value;
-});
 
 // Methods
 const validateEmail = () => {
@@ -320,199 +85,16 @@ const validateEmail = () => {
   }
 };
 
-const sendOTP = async () => {
-  if (!isEmailValid.value) return;
-  
-  isSending.value = true;
-  emailError.value = '';
-  
-  try {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    // For demo purposes, we'll simulate a successful OTP send
-    console.log('OTP sent to:', formData.value.email);
-    
-    // Start resend countdown
-    resendCountdown.value = 60;
-    const countdownInterval = setInterval(() => {
-      resendCountdown.value--;
-      if (resendCountdown.value <= 0) {
-        clearInterval(countdownInterval);
-      }
-    }, 1000);
-    
-    currentStep.value = 2;
-  } catch (error) {
-    emailError.value = 'Failed to send verification code. Please try again.';
-  } finally {
-    isSending.value = false;
-  }
-};
 
-const handleOTPInput = (index: number, event: Event) => {
-  const target = event.target as HTMLInputElement;
-  const value = target.value;
-  
-  // Only allow numbers
-  if (!/^\d*$/.test(value)) {
-    target.value = '';
-    return;
+const handlePassword = async () =>
+{
+  if (!isEmailValid.value)
+  {
+  return
   }
-  
-  otpDigits.value[index] = value;
-  
-  // Move to next input if value is entered
-  if (value && index < 5) {
-    nextTick(() => {
-      otpInputs.value[index + 1]?.focus();
-    });
-  }
-  
-  // Move to previous input if value is deleted
-  if (!value && index > 0) {
-    nextTick(() => {
-      otpInputs.value[index - 1]?.focus();
-    });
-  }
-};
-
-const handleOTPKeydown = (index: number, event: KeyboardEvent) => {
-  if (event.key === 'Backspace' && !otpDigits.value[index] && index > 0) {
-    otpInputs.value[index - 1]?.focus();
-  }
-};
-
-const handleOTPPaste = (event: ClipboardEvent) => {
-  event.preventDefault();
-  const pastedData = event.clipboardData?.getData('text/plain') || '';
-  const digits = pastedData.replace(/\D/g, '').slice(0, 6);
-  
-  if (digits.length === 6) {
-    otpDigits.value = digits.split('');
-    nextTick(() => {
-      otpInputs.value[5]?.focus();
-    });
-  }
-};
-
-const verifyOTP = async () => {
-  if (!isOTPComplete.value) return;
-  
-  isVerifying.value = true;
-  otpError.value = '';
-  
-  try {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    const enteredOTP = otpDigits.value.join('');
-    
-    // For demo purposes, accept any 6-digit code
-    if (enteredOTP.length === 6 && /^\d{6}$/.test(enteredOTP)) {
-      console.log('OTP verified:', enteredOTP);
-      currentStep.value = 3;
-    } else {
-      otpError.value = 'Invalid verification code. Please try again.';
-    }
-  } catch (error) {
-    otpError.value = 'Failed to verify code. Please try again.';
-  } finally {
-    isVerifying.value = false;
-  }
-};
-
-const resendOTP = async () => {
-  if (resendCountdown.value > 0) return;
-  
-  isSending.value = true;
-  otpError.value = '';
-  
-  try {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    console.log('OTP resent to:', formData.value.email);
-    
-    // Reset countdown
-    resendCountdown.value = 60;
-    const countdownInterval = setInterval(() => {
-      resendCountdown.value--;
-      if (resendCountdown.value <= 0) {
-        clearInterval(countdownInterval);
-      }
-    }, 1000);
-    
-    // Clear OTP inputs
-    otpDigits.value = ['', '', '', '', '', ''];
-    nextTick(() => {
-      otpInputs.value[0]?.focus();
-    });
-  } catch (error) {
-    otpError.value = 'Failed to resend code. Please try again.';
-  } finally {
-    isSending.value = false;
-  }
-};
-
-const validatePassword = () => {
-  passwordError.value = '';
-  const password = formData.value.newPassword;
-  
-  if (!password) {
-    passwordError.value = 'Password is required';
-  } else if (password.length < 8) {
-    passwordError.value = 'Password must be at least 8 characters long';
-  } else if (!/[a-z]/.test(password)) {
-    passwordError.value = 'Password must contain at least one lowercase letter';
-  } else if (!/[A-Z]/.test(password)) {
-    passwordError.value = 'Password must contain at least one uppercase letter';
-  } else if (!/[0-9]/.test(password)) {
-    passwordError.value = 'Password must contain at least one number';
-  }
-  
-  validateConfirmPassword();
-};
-
-const validateConfirmPassword = () => {
-  confirmPasswordError.value = '';
-  const { newPassword, confirmPassword } = formData.value;
-  
-  if (!confirmPassword) {
-    confirmPasswordError.value = 'Please confirm your password';
-  } else if (newPassword !== confirmPassword) {
-    confirmPasswordError.value = 'Passwords do not match';
-  }
-};
-
-const togglePassword = () => {
-  showPassword.value = !showPassword.value;
-};
-
-const toggleConfirmPassword = () => {
-  showConfirmPassword.value = !showConfirmPassword.value;
-};
-
-const resetPassword = async () => {
-  if (!canResetPassword.value) return;
-  
-  isResetting.value = true;
-  
-  try {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    console.log('Password reset successful');
-    console.log('New password:', formData.value.newPassword);
-    
-    currentStep.value = 4;
-  } catch (error) {
-    passwordError.value = 'Failed to reset password. Please try again.';
-  } finally {
-    isResetting.value = false;
-  }
-};
-
+  console.log("in handle password", formData.value.email)
+  await resetPassword(formData.value.email)
+}
 const goBack = () => {
   if (currentStep.value > 1) {
     currentStep.value--;

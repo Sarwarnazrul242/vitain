@@ -1,14 +1,14 @@
 import { ref, reactive, nextTick } from 'vue';
 import { initializeApp } from "firebase/app";
 import { getFirestore, doc, setDoc, getDocs, query, where, collection, serverTimestamp } from "firebase/firestore";
-import { sendEmailVerification, signOut } from "firebase/auth";
+import { reload, updatePassword, sendPasswordResetEmail, sendEmailVerification, signOut } from "firebase/auth";
 import {
   getAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   onAuthStateChanged
 } from "firebase/auth";
-import { loading, updateLoading } from "@/composables/useLoading";
+import { loading, updateLoading } from "../composables/useLoading";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_APIKEY,
@@ -24,6 +24,7 @@ const app = initializeApp(firebaseConfig);
 
 const db = getFirestore(app);
 const auth = getAuth(app);
+const credentials = ref<any>();
 onAuthStateChanged(auth, (user) => {
   if (user) {
     console.log("User is signed in:", user.email);
@@ -31,7 +32,8 @@ onAuthStateChanged(auth, (user) => {
     console.log("No user is signed in.");
   }
 });
-export type ErrorType  = "general" | "fill" | "email" |  "password" | "login" | "quiz" | "data" | "product";
+export type ErrorType  = "general" | "fill" | "email" |  "password" | "login" | "quiz" | "data" | "product"|"verify";
+export const pastError = ref<ErrorType>("general");
 
 export interface AppError {
   type: ErrorType;
@@ -45,6 +47,7 @@ export interface AppError {
     password: string;
     login: string;
     quiz: string;
+    verify: string
 
   }>(
     {
@@ -52,7 +55,8 @@ export interface AppError {
       fill:"",
       password:"",
       login:"",
-      quiz: ""
+      quiz: "",
+      verify: ""
     }
   )
 
@@ -77,7 +81,7 @@ export async function signup(firstName: string, lastName: string, email: string,
     );
     const user = user_credentials.user
     
-    //await sendEmailVerification(user);
+    await sendEmailVerification(user);
 
     await setDoc(doc(db, "users", user.uid),{
       uid: user.uid,
@@ -86,9 +90,10 @@ export async function signup(firstName: string, lastName: string, email: string,
       email: user.email,
       createdAt: new Date().toISOString(),
     });
-
-     console.log("User signed up and save: ", user);
-
+     
+    console.log("User signed up and save: ", user);
+    
+    sessionStorage.setItem("email",email);
   } catch (err) {
 
     if (err.message.includes("auth/invalid-email"))
@@ -104,24 +109,68 @@ export async function signup(firstName: string, lastName: string, email: string,
   }
 }
 
+export async function checkEmailVerification()
+{
+  try{
+   const credential = getAuth().currentUser;
+    if (credential)
+    { 
+      await reload(credential)
+
+      if(!credential.emailVerified)
+      {
+      console.log("email veirfied syatus:", credential);
+      throw {type: "verify", message:"Please verify your email."};
+      }
+    }
+
+    return true;
+    
+  } catch (err)
+  {
+    throw err;
+  }
+
+}
+
+export async function resetPassword(email)
+{
+  // Get the current user
+  try {
+  const auth = getAuth();
+  const user = auth.currentUser;
+   console.log("In reset password")
+   
+    // Optionally re-authenticate first (see below)
+
+    // Update password
+  
+    await sendPasswordResetEmail(auth, email);
+    console.log("✅ Password reset email sent.");
+  
+} 
+  catch (error) {
+    console.error("❌ Failed to send reset email:", error);
+  
+  }
+
+}
 export async function login(email: string, password: string) {
   try {
     console.log(email);
-
+    
     let user_credentials = await signInWithEmailAndPassword(
       auth,
       email,
       password
     );
-    const user = user_credentials.user;
+    
+   
+    await checkEmailVerification();
+    credentials.value = user_credentials.user;
+    console.log(credentials.value);
 
-    // if (!user.emailVerified)
-    // {
-    //   throw new Error("Please verify your email before logging in.");
-    // }
-
-
-    console.log(user_credentials.user);
+    return credentials;
   } catch (err) {
     if (err.message.includes("auth/invalid-email"))
      {
@@ -141,6 +190,19 @@ export async function login(email: string, password: string) {
     else if (err.message.includes("auth/too-many-requests"))
     {
       throw {type: "login", message: "Too many login attempts. Try again later."}
+   
+    }
+    
+    //Sends verification email and then is caught by handlelogin in login.vue which then routes it to verify.vue to check verificatrion
+    else if (err.type == "verify")
+    { 
+      const credential = getAuth().currentUser;
+      
+      if (credential != null)
+        {await sendEmailVerification(credential);
+
+        }
+      throw err;
     }
     
     else

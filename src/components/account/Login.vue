@@ -233,7 +233,7 @@
   import BackgroundGradient from "@/components/homepage/BackgroundGradient.vue";
   import Footer from "@/components/common/Footer.vue";
   import { watch, onMounted, ref } from "vue";
-  import { errors, ErrorType, AppError, isAppError, login, signup, submitForm } from "../../services/auth";
+  import { errors, ErrorType, AppError, isAppError, pastError, login, signup, submitForm } from "../../services/auth";
   import { useRoute, useRouter } from "vue-router";
   import { reactive } from 'vue';
 
@@ -250,7 +250,6 @@
   const route_to_results_after = ref<boolean>(false);
   const query_data = ref<any>();
   const errorMessage = ref("");
-  const pastError = ref<ErrorType>("general");
   
   const handleStateClick= (status) => {
   state.value = status;
@@ -288,35 +287,9 @@
      
       await signup(firstName.value, lastName.value, email.value,password.value );
       console.log("Sign up successful!");
-      
-      const formSubmission = sessionStorage.getItem("quizData");
-      sessionStorage.removeItem("quizData"); //Clear lcal storage ebcause sessions torage has been passed abck for the quiz data
-    
 
-       
-        //Handles formdat of new users who have not logged in
-        try{
-        if (formSubmission)
-       {
-          await handleFormSubmission(JSON.parse(formSubmission))
-          return
-       }
-
-       else 
-       {
-          //Should take to quiz? for them to fill out info or verification page or something
-          router.push("/take-quiz"); 
-       }} catch (err)
-       {
-        console.log("signup formsubmission error", err)
-       }
-   
-     
-      //localStorage.setItem('pendingVerificationEmail', email.value);
-      //localStorage.setItem('pendingVerificationName', `${firstName.value} ${lastName.value}`);
+      router.push("/verify");
       
-      // Redirect to verification page
-     // router.push("/verify");
    } catch (err: any){
 
      console.log(err);
@@ -324,8 +297,8 @@
       //Assing the error to the correct slot
 
       pastError.value = err.type;
-      console.log("is app error", pastError.value);
       errors[err.type] = err.message;
+      console.log("is app error", errors[err.type] );
      
      }
      else{
@@ -354,6 +327,13 @@ const handleLogin = async () =>
       router.push("/dashboard"); 
      
       } catch (err: any){
+         
+        //Ensures user verifies 
+        if (err.type =="verify")
+        {
+          router.push("/verify");
+          return;
+        }
         pastError.value = "login"
         errors["login"]= err.message;
         console.log(err);
@@ -362,16 +342,6 @@ const handleLogin = async () =>
 
   }
 
-const handleFormSubmission = async (formSubmission) =>
-{
-  try{
-    await submitForm(formSubmission, router)
-
-  } catch (err)
-  {
-    console.log(err)
-  }
-}
 
   onMounted(() => {
     if (route.query.results) {
