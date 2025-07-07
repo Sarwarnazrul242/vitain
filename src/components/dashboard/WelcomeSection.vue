@@ -65,8 +65,9 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { ref, computed, ComputedRef, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
+import { retrieveUserInfo } from "../../services/auth";
 
 const router = useRouter();
 
@@ -79,18 +80,37 @@ const sidebarRef = ref();
 
 // User data (in real app, this would come from user store/API)
 const userData = ref({
-  name: 'John Doe',
-  email: 'john@example.com',
-  joinDate: new Date('2024-01-15'),
-  activeGoals: 3,
-  currentSupplements: 5,
-  checkInStreak: 7,
-  profileComplete: true
+  name: '',
+  email: '',
+  joinDate: ''
 });
 
+// const userData = ref({
+//   name: '',
+//   email: '',
+//   joinDate: '',
+//   activeGoals: 3,
+//   currentSupplements: 5,
+//   checkInStreak: 7,
+//   profileComplete: true
+// });
+
 // Computed properties
-const userName = computed(() => userData.value.name);
-const userInitials = computed(() => {
+const userName = ref<ComputedRef <string>>();
+const userEmail = ref<ComputedRef <string>>();
+const userInitials = ref<ComputedRef <string>>();
+  
+const getUserInfo = async ()=> {
+
+  try{
+     const info = await retrieveUserInfo();
+
+     if (info)
+     {
+      userData.value = info;
+      userName.value = computed(() => userData.value.name);
+      userEmail.value = computed(() => userData.value.email);
+      userInitials.value = computed(() => {
   return userData.value.name
     .split(' ')
     .map(n => n[0])
@@ -98,18 +118,38 @@ const userInitials = computed(() => {
     .toUpperCase();
 });
 
+     }
+
+
+  } catch (err)
+  {
+  if (err.type == "login")
+      { 
+        //Routes user to log in page before they can access dashboard
+        router.push("/log-in");
+      }
+
+      else{
+        console.log(err)
+      }
+    
+  }
+
+}
+
+
 const daysSinceJoining = computed(() => {
   const today = new Date();
   const joinDate = userData.value.joinDate;
-  const diffTime = Math.abs(today.getTime() - joinDate.getTime());
+  const diffTime = 0;//Math.abs(today.getTime() - joinDate.getTime());
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   return diffDays;
 });
 
-const activeGoals = computed(() => userData.value.activeGoals);
-const currentSupplements = computed(() => userData.value.currentSupplements);
-const checkInStreak = computed(() => userData.value.checkInStreak);
-const profileComplete = computed(() => userData.value.profileComplete);
+// const activeGoals = computed(() => userData.value.activeGoals);
+// const currentSupplements = computed(() => userData.value.currentSupplements);
+// const checkInStreak = computed(() => userData.value.checkInStreak);
+// const profileComplete = computed(() => userData.value.profileComplete);
 
 const welcomeMessage = computed(() => {
   const hour = new Date().getHours();
@@ -165,13 +205,9 @@ defineExpose({
   openSidebar
 });
 
-onMounted(() => {
-  // Load user data from localStorage or API
-  const savedUserData = localStorage.getItem('userData');
-  if (savedUserData) {
-    const parsed = JSON.parse(savedUserData);
-    userData.value = { ...userData.value, ...parsed };
-  }
+onMounted(async () => {
+  // Load user data from database
+  await getUserInfo();
   
   // Add click outside listener
   document.addEventListener('click', handleClickOutside);

@@ -1,14 +1,14 @@
 import { ref, reactive, nextTick } from 'vue';
 import { initializeApp } from "firebase/app";
-import { getFirestore, doc, setDoc, getDocs, query, where, collection, serverTimestamp } from "firebase/firestore";
+import { getFirestore, doc, setDoc, getDoc, getDocs, query, where, collection, serverTimestamp } from "firebase/firestore";
 import { reload, updatePassword, sendPasswordResetEmail, sendEmailVerification, signOut } from "firebase/auth";
-import {
+import {User,
   getAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   onAuthStateChanged
 } from "firebase/auth";
-import { loading, updateLoading } from "../composables/useLoading";
+import { loading, updateLoading } from "../composables/featureCtrl";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_APIKEY,
@@ -23,16 +23,10 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 
 const db = getFirestore(app);
-const auth = getAuth(app);
+const auth = getAuth();
 const credentials = ref<any>();
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    console.log("User is signed in:", user.email);
-  } else {
-    console.log("No user is signed in.");
-  }
-});
-export type ErrorType  = "general" | "fill" | "email" |  "password" | "login" | "quiz" | "data" | "product"|"verify";
+
+export type ErrorType  = "general" | "fill" | "email" |  "password" | "login" | "quiz" | "data" | "product"|"verify" | "database";
 export const pastError = ref<ErrorType>("general");
 
 export interface AppError {
@@ -239,20 +233,25 @@ export function retrieveAuth() {
   return auth;
 }
 
-export async function detectLoginState()
+export async function detectLoginState(): Promise<User>
 {
   try{
     const auth = getAuth();
-    const user = auth.currentUser;
     
-    if (!user)
-    {
-      console.log("No user is logged in")
-      throw {type: "login", message: "No user is logged in"}
-    }
-    
-    console.log("User is logged in: ", user)
-    return user; //User is logged in
+    return new Promise ((resolve,reject)=> {
+       //If error wont go past if and ecerything ends if not error it continues accorlding
+      const unsubscribe = onAuthStateChanged(auth, (user) => {
+        unsubscribe(); //stop listenign agter first trigger
+        if (user) {    
+          console.log("User is logged in: ",  user.email)
+          resolve(user);
+        } 
+        else{
+          console.log("No user is logged in")
+          reject({type: "login", message: "No user is logged in"})
+        }
+      });
+    });
 
     } catch(err)
     {
@@ -262,6 +261,7 @@ export async function detectLoginState()
       }
       else
       {
+       console.log("Error in detecting login state: ", err)
        throw {type: "general", message: "There was an error. Try again."} 
       }
     }
@@ -451,7 +451,7 @@ export async function submitForm   (formSubmission, router, error: string ="") {
       }
 
       else {
-        console.log("err")
+        console.log(err)
       }
     }
     
@@ -590,3 +590,47 @@ export async function submitForm   (formSubmission, router, error: string ="") {
       "There was an error processing your request. Please try again.";
   } 
 };
+
+export async function retrieveUserInfo()
+{
+   console.log("detecting log in state")
+   
+    // Ensures user is logged in/signed up before the info is stored in db and AI is queried
+    try
+    {
+      const user = await detectLoginState();
+      const userDocRef = doc(db, "users", user.uid);
+      const userSnap = await getDoc(userDocRef);
+
+      if (userSnap.exists())
+      {
+        const data = userSnap.data();
+        const name = `${data.firstName} ${data.lastName}` ;
+        const email = data.email;
+        const joinDate = data.createdAt;
+
+        return {name, email, joinDate}
+      }
+
+      else{
+        throw {type: "database", message: "User document with data not found in database"}
+      }
+
+    } catch (err)
+    {
+      if (err.type=="login")
+      { 
+        console.log("User needs to login: ", err)
+      }
+
+      else 
+      {
+        console.log(err)
+      }
+
+    }
+
+
+
+
+}

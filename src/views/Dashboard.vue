@@ -2,7 +2,7 @@
   <div class="relative min-h-screen bg-[#0A0A0A]">
     <BackgroundGradient />
     <div class="relative">
-      <DashboardNavbar />
+    <DashboardNavbar />
       <!-- Dashboard Content -->
       <section class="relative pt-32 pb-20 md:py-32">
         <div class="max-w-7xl mx-auto px-4 relative z-10">

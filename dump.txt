@@ -1,13 +1,9 @@
-<template>
-  <nav class="dashboard-navbar">
-    <div class="navbar-container">
+ <nav class="dashboard-navbar" >
+    <div class="navbar-container"> <!--- v-if="userState === 'Signed In'"> -->
       <!-- Left Section - Logo -->
       <div class="navbar-left">
         <div class="logo-section">
-          <img src="@/assets/logo.png" alt="Vitain Logo" class="h-12 w-12" />
-          <span class="logo-text">
-            Vitain
-          </span>
+          
         </div>
       </div>
 
@@ -78,7 +74,7 @@
               
               <div class="dropdown-divider"></div>
               
-              <button @click="handleLogout" class="dropdown-item logout-item">
+              <button @click="logout" class="dropdown-item logout-item">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                 </svg>
@@ -90,118 +86,45 @@
       </div>
     </div>
   </nav>
-</template>
 
-<script lang="ts" setup>
-import { ref, computed, onMounted, onUnmounted, ComputedRef } from 'vue';
-import { useRouter } from 'vue-router';
-import { retrieveUserInfo, logout } from "../../services/auth";
+    <div class="bg-[#ffffff] min-h-screen">
+        <NavBar  />
+        <!-- Force re-mount on route change -->
+        <router-view></router-view>
+    </div>
 
-const router = useRouter();
+    onBeforeUnmount(() => {
+  sessionStorage.removeItem("loading")
+  window.removeEventListener("loading-change", updateLoading);
 
-// Reactive data
-const isUserMenuOpen = ref(false);
-// const notificationCount = ref(3);
+  sessionStorage.removeItem("userState")
+  window.removeEventListener("userState-change", updateUserState);
 
-// User data
-const userData = ref({
-  name: '',
-  email: ''
+  document.removeEventListener('click', handleClickOutside); //Remove user must have signed in at some point does not matter will be last after site clothes as App,vue always global
+});
+</script> 
+
+
+<script lang='ts' setup>
+import { ref, onMounted, onBeforeUnmount, defineAsyncComponent, computed } from 'vue';
+import { useRoute } from 'vue-router';
+import { loading, updateLoading, userState, updateUserState } from "./composables/featureCtrl";
+import { toggleUserMenu, userInitials,userEmail,userName, isUserMenuOpen, handleClickOutside,  toggleNotifications, logout , closeUserMenu} from './services/dashboard.ts';
+
+const NavBar = defineAsyncComponent(() => import('./components/common/NavBar.vue'));
+
+const route = useRoute();
+
+// Check if current route is dashboard
+const isDashboardRoute = computed(() => {
+  return route.name === 'Dashboard' || route.path === '/dashboard';
 });
 
-const state = ref<"Signed In" | "Signed Out">("Signed Out");
-// Computed properties
-const userName = ref<ComputedRef <string>>();
-const userEmail = ref<ComputedRef <string>>();
-const userInitials = ref<ComputedRef <string>>(); 
-
-// Methods
-const toggleUserMenu = () => {
-  isUserMenuOpen.value = !isUserMenuOpen.value;
-};
-
-const closeUserMenu = () => {
-  isUserMenuOpen.value = false;
-};
-
-const toggleNotifications = () => {
-  // Handle notifications toggle
-  console.log('Toggle notifications');
-};
-
-
-const handleLogout = async () => {
-
-  try{
-      await logout();
-      sessionStorage.setItem("userState","Signed Out");
-      router.push("/log-in");
-  } catch(err)
-  {
-     console.log(err)
-  }
-
-}
-
-// Close user menu when clicking outside
-const handleClickOutside = (event: Event) => {
-  const target = event.target as HTMLElement;
-  if (!target.closest('.user-menu-container')) {
-    closeUserMenu();
-  }
-};
-
-const getUserInfo = async ()=> {
-
-  try{
-     const info = await retrieveUserInfo();
-
-     if (info)
-     {
-      userData.value = info;
-      userName.value = computed(() => userData.value.name);
-      userEmail.value = computed(() => userData.value.email);
-      userInitials.value = computed(() => {
-  return userData.value.name
-    .split(' ')
-    .map(n => n[0])
-    .join('')
-    .toUpperCase();
-});
-
-     }
-
-
-  } catch (err)
-  {
-  if (err.type == "login")
-      { 
-        //Routes user to log in page before they can access dashboard
-        router.push("/log-in");
-      }
-
-      else{
-        console.log(err)
-      }
-    
-  }
-
-}
-
-onMounted(async () => {
-  // Load user data from database
-  await getUserInfo();
+onMounted(() => {
   
-  // Add click outside listener
-  document.addEventListener('click', handleClickOutside); //What does this do?
-  
+  window.addEventListener("loading-change", updateLoading);
+  window.addEventListener("userState-change", updateUserState);
 });
-
-onUnmounted(() => {
-  document.removeEventListener('click', handleClickOutside);
-  
-});
-</script>
 
 <style scoped>
 .dashboard-navbar {
@@ -337,3 +260,61 @@ onUnmounted(() => {
   }
 }
 </style> 
+
+
+Fix=>
+WelcomeSection.vue:30 [Vue warn]: Property "activeGoals" was accessed during render but is not defined on instance. 
+  at <WelcomeSection> 
+  at <Dashboard onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< undefined > > 
+  at <RouterView> 
+  at <App>
+
+WelcomeSection.vue:38 [Vue warn]: Property "currentSupplements" was accessed during render but is not defined on instance. 
+  at <WelcomeSection> 
+  at <Dashboard onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< undefined > > 
+  at <RouterView> 
+  at <App>
+WelcomeSection.vue:46 [Vue warn]: Property "checkInStreak" was accessed during render but is not defined on instance. 
+  at <WelcomeSection> 
+  at <Dashboard onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< undefined > > 
+  at <RouterView> 
+  at <App>
+WelcomeSection.vue:52 [Vue warn]: Property "profileComplete" was accessed during render but is not defined on instance. 
+  at <WelcomeSection> 
+  at <Dashboard onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< undefined > > 
+  at <RouterView> 
+  at <App>
+auth.ts:596 detecting log in state
+auth.ts:596 detecting log in state
+2
+auth.ts:246 User is logged in:  agholor2004@gmail.com
+WelcomeSection.vue:30 [Vue warn]: Property "activeGoals" was accessed during render but is not defined on instance. 
+  at <WelcomeSection> 
+  at <Dashboard onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< 
+Proxy(Object) {__v_skip: true}
+ > > 
+  at <RouterView> 
+  at <App>
+WelcomeSection.vue:38 [Vue warn]: Property "currentSupplements" was accessed during render but is not defined on instance. 
+  at <WelcomeSection> 
+  at <Dashboard onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< 
+Proxy(Object) {__v_skip: true}
+ > > 
+  at <RouterView> 
+  at <App>
+WelcomeSection.vue:46 [Vue warn]: Property "checkInStreak" was accessed during render but is not defined on instance. 
+  at <WelcomeSection> 
+  at <Dashboard onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< 
+Proxy(Object) {__v_skip: true}
+ > > 
+  at <RouterView> 
+  at <App>
+WelcomeSection.vue:52 [Vue warn]: Property "profileComplete" was accessed during render but is not defined on instance. 
+  at <WelcomeSection> 
+  at <Dashboard onVnodeUnmounted=fn<onVnodeUnmounted> ref=Ref< 
+Proxy(Object) {__v_skip: true}
+ > > 
+  at <RouterView> 
+  at <App>
+﻿
+

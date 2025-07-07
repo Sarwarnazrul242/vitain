@@ -29,9 +29,9 @@
 
         <!-- Content -->
         <div class="relative z-10 max-w-3xl mx-auto">
-            <div class="mb-12 animate-float">
+            <div class="mb-12 pt-16 animate-float">
                 <div class="logo-container">
-                    <img src="@/assets/logo.png" alt="Vitain Logo" class="w-32 h-32 mx-auto relative z-10" />
+                    <img src="@/assets/logo.png" alt="Vitain Logo" class="w-32 h-32 mx-auto relative z-10"  />
                 </div>
             </div>
             <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-transparent bg-clip-text mb-6 animate-fade-in-down leading-tight">
@@ -45,9 +45,16 @@
                 <button 
                     @click="navigateToQuiz" 
                     class="group relative px-8 py-3 rounded-lg text-lg overflow-hidden hover:scale-105 transition-all duration-300"
-                >
+                v-if="userState==='Signed Out'">
                     <span class="absolute inset-0 bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] transition-transform group-hover:scale-105"></span>
                     <span class="relative text-white font-medium">Take the Quiz</span>
+                </button>
+                <button 
+                    @click="navigateToDashboard" 
+                    class="group relative px-8 py-3 rounded-lg text-lg overflow-hidden hover:scale-105 transition-all duration-300"
+                v-if="userState==='Signed In'">
+                    <span class="absolute inset-0 bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] transition-transform group-hover:scale-105"></span>
+                    <span class="relative text-white font-medium">Dashboard</span>
                 </button>
                 <button 
                     @click="scrollToLearnMore" 
@@ -76,12 +83,19 @@
     </section>
 </template>
 
-<script setup>
+<script lang="ts" setup>
+import { onMounted, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
+import {userState, updateUserState} from "../../composables/featureCtrl";
+
 const router = useRouter();
 
 const navigateToQuiz = () => {
   router.push("/take-quiz");
+};
+
+const navigateToDashboard = () => {
+  router.push("/dashboard");
 };
 
 const scrollToLearnMore = () => {
@@ -90,6 +104,15 @@ const scrollToLearnMore = () => {
     nextSection.scrollIntoView({ behavior: "smooth" });
   }
 };
+
+
+onMounted(() => {
+  window.addEventListener("userState-change", updateUserState);
+});
+
+onUnmounted(() => {
+  window.removeEventListener("userState-change", updateUserState);
+});
 </script>
 
 <style scoped>

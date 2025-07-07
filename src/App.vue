@@ -1,10 +1,9 @@
 <template>
-    <div class="bg-[#ffffff] min-h-screen">
+       <div class="bg-[#ffffff] min-h-screen">
         <NavBar v-if="!isDashboardRoute" />
         <!-- Force re-mount on route change -->
         <router-view></router-view>
     </div>
-
     <!-- Global Loading Overlay -->
     <div
       v-if="loading === 'true'"
@@ -45,9 +44,9 @@
 <script lang='ts' setup>
 import { ref, onMounted, onBeforeUnmount, defineAsyncComponent, computed } from 'vue';
 import { useRoute } from 'vue-router';
-import { loading, updateLoading } from "@/composables/useLoading";
+import { loading, updateLoading } from "./composables/featureCtrl";
 
-const NavBar = defineAsyncComponent(() => import('@/components/common/NavBar.vue'));
+const NavBar = defineAsyncComponent(() => import('./components/common/NavBar.vue'));
 
 const route = useRoute();
 
@@ -57,14 +56,15 @@ const isDashboardRoute = computed(() => {
 });
 
 onMounted(() => {
+  
   window.addEventListener("loading-change", updateLoading);
 });
 
 onBeforeUnmount(() => {
   sessionStorage.removeItem("loading")
   window.removeEventListener("loading-change", updateLoading);
+
 });
 </script> 
-
 
 

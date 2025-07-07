@@ -264,8 +264,6 @@
     try {
       //Clears the error when user trys again to fill
 
-  
-
       if (!firstName.value.trim() || !lastName.value.trim() || email.value.trim() === "" || password.value.trim() === "") {
         throw  {type:"fill", message: "Please fill in all required fields."}
         return;
@@ -323,7 +321,7 @@ const handleLogin = async () =>
       }
       
       await login(email.value, password.value);
- 
+      sessionStorage.setItem("userState","Signed In")
       router.push("/dashboard"); 
      
       } catch (err: any){

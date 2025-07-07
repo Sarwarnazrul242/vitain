@@ -123,6 +123,7 @@ const checkVerification = async () => {
     else 
     {
       //Should take to quiz? for them to fill out info or verification page or something
+      sessionStorage.setItem("userState","Signed In"); //So that user specific NavBar pops up
       router.push("/take-quiz"); 
     }} catch (err)
     {

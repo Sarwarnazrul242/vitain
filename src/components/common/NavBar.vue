@@ -19,8 +19,7 @@
           <router-link to="/supplements" class="nav-link"
             >Supplements</router-link
           >
-          <router-link to="/log-in" class="nav-link">Log In</router-link>
-          <a href @click="handleLogout" class="nav-link">Log out</a> <!-- removeeee-->
+          <router-link to="/log-in" class="nav-link" v-if="userState === 'Signed Out'" >Log In</router-link>
         </div>
       </div>
 
@@ -57,13 +56,17 @@
             to="/log-in"
             class="mobile-nav-link"
             @click="toggleMobileMenu"
-            >Log In</router-link
-          >
+            v-if="userState === 'Signed Out'" 
+            >Log In</router-link>
         </div>
       </div>
 
       <router-link to="/take-quiz" class="get-started-btn"
-        >Get Started <span class="arrow">→</span></router-link
+        v-if="userState === 'Signed Out'" >Get Started <span class="arrow">→</span></router-link
+      >
+
+      <router-link to="/dashboard" class="get-started-btn"
+        v-if="userState === 'Signed In'" >Dashboard <span class="arrow">→</span></router-link
       >
     </div>
   </nav>
@@ -72,7 +75,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
-  import { logout } from "../../services/auth";
+import {userState, updateUserState} from "../../composables/featureCtrl";
 
 const router = useRouter();
 const isScrolled = ref(false);
@@ -87,18 +90,14 @@ const handleScroll = () => {
   isScrolled.value = window.scrollY > 20;
 };
 
-const handleLogout = async () => {
+import { watchEffect } from 'vue';
 
-  try{
-      await logout()
-  } catch(err)
-  {
-     console.log(err)
-  }
-
-}
+watchEffect(() => {
+    updateUserState();
+});
 
 onMounted(() => {
+  window.addEventListener("userState-change", updateUserState);
   window.addEventListener("scroll", handleScroll);
 });
 
