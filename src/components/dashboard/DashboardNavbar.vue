@@ -2,6 +2,7 @@
   <nav class="dashboard-navbar">
     <div class="navbar-container">
       <!-- Left Section - Logo -->
+       <router-link to="/">
       <div class="navbar-left">
         <div class="logo-section">
           <img src="@/assets/logo.png" alt="Vitain Logo" class="h-12 w-12" />
@@ -10,7 +11,7 @@
           </span>
         </div>
       </div>
-
+      </router-link>
 
 
 
