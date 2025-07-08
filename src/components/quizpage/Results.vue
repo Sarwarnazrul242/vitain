@@ -407,7 +407,7 @@ import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import ChatButton from "@/components/common/ChatButton.vue";
 import { retrieveAuth, login, signup, storeSupplements, storeProducts } from "../../services/auth";
-import { loading, updateLoading } from "@/composables/useLoading";
+// import { loading, updateLoading } from "@/composables/useLoading";
 
 const route = useRoute();
 const router = useRouter();
