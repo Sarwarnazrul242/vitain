@@ -52,11 +52,22 @@ const router = createRouter({
       name: "Questionnaire",
       component: () => import("@/components/account/Question.vue"),
     },
+     {
+      path: "/dashboard",
+      name: "Dashboard",
+      component: () => import("@/views/Dashboard.vue"),
+      meta: { requiresAuth: true },
+    },
     {
       path: "/business",
       name: "Business",
       component: () => import("@/views/Business.vue"),
       meta: { requiresAuth: true },
+    },
+    {
+      path: "/contact",
+      name: "Contact",
+      component: () => import("@/views/Contact.vue"),
     },
     {
       path: "/privacy-policy",
@@ -77,12 +88,6 @@ const router = createRouter({
       path: "/forgot-password",
       name: "ForgotPassword",
       component: () => import("@/components/account/forgotpassword.vue"),
-    },
-    {
-      path: "/dashboard",
-      name: "Dashboard",
-      component: () => import("@/views/Dashboard.vue"),
-      meta: { requiresAuth: true },
     },
     {
       path: "/:pathMatch(.*)*",

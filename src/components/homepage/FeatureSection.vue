@@ -13,7 +13,7 @@
         <p 
           class="text-gray-300 text-lg md:text-xl max-w-3xl mx-auto animate-fade-in-up"
         >
-          Discover the future of supplement wellness powered by Vitain AI grounded in data from scientific research and 
+          Discover the future of supplement wellness powered by VitainAI grounded in data from scientific research and 
           government health databases.        </p>
       </div>
 
@@ -36,8 +36,8 @@
               AI-Powered Analysis
             </h3>
             <p class="text-gray-300 leading-relaxed">
-              Vitain AI is fueled by state-of-the-art technology and powerful algorithms to analyze your health data alongside its 
-              data sources.
+              VitainAI is fueled by state-of-the-art technology and powerful algorithms to analyze your health profile alongside its 
+              scientific and government sources.
             </p>
           </div>
         </div>
