@@ -239,6 +239,7 @@ export async function detectLoginState(): Promise<User> {
         if (user) {
           console.log("User is logged in: ", user.email);
           resolve(user);
+          return user;
         } else {
           console.log("No user is logged in");
           reject({ type: "login", message: "No user is logged in" });

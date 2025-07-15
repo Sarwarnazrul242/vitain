@@ -9,7 +9,7 @@
         class="absolute inset-0 bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] opacity-90 group-hover:opacity-100 transition-opacity"
       ></span>
       <span class="relative px-6 py-4 text-white flex items-center gap-3">
-        <span class="hidden md:block">Chat with AI Assistant</span>
+        <span class="hidden md:block">Chat with VitainAI</span>
         <svg
           xmlns="http://www.w3.org/2000/svg"
           class="h-6 w-6"
@@ -48,8 +48,8 @@
             class="p-4 border-b border-white/10 flex items-center justify-between bg-gradient-to-r from-[#4ADE80]/10 to-[#3B82F6]/10"
           >
             <div>
-              <h3 class="font-bold text-white">AI Health Assistant</h3>
-              <p class="text-sm text-gray-400">Ask me anything about health</p>
+              <h3 class="font-bold text-white">VitainAI</h3>
+              <p class="text-sm text-gray-400">Ask me anything about supplement and personal wellness</p>
             </div>
             <button
               @click="toggleChat"
