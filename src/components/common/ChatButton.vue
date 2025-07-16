@@ -166,7 +166,7 @@
 </template>
 
 <script setup>
-import { marked } from "marked";
+// import { marked } from "marked";
 import { ref, watch, nextTick, onMounted, onUnmounted } from "vue";
 import axios from "axios";
 import { getAuth, onAuthStateChanged } from "firebase/auth";

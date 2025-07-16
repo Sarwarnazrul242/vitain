@@ -93,6 +93,17 @@ const router = createRouter({
       path: "/:pathMatch(.*)*",
       redirect: "/",
     },
+    {
+      path: "/api",
+      name: "APIPage",
+      component: () => import("@/views/APiPage.vue"),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: "/pricing",
+      name: "Pricing",
+      component: () => import("@/views/Pricing.vue"),
+    },
   ],
   scrollBehavior(to, from, savedPosition) {
     // always scroll to top
