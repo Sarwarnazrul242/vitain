@@ -225,7 +225,6 @@ async function fetchChatHistory() {
 
 const toggleChat = async () => {
   try {
-    console.log("hie");
     const idToken = await getValidIdToken();
     console.log(idToken);
     await fetchChatHistory();
