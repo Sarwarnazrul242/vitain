@@ -53,14 +53,20 @@
 </template>
 
 <script lang="ts" setup>
-import BackgroundGradient from "@/components/homepage/BackgroundGradient.vue";
-import Footer from "@/components/common/Footer.vue";
+import BackgroundGradient from "../../components/homepage/BackgroundGradient.vue";
+import Footer from "../../components/common/Footer.vue";
 import { ref, computed, onMounted, nextTick } from "vue";
 import { useRouter } from "vue-router";
 import { errors, ErrorType, AppError, isAppError, pastError, submitForm, resetPassword } from "../../services/auth";
 const router = useRouter();
 // Error messages
 const emailError = ref('');
+const otpError = ref('');
+const passwordError = ref('');
+const confirmPasswordError = ref('');
+
+// Step state (add this to fix the error)
+const currentStep = ref(1);
 
 
 // Computed properties

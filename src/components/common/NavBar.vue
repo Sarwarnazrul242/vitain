@@ -15,10 +15,11 @@
       <div class="nav-links-container">
         <div class="nav-links">
           <router-link to="/" class="nav-link">Home</router-link>
+          <router-link to="/supplements" class="nav-link">Supplements</router-link>
           <router-link to="/business" class="nav-link">Business</router-link>
-          <router-link to="/supplements" class="nav-link"
-            >Supplements</router-link
-          >
+          <router-link to="/contact" class="nav-link">Contact Us</router-link>
+          <router-link to="/api" class="nav-link">API</router-link>
+          <router-link to="/pricing" class="nav-link">Pricing</router-link>
           <router-link to="/log-in" class="nav-link" v-if="userState === 'Signed Out'" >Log In</router-link>
         </div>
       </div>
@@ -41,17 +42,34 @@
             >Home</router-link
           >
           <router-link
+            to="/supplements"
+            class="mobile-nav-link"
+            @click="toggleMobileMenu"
+            >Supplements</router-link
+          >
+           <router-link
             to="/business"
             class="mobile-nav-link"
             @click="toggleMobileMenu"
             >Business</router-link
           >
           <router-link
-            to="/supplements"
+            to="/contact"
             class="mobile-nav-link"
             @click="toggleMobileMenu"
-            >Supplements</router-link
+            >Contact Us</router-link
           >
+          <router-link
+            to="/pricing"
+            class="mobile-nav-link"
+            @click="toggleMobileMenu"
+            >Pricing
+          </router-link>
+          <router-link
+            to="/api"
+            class="mobile-nav-link"
+            @click="toggleMobileMenu"
+          >API</router-link>
           <router-link
             to="/log-in"
             class="mobile-nav-link"

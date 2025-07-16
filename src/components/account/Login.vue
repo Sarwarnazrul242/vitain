@@ -230,8 +230,8 @@
   </template>
   
   <script lang="ts" setup>
-  import BackgroundGradient from "@/components/homepage/BackgroundGradient.vue";
-  import Footer from "@/components/common/Footer.vue";
+  import BackgroundGradient from "../../components/homepage/BackgroundGradient.vue";
+  import Footer from "../../components/common/Footer.vue";
   import { watch, onMounted, ref } from "vue";
   import { errors, ErrorType, AppError, isAppError, pastError, login, signup, submitForm } from "../../services/auth";
   import { useRoute, useRouter } from "vue-router";

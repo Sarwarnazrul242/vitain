@@ -45,6 +45,7 @@
 import { ref, onMounted, onBeforeUnmount, defineAsyncComponent, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { loading, updateLoading } from "./composables/featureCtrl";
+import { errors, ErrorType, AppError, isAppError, pastError, detectLoginState } from "./services/auth";
 
 const NavBar = defineAsyncComponent(() => import('./components/common/NavBar.vue'));
 
@@ -55,8 +56,30 @@ const isDashboardRoute = computed(() => {
   return route.name === 'Dashboard' || route.path === '/dashboard';
 });
 
-onMounted(() => {
-  
+const handleLoginState = async () => {
+  try{
+   await detectLoginState();
+   sessionStorage.setItem("userState","Signed In"); //So that user specific NavBar pops up
+
+  } catch(err)
+  {
+
+  if (err.type =="login")
+  {
+    sessionStorage.setItem("userState","Signed Out"); //So that user specific NavBar pops up
+  }
+
+  else
+  {
+    throw err
+  }
+
+  }
+
+}
+
+onMounted(async() => {
+  await handleLoginState();
   window.addEventListener("loading-change", updateLoading);
 });
 

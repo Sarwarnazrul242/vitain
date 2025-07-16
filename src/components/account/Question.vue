@@ -371,8 +371,8 @@
 </template>
 
 <script lang="ts" setup>
-import BackgroundGradient from "@/components/homepage/BackgroundGradient.vue";
-import Footer from "@/components/common/Footer.vue";
+import BackgroundGradient from "../../components/homepage/BackgroundGradient.vue";
+  import Footer from "../../components/common/Footer.vue";
 import { ref, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
 

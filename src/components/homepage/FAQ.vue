@@ -152,17 +152,14 @@
                 </div>
             </div>
 
-            <!-- Contact CTA -->
+            <!-- Contact Us -->
             <div class="text-center mt-16">
                 <p class="text-gray-400 text-lg mb-6">
                     Still have questions? We're here to help!
                 </p>
-                <a href="mailto:vitain@gmail.com" class="inline-flex items-center gap-2 px-8 py-4 rounded-xl text-lg font-medium bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-white hover:scale-105 transition-transform duration-300">
-                    Contact Support
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                    </svg>
-                </a>
+                <router-link to="/contact" class="inline-flex items-center gap-2 px-8 py-4 rounded-xl text-lg font-medium bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-white hover:scale-105 transition-transform duration-300">Contact Us</router-link>
+                 
+               
             </div>
         </div>
     </section>
