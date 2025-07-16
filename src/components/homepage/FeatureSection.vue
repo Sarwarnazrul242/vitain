@@ -22,24 +22,18 @@
         class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10"
       >
         <!-- AI Analysis -->
-        <div class="feature-card group" data-aos="fade-up" data-aos-delay="100">
-          <div
-            class="absolute inset-0 bg-gradient-to-r from-[#4ADE80]/10 to-[#3B82F6]/10 rounded-2xl blur group-hover:blur-xl transition-all duration-300"
-          ></div>
-          <div class="relative z-10 p-8">
-            <div class="icon-wrapper mb-6">
-              <span class="text-4xl">🤖</span>
-            </div>
-            <h3
-              class="text-2xl font-bold mb-4 bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-transparent bg-clip-text"
-            >
-              AI-Powered Analysis
-            </h3>
-            <p class="text-gray-300 leading-relaxed">
-              VitainAI is fueled by state-of-the-art technology and powerful algorithms to analyze your health profile alongside its 
-              scientific and government sources.
-            </p>
+        <div class="feature-card-simple">
+          <div class="icon-wrapper-simple mb-6">
+            <!-- Simple SVG icon: Target -->
+            <svg width="36" height="36" fill="none" viewBox="0 0 36 36"><circle cx="18" cy="18" r="14" stroke="#3B82F6" stroke-width="3"/><circle cx="18" cy="18" r="7" stroke="#4ADE80" stroke-width="3"/><circle cx="18" cy="18" r="2" fill="#3B82F6"/></svg>
           </div>
+          <h3 class="text-2xl font-bold mb-4 text-gray-100">
+            AI-Powered Analysis
+          </h3>
+          <p class="text-gray-400 leading-relaxed">
+            VitainAI is fueled by state-of-the-art technology and powerful algorithms to analyze your health profile alongside its 
+            scientific and government sources.
+          </p>
         </div>
 
         <!-- Personalized Plans -->
