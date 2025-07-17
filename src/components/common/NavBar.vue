@@ -18,8 +18,8 @@
           <router-link to="/supplements" class="nav-link">Supplements</router-link>
           <router-link to="/business" class="nav-link">Business</router-link>
           <router-link to="/contact" class="nav-link">Contact Us</router-link>
-          <router-link to="/api" class="nav-link">API</router-link>
-          <router-link to="/pricing" class="nav-link">Pricing</router-link>
+          <!-- <router-link to="/api" class="nav-link">API</router-link>
+          <router-link to="/pricing" class="nav-link">Pricing</router-link> -->
           <router-link to="/log-in" class="nav-link" v-if="userState === 'Signed Out'" >Log In</router-link>
         </div>
       </div>
@@ -59,7 +59,7 @@
             @click="toggleMobileMenu"
             >Contact Us</router-link
           >
-          <router-link
+          <!-- <router-link
             to="/pricing"
             class="mobile-nav-link"
             @click="toggleMobileMenu"
@@ -69,7 +69,7 @@
             to="/api"
             class="mobile-nav-link"
             @click="toggleMobileMenu"
-          >API</router-link>
+          >API</router-link> -->
           <router-link
             to="/log-in"
             class="mobile-nav-link"
