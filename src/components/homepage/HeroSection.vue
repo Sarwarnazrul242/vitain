@@ -63,11 +63,7 @@
                 </div>
                 
                 <!-- Stats -->
-<<<<<<< HEAD
-                <div class="grid grid-cols-3 gap-8 animate-fade-in-up delay-500">
-=======
                 <div class="grid grid-cols-2 gap-8 animate-fade-in-up delay-600">
->>>>>>> 5661290 (Continued work on improving UI/UX and marketing)
                     <div class="stats-card">
                         <div class="text-3xl font-bold bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-transparent bg-clip-text">1</div>
                         <div class="text-gray-300 text-sm">VitainAI</div>
@@ -81,8 +77,8 @@
                         <div class="text-gray-300 text-sm">Chemical Ingredients</div>
                     </div>
                     <div class="stats-card">
-                        <div class="text-3xl font-bold bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-transparent bg-clip-text">6+</div>
-                        <div class="text-gray-300 text-sm">Amazing features</div>
+                        <div class="text-3xl font-bold bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-transparent bg-clip-text">1</div>
+                        <div class="text-gray-300 text-sm">New You! </div>
                     </div>
                 </div>
             </div>

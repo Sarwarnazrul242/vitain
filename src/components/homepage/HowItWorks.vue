@@ -108,10 +108,6 @@
                     </div>
                 </div>
             </div>
-<<<<<<< HEAD
-           
-=======
->>>>>>> 5661290 (Continued work on improving UI/UX and marketing)
 
             <!-- CTA Section -->
             <!-- <div class="text-center mt-20">
