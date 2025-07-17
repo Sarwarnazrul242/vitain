@@ -37,10 +37,29 @@
         </div>
 
         <!-- Personalized Plans -->
+<<<<<<< HEAD
         <div class="feature-card-simple">
           <div class="icon-wrapper-simple mb-6">
             <!-- Simple SVG icon: Target -->
             <svg width="36" height="36" fill="none" viewBox="0 0 36 36"><circle cx="18" cy="18" r="14" stroke="#3B82F6" stroke-width="3"/><circle cx="18" cy="18" r="7" stroke="#4ADE80" stroke-width="3"/><circle cx="18" cy="18" r="2" fill="#3B82F6"/></svg>
+=======
+        <div class="feature-card group" data-aos="fade-up" data-aos-delay="200">
+          <div
+            class="absolute inset-0 bg-gradient-to-r from-[#4ADE80]/10 to-[#3B82F6]/10 rounded-2xl blur group-hover:blur-xl transition-all duration-300"
+          ></div>
+          <div class="relative z-10 p-8">
+            <div class="icon-wrapper mb-6">
+              <span class="text-4xl">🎯</span>
+            </div>
+            <h3
+              class="text-2xl font-bold mb-4 bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-transparent bg-clip-text"
+            >
+              Personalized Plans
+            </h3>
+            <p class="text-gray-300 leading-relaxed">
+              Receive custom supplement suggestions and usage plans that evolve with changes in your body, routine, personal health and goals.
+            </p>
+>>>>>>> 5661290 (Continued work on improving UI/UX and marketing)
           </div>
           <h3 class="text-2xl font-bold mb-4 text-gray-100">
             Personalized Plans
@@ -50,11 +69,53 @@
           </p>
         </div>
 
+<<<<<<< HEAD
         <!-- Quality Assurance -->
         <div class="feature-card-simple">
           <div class="icon-wrapper-simple mb-6">
             <!-- Simple SVG icon: Shield/Check -->
             <svg width="36" height="36" fill="none" viewBox="0 0 36 36"><path d="M18 4l12 4v7c0 8-5.5 13.5-12 17-6.5-3.5-12-9-12-17V8l12-4z" stroke="#4ADE80" stroke-width="2" fill="none"/><path d="M13 18l3 3 5-5" stroke="#3B82F6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+=======
+        <!-- Transparent Data -->
+        <div class="feature-card group" data-aos="fade-up" data-aos-delay="300">
+          <div
+            class="absolute inset-0 bg-gradient-to-r from-[#4ADE80]/10 to-[#3B82F6]/10 rounded-2xl blur group-hover:blur-xl transition-all duration-300"
+          ></div>
+          <div class="relative z-10 p-8">
+            <div class="icon-wrapper mb-6">
+              <span class="text-4xl">✨</span>
+            </div>
+            <h3
+              class="text-2xl font-bold mb-4 bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-transparent bg-clip-text"
+            >
+              Transparent Data
+            </h3>
+            <p class="text-gray-300 leading-relaxed">
+              We provide thorough, transparent insight into every supplement and brand we suggest.
+              Our data comes from scientific research and government health databases.
+            </p>
+          </div>
+        </div>
+
+        <!-- Business & Partnerships  -->
+        <div class="feature-card group" data-aos="fade-up" data-aos-delay="400">
+          <div
+            class="absolute inset-0 bg-gradient-to-r from-[#4ADE80]/10 to-[#3B82F6]/10 rounded-2xl blur group-hover:blur-xl transition-all duration-300"
+          ></div>
+          <div class="relative z-10 p-8">
+            <div class="icon-wrapper mb-6">
+              <span class="text-4xl">👨‍⚕️</span>
+            </div>
+            <h3
+              class="text-2xl font-bold mb-4 bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-transparent bg-clip-text"
+            >
+              Partnerships
+            </h3>
+            <p class="text-gray-300 leading-relaxed">
+              Utilize our platform to connect with health-conscious users and assist us in transforming their health.
+              Whether you are a business, health provider, researcher or influencer we want to partner with you.
+            </p>
+>>>>>>> 5661290 (Continued work on improving UI/UX and marketing)
           </div>
           <h3 class="text-2xl font-bold mb-4 text-gray-100">
             Quality Assurance
@@ -65,10 +126,29 @@
         </div>
 
         <!-- Progress Tracking -->
+<<<<<<< HEAD
         <div class="feature-card-simple">
           <div class="icon-wrapper-simple mb-6">
             <!-- Simple SVG icon: Chart -->
             <svg width="36" height="36" fill="none" viewBox="0 0 36 36"><rect x="8" y="20" width="4" height="8" rx="2" fill="#3B82F6"/><rect x="16" y="14" width="4" height="14" rx="2" fill="#4ADE80"/><rect x="24" y="10" width="4" height="18" rx="2" fill="#3B82F6"/></svg>
+=======
+        <div class="feature-card group" data-aos="fade-up" data-aos-delay="500">
+          <div
+            class="absolute inset-0 bg-gradient-to-r from-[#4ADE80]/10 to-[#3B82F6]/10 rounded-2xl blur group-hover:blur-xl transition-all duration-300"
+          ></div>
+          <div class="relative z-10 p-8">
+            <div class="icon-wrapper mb-6">
+              <span class="text-4xl">📊</span>
+            </div>
+            <h3
+              class="text-2xl font-bold mb-4 bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-transparent bg-clip-text">
+              Health Tracking
+            </h3>
+            <p class="text-gray-300 leading-relaxed">
+              Our platform can record, track and monitor your health and supplement usage.
+              Receive insights and trends on how they complement each other. 
+            </p>
+>>>>>>> 5661290 (Continued work on improving UI/UX and marketing)
           </div>
           <h3 class="text-2xl font-bold mb-4 text-gray-100">
             Progress Tracking
@@ -79,10 +159,30 @@
         </div>
 
         <!-- Research Based -->
+<<<<<<< HEAD
         <div class="feature-card-simple">
           <div class="icon-wrapper-simple mb-6">
             <!-- Simple SVG icon: DNA -->
             <svg width="36" height="36" fill="none" viewBox="0 0 36 36"><path d="M10 8c6 8 10 12 16 20" stroke="#3B82F6" stroke-width="2"/><path d="M26 8c-6 8-10 12-16 20" stroke="#4ADE80" stroke-width="2"/></svg>
+=======
+        <div class="feature-card group" data-aos="fade-up" data-aos-delay="600">
+          <div
+            class="absolute inset-0 bg-gradient-to-r from-[#4ADE80]/10 to-[#3B82F6]/10 rounded-2xl blur group-hover:blur-xl transition-all duration-300"
+          ></div>
+          <div class="relative z-10 p-8">
+            <div class="icon-wrapper mb-6">
+              <span class="text-4xl">🧬</span>
+            </div>
+            <h3
+              class="text-2xl font-bold mb-4 bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-transparent bg-clip-text"
+            >
+              Developers
+            </h3>
+            <p class="text-gray-300 leading-relaxed">
+              Plug into our API to get programmatic access to VitainAI and well-organised supplement product data and ingredient details.
+              
+            </p>
+>>>>>>> 5661290 (Continued work on improving UI/UX and marketing)
           </div>
           <h3 class="text-2xl font-bold mb-4 text-gray-100">
             Research Based

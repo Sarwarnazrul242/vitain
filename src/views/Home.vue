@@ -5,9 +5,8 @@
             <NavBar />
             <HeroSection />
             <FeatureSection />
-            <OverviewSection />
-            <QuizSection />
             <HowItWorks />
+            <QuizSection />
             <FAQ />
             <Footer />
             <ChatButton />
