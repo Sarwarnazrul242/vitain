@@ -1,5 +1,6 @@
 <template>
-    <section class="relative min-h-screen flex items-center justify-center text-center px-4 py-20 md:py-0 overflow-hidden">
+    <section class="relative min-h-screen flex items-center justify-center text-center px-4 py-20 md:py-0 overflow-hidden"
+    >
         <!-- Modern Animated Background -->
         <div class="absolute inset-0 z-0">
             <!-- Animated geometric shapes -->
@@ -30,11 +31,11 @@
         <!-- Responsive Flex Layout: Content Left, Image Right -->
         <div class="relative z-10 w-full max-w-6xl mx-auto flex flex-col-reverse md:flex-row items-center justify-between gap-8 md:gap-16">
             <!-- Left: Text Content -->
-            <div class="flex-1 max-w-3xl text-left">
-                <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-transparent bg-clip-text mb-6 animate-fade-in-down leading-tight">
+            <div class="flex-1 max-w-3xl text-left animate-hero-text-pop-in">
+                <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-transparent bg-clip-text mb-6 animate-fade-in-down delay-200 leading-tight">
                     Vitain your Vitality
                 </h1>
-                <p class="text-gray-300 text-lg md:text-xl mb-10 max-w-xl animate-fade-in-up delay-200 leading-relaxed">
+                <p class="text-gray-300 text-lg md:text-xl mb-10 max-w-xl animate-fade-in-up delay-300 leading-relaxed">
                     We tailor supplements to your needs, help you monitor your progress, and give you full visibility into every ingredient 
                     and brand we recommend.
                 </p>
@@ -62,7 +63,7 @@
                 </div>
                 
                 <!-- Stats -->
-                <div class="grid grid-cols-3 gap-8 animate-fade-in-up delay-600">
+                <div class="grid grid-cols-3 gap-8 animate-fade-in-up delay-500">
                     <div class="stats-card">
                         <div class="text-3xl font-bold bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-transparent bg-clip-text">1000+</div>
                         <div class="text-gray-400 text-sm">Users</div>
@@ -78,15 +79,16 @@
                 </div>
             </div>
             <!-- Right: AI Capsule Image -->
-            <div class="flex-1 flex items-center justify-center w-full md:w-auto mt-12 md:mt-0">
-                <img src="@/assets/vitainAI.png" alt="Vitain AI Capsule" class="w-100 max-w-full h-auto drop-shadow-2xl animate-fade-in-up" />
+            <div class="flex-1 flex items-center justify-center w-full md:w-auto mt-12 md:mt-0 animate-hero-img-pop-in" ref="imgContainerRef"
+                 @mousemove="handleMouseMove" @mouseleave="handleMouseLeave">
+                <img src="@/assets/vitainAI.png" alt="Vitain AI Capsule" class="w-100 max-w-full h-auto drop-shadow-2xl" :style="parallaxStyle" />
             </div>
         </div>
     </section>
 </template>
 
 <script lang="ts" setup>
-import { onMounted, onUnmounted } from "vue";
+import { onMounted, onUnmounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import {userState, updateUserState} from "../../composables/featureCtrl";
 
@@ -107,6 +109,29 @@ const scrollToLearnMore = () => {
   }
 };
 
+// Parallax effect for vitainAI image
+const parallaxStyle = ref({});
+const imgContainerRef = ref<HTMLElement | null>(null);
+
+const handleMouseMove = (e: MouseEvent) => {
+  if (!imgContainerRef.value) return;
+  const rect = imgContainerRef.value.getBoundingClientRect();
+  const x = (e.clientX - rect.left) / rect.width - 0.5; // -0.5 to 0.5
+  const y = (e.clientY - rect.top) / rect.height - 0.5;
+  const maxTranslate = 24; // px
+  const maxRotate = 8; // deg
+  parallaxStyle.value = {
+    transform: `translate(${x * maxTranslate}px, ${y * maxTranslate}px) rotateY(${-x * maxRotate}deg) rotateX(${y * maxRotate}deg)`,
+    transition: 'transform 0.2s cubic-bezier(0.23, 1, 0.32, 1)'
+  };
+};
+
+const handleMouseLeave = () => {
+  parallaxStyle.value = {
+    transform: 'translate(0,0) rotateY(0deg) rotateX(0deg)',
+    transition: 'transform 0.5s cubic-bezier(0.23, 1, 0.32, 1)'
+  };
+};
 
 onMounted(() => {
   window.addEventListener("userState-change", updateUserState);
@@ -362,5 +387,61 @@ onUnmounted(() => {
 
 .stats-card {
   @apply text-center p-4 rounded-xl backdrop-blur-lg bg-white/5 border border-gray-800 hover:border-gray-700 transition-all hover:scale-105;
+}
+
+@keyframes heroFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-hero-fade-in {
+  animation: heroFadeIn 1.2s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+@keyframes heroTextPopIn {
+  0% {
+    opacity: 0;
+    transform: translateX(-60px) scale(0.95) skewY(2deg);
+  }
+  60% {
+    opacity: 1;
+    transform: translateX(8px) scale(1.03) skewY(-1deg);
+  }
+  80% {
+    transform: translateX(0px) scale(0.98) skewY(0deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0) scale(1) skewY(0deg);
+  }
+}
+
+@keyframes heroImgPopIn {
+  0% {
+    opacity: 0;
+    transform: translateX(60px) scale(0.95) skewY(-2deg);
+  }
+  60% {
+    opacity: 1;
+    transform: translateX(-8px) scale(1.04) skewY(1deg);
+  }
+  80% {
+    transform: translateX(0px) scale(0.98) skewY(0deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0) scale(1) skewY(0deg);
+  }
+}
+
+.animate-hero-text-pop-in {
+  animation: heroTextPopIn 1.1s cubic-bezier(0.68, -0.55, 0.27, 1.55) 0.1s both;
+}
+.animate-hero-img-pop-in {
+  animation: heroImgPopIn 1.1s cubic-bezier(0.68, -0.55, 0.27, 1.55) 0.3s both;
 }
 </style>

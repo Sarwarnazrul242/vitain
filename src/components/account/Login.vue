@@ -286,6 +286,11 @@
       await signup(firstName.value, lastName.value, email.value,password.value );
       console.log("Sign up successful!");
 
+      // Set pending verification flag
+      sessionStorage.setItem("pendingVerification", "true");
+      console.log("Set pendingVerification flag");
+      
+      // Redirect to email verification first
       router.push("/verify");
       
    } catch (err: any){
@@ -322,7 +327,29 @@ const handleLogin = async () =>
       
       await login(email.value, password.value);
       sessionStorage.setItem("userState","Signed In")
-      router.push("/dashboard"); 
+      
+      // Check if user has quiz data stored (from quiz flow)
+      const quizData = sessionStorage.getItem("quizData");
+      const fromTakeQuiz = sessionStorage.getItem("fromTakeQuiz");
+      
+      if (quizData) {
+        sessionStorage.removeItem("quizData"); // Clear the stored data
+        sessionStorage.removeItem("fromTakeQuiz"); // Clear the take-quiz flag
+        
+        if (fromTakeQuiz === "true") {
+          // User came from take-quiz, they already answered questions
+          // Just redirect to dashboard since they don't need to complete profile
+          router.push("/dashboard");
+        } else {
+          // User came from signup flow, they need to complete profile
+          sessionStorage.setItem("signupCompleted", "true"); // Mark that user has completed signup flow
+          router.push("/CompleteProfile"); // Redirect to CompleteProfile for signup flow
+        }
+      } else {
+        // Clear signupCompleted flag for normal login flow
+        sessionStorage.removeItem("signupCompleted");
+        router.push("/dashboard"); // Normal login flow
+      } 
      
       } catch (err: any){
          

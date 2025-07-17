@@ -39,40 +39,6 @@
         tailored to your unique needs and goals
       </p>
 
-      <!-- Progress Steps -->
-      <div class="flex justify-center items-center gap-16 mt-8 animate-fade-in">
-        <div class="step-container group" v-for="step in 3" :key="step">
-          <div class="relative">
-            <div
-              class="w-6 h-6 rounded-full transition-all duration-300 flex items-center justify-center"
-              :class="[
-                step === 1
-                  ? 'bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] scale-125'
-                  : 'bg-white/20',
-                'group-hover:scale-110',
-              ]"
-            >
-              <span
-                class="text-xs font-bold"
-                :class="step === 1 ? 'text-white' : 'text-white/60'"
-              >
-                {{ step }}
-              </span>
-            </div>
-            <div
-              class="absolute -inset-3 bg-gradient-to-r from-[#4ADE80]/20 to-[#3B82F6]/20 rounded-full blur-sm"
-              v-if="step === 1"
-            ></div>
-          </div>
-          <div
-            class="absolute -bottom-8 left-1/2 transform -translate-x-1/2 whitespace-nowrap text-sm font-medium"
-            :class="step === 1 ? 'text-white' : 'text-gray-400'"
-          >
-            {{ getStepName(step) }}
-          </div>
-        </div>
-      </div>
-
       <!-- Estimated Time -->
       <div
         class="mt-12 text-gray-400 text-sm animate-fade-in-up"
@@ -91,37 +57,17 @@
             d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
           />
         </svg>
-        Takes about 2 minutes
+        Takes about 5-7 minutes
       </div>
     </div>
   </section>
 </template>
 
 <script setup>
-const getStepName = (step) => {
-  switch (step) {
-    case 1:
-      return "Basic Info";
-    case 2:
-      return "Health Goals";
-    case 3:
-      return "Preferences";
-    default:
-      return "";
-  }
-};
+// Component setup - no functions needed
 </script>
 
 <style scoped>
-.step-container {
-  @apply relative flex items-center;
-}
-
-.step-container:not(:last-child)::after {
-  content: "";
-  @apply absolute w-24 h-[2px] bg-white/20 left-8 top-1/2 transform -translate-y-1/2;
-}
-
 @keyframes fadeInDown {
   from {
     opacity: 0;

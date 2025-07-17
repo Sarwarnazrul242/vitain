@@ -110,21 +110,37 @@ const checkVerification = async () => {
 
     console.log("email verified")
     const formSubmission = sessionStorage.getItem("quizData");
+    const fromTakeQuiz = sessionStorage.getItem("fromTakeQuiz");
        
     //Handles formdat of new users who have not logged in
     try{
     if (formSubmission)
     {  
-     sessionStorage.removeItem("quizData"); //Clear lcal storage ebcause sessions torage has been passed abck for the quiz data
-      await handleFormSubmission(JSON.parse(formSubmission))
-      return
+     sessionStorage.removeItem("quizData"); //Clear local storage because session storage has been passed back for the quiz data
+     sessionStorage.removeItem("fromTakeQuiz"); // Clear the take-quiz flag
+     
+     if (fromTakeQuiz === "true") {
+       // User came from take-quiz, they already answered questions
+       // Just submit the form and redirect to dashboard
+       sessionStorage.removeItem("pendingVerification"); //Clear pending verification flag
+       await handleFormSubmission(JSON.parse(formSubmission));
+       router.push("/dashboard");
+       return;
+     } else {
+       // User came from signup flow, they need to complete profile
+       sessionStorage.removeItem("pendingVerification"); //Clear pending verification flag
+       await handleFormSubmission(JSON.parse(formSubmission));
+       return;
+     }
     }
 
     else 
     {
-      //Should take to quiz? for them to fill out info or verification page or something
+      //For new users who just completed signup and verification, take them to CompleteProfile
       sessionStorage.setItem("userState","Signed In"); //So that user specific NavBar pops up
-      router.push("/take-quiz"); 
+      sessionStorage.setItem("signupCompleted", "true"); //Mark that user has completed signup flow
+      sessionStorage.removeItem("pendingVerification"); //Clear pending verification flag
+      router.push("/CompleteProfile"); 
     }} catch (err)
     {
     console.log("signup formsubmission error", err)

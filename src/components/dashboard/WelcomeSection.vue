@@ -169,7 +169,7 @@ const urgentCount = computed(() => {
 
 // Methods
 const completeProfile = () => {
-  router.push('/questionnaire');
+          router.push('/take-quiz');
 };
 
 const toggleNotifications = () => {

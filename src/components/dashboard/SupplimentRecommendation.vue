@@ -157,7 +157,7 @@ const viewDetails = (supplement: any) => {
 };
 
 const completeProfile = () => {
-  router.push('/questionnaire');
+          router.push('/take-quiz');
 };
 
 onMounted(() => {

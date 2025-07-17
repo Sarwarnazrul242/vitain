@@ -53,7 +53,7 @@ const route = useRoute();
 
 // Check if current route is dashboard
 const isDashboardRoute = computed(() => {
-  return route.name === 'Dashboard' || route.path === '/dashboard';
+  return route.name === 'Dashboard' || route.path === '/dashboard' || route.path === '/profile';
 });
 
 const handleLoginState = async () => {

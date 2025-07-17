@@ -16,7 +16,6 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
                 <!-- Step 1 -->
                 <div class="step-card group">
-                    <div class="absolute inset-0 bg-gradient-to-r from-[#4ADE80]/10 to-[#3B82F6]/10 rounded-2xl blur group-hover:blur-xl transition-all duration-300"></div>
                     <div class="relative z-10 p-8">
                         <div class="step-number mb-6">1</div>
                         <h3 class="text-2xl font-bold mb-4 bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-transparent bg-clip-text">
@@ -44,7 +43,6 @@
 
                 <!-- Step 2 -->
                 <div class="step-card group">
-                    <div class="absolute inset-0 bg-gradient-to-r from-[#4ADE80]/10 to-[#3B82F6]/10 rounded-2xl blur group-hover:blur-xl transition-all duration-300"></div>
                     <div class="relative z-10 p-8">
                         <div class="step-number mb-6">2</div>
                         <h3 class="text-2xl font-bold mb-4 bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-transparent bg-clip-text">
@@ -72,7 +70,6 @@
 
                 <!-- Step 3 -->
                 <div class="step-card group">
-                    <div class="absolute inset-0 bg-gradient-to-r from-[#4ADE80]/10 to-[#3B82F6]/10 rounded-2xl blur group-hover:blur-xl transition-all duration-300"></div>
                     <div class="relative z-10 p-8">
                         <div class="step-number mb-6">3</div>
                         <h3 class="text-2xl font-bold mb-4 bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-transparent bg-clip-text">
@@ -98,34 +95,10 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Features Section -->
-            <div class="grid grid-cols-1 gap-12">
-                <div>
-                    <h2 class="text-3xl md:text-5xl font-bold mb-8">
-                        <span class="bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-transparent bg-clip-text">
-                            Why Choose Vitain?
-                        </span>
-                    </h2>
-                    <div class="space-y-6">
-                        <div class="feature-item">
-                            <h3 class="text-xl font-bold mb-2 text-white">AI-Powered Analysis</h3>
-                            <p class="text-gray-400">Our advanced algorithms analyze thousands of research papers and clinical studies to provide the most effective recommendations.</p>
-                        </div>
-                        <div class="feature-item">
-                            <h3 class="text-xl font-bold mb-2 text-white">Personalized Approach</h3>
-                            <p class="text-gray-400">Every recommendation is tailored to your unique health profile, goals, and lifestyle.</p>
-                        </div>
-                        <div class="feature-item">
-                            <h3 class="text-xl font-bold mb-2 text-white">Continuous Support</h3>
-                            <p class="text-gray-400">Get ongoing guidance and adjustments to your supplement plan as your health journey progresses.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+           
 
             <!-- CTA Section -->
-            <div class="text-center mt-20">
+            <!-- <div class="text-center mt-20">
                 <router-link 
                     to="/take-quiz"
                     class="relative group inline-flex items-center gap-2 px-8 py-4 rounded-xl text-lg font-medium overflow-hidden"
@@ -138,7 +111,7 @@
                         </svg>
                     </span>
                 </router-link>
-            </div>
+            </div> -->
         </div>
     </section>
 </template>
@@ -149,7 +122,9 @@
 
 <style scoped>
 .step-card {
-    @apply relative p-6 rounded-2xl backdrop-blur-sm border border-white/10 hover:border-white/20 transition-all duration-300;
+    @apply relative p-6 rounded-2xl border border-white/10 hover:border-[#4ADE80] transition-all duration-300;
+    background: linear-gradient(90deg, rgba(255,255,255,0.05) 0%, rgba(59,130,246,0.04) 100%);
+    backdrop-filter: blur(8px);
 }
 
 .step-number {

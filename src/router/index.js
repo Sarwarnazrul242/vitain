@@ -22,6 +22,12 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
+      path: "/CompleteProfile",
+      name: "CompleteProfile",
+      component: () => import("@/views/Quiz.vue"),
+      meta: { requiresAuth: true, requiresSignupFlow: true },
+    },
+    {
       path: "/quiz-results",
       name: "results",
       component: () => import("@/components/quizpage/Results.vue"),
@@ -46,16 +52,19 @@ const router = createRouter({
       path: "/verify",
       name: "Verify",
       component: () => import("@/components/account/Verify.vue"),
+      meta: { requiresSignupFlow: true },
     },
-    {
-      path: "/questionnaire",
-      name: "Questionnaire",
-      component: () => import("@/components/account/Question.vue"),
-    },
+
      {
       path: "/dashboard",
       name: "Dashboard",
       component: () => import("@/views/Dashboard.vue"),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: "/profile",
+      name: "Profile",
+      component: () => import("@/components/dashboard/Profile.vue"),
       meta: { requiresAuth: true },
     },
     {
@@ -113,6 +122,37 @@ const router = createRouter({
 
 // Navigation guard
 router.beforeEach((to, from, next) => {
+  // Check if route requires signup flow (for both auth and non-auth routes)
+  if (to.meta.requiresSignupFlow) {
+    console.log("Route requires signup flow:", to.path);
+    
+    if (to.path === "/verify") {
+      // For verify path, check if user has pending verification
+      const pendingVerification = sessionStorage.getItem("pendingVerification") || localStorage.getItem("pendingVerification");
+      console.log("Pending verification check:", pendingVerification);
+      
+      if (!pendingVerification) {
+        // User hasn't gone through signup flow, redirect to login
+        console.log("No pending verification, redirecting to login");
+        next("/log-in");
+        return;
+      }
+      console.log("Pending verification found, allowing access");
+    } else {
+      // For other paths like CompleteProfile, check if user has completed signup
+      const hasCompletedSignup = sessionStorage.getItem("signupCompleted");
+      console.log("Signup completed check:", hasCompletedSignup);
+      
+      if (!hasCompletedSignup) {
+        // User hasn't gone through signup flow, redirect to login
+        console.log("No signup completed, redirecting to login");
+        next("/log-in");
+        return;
+      }
+      console.log("Signup completed found, allowing access");
+    }
+  }
+
   if (to.meta.requiresAuth) {
     const expiryTime = localStorage.getItem("pinAuthExpiry");
     const currentTime = new Date().getTime();

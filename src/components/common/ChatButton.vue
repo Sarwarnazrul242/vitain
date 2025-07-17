@@ -49,7 +49,9 @@
           >
             <div>
               <h3 class="font-bold text-white">VitainAI</h3>
-              <p class="text-sm text-gray-400">Ask me anything about supplement and personal wellness</p>
+              <p class="text-sm text-gray-400">
+                Ask me anything about supplement and personal wellness
+              </p>
             </div>
             <button
               @click="toggleChat"
@@ -166,7 +168,7 @@
 </template>
 
 <script setup>
-// import { marked } from "marked";
+import { marked } from "marked";
 import { ref, watch, nextTick, onMounted, onUnmounted } from "vue";
 import axios from "axios";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
@@ -225,12 +227,15 @@ async function fetchChatHistory() {
 
 const toggleChat = async () => {
   try {
-    console.log("hie");
+    console.log("a");
     const idToken = await getValidIdToken();
-    console.log(idToken);
+
     await fetchChatHistory();
     isOpen.value = !isOpen.value;
-  } catch (err) {}
+  } catch (err) {
+    console.log(err);
+    alert("You must be logged in to use this feature");
+  }
 };
 
 // Handle click outside to close chat
@@ -397,7 +402,7 @@ async function sendMessage() {
 
     // Get AI response
     const res = await axios.post(
-      "https://vitain-ai.onrender.com/test_tool_choice",
+      "https://vitain-ai.onrender.com/chat",
       {
         role: "user",
         action: "send_message",
@@ -426,6 +431,13 @@ async function sendMessage() {
 
       // console.log(formatted_strs);
 
+      conversation_history.value.push({
+        role: "assistant",
+        content: res.data.message,
+      });
+    }
+
+    if (res.data.type === "get_supplement_interactions") {
       conversation_history.value.push({
         role: "assistant",
         content: res.data.message,

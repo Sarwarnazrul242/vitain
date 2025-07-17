@@ -77,7 +77,7 @@ export const errors = reactive<{
   verify: "",
 });
 
-type SubmissionType = "quiz" | "supplement";
+type SubmissionType = "quiz" | "supplement" | "comprehensiveQuestionnaire";
 
 interface SubmissionPayload {
   type: SubmissionType;
@@ -382,19 +382,67 @@ export async function storeProducts(supplement, products) {
 }
 
 export async function validateForm(formSubmission) {
-  if (!formSubmission.weight) return "Please enter your weight";
-  if (!formSubmission.height) return "Please enter your height";
-  if (!formSubmission.gender) return "Please select your gender";
-  if (!formSubmission.age) return "Please enter your age";
-  if (!formSubmission.activeness) return "Please select your activity level";
-  if (!formSubmission.goals) return "Please enter your health goals";
+  // Check if this is the new comprehensive questionnaire format
+  if (formSubmission.role === "user" && formSubmission.action === "list") {
+    // New comprehensive questionnaire validation
+    if (!formSubmission.age) return "Please enter your age";
+    if (!formSubmission.biologicalSex) return "Please select your biological sex";
+    if (!formSubmission.height) return "Please enter your height";
+    if (!formSubmission.weight) return "Please enter your weight";
+    if (!formSubmission.generalHealth) return "Please select your general health status";
+    if (!formSubmission.physicalWellness) return "Please answer about your physical wellness";
+    if (!formSubmission.painDiscomfort) return "Please answer about pain or discomfort";
+    if (!formSubmission.currentSymptoms || formSubmission.currentSymptoms.length === 0) return "Please select your current symptoms";
+    if (!formSubmission.medicalConditions || formSubmission.medicalConditions.length === 0) return "Please select your medical conditions";
+    if (!formSubmission.digestiveIssues) return "Please answer about digestive issues";
+    if (!formSubmission.concerningSymptoms) return "Please answer about concerning symptoms";
+    if (!formSubmission.pregnancyStatus) return "Please answer about pregnancy status";
+    if (!formSubmission.allergies) return "Please answer about allergies";
+    if (!formSubmission.prescriptionMeds) return "Please answer about prescription medications";
+    if (!formSubmission.otcSupplements) return "Please answer about over-the-counter supplements";
+    if (!formSubmission.advisedNotToTake) return "Please answer about advised supplements";
+    if (!formSubmission.bloodTests) return "Please answer about blood tests";
+    if (!formSubmission.shareTestResults) return "Please answer about sharing test results";
+    if (!formSubmission.specificDiet) return "Please select your diet";
+    if (!formSubmission.mealsPerDay) return "Please select meals per day";
+    if (!formSubmission.alcoholConsumption) return "Please answer about alcohol consumption";
+    if (!formSubmission.tobaccoUse) return "Please answer about tobacco use";
+    if (!formSubmission.sleepHours) return "Please select your sleep hours";
+    if (!formSubmission.fatigueLevel) return "Please select your fatigue level";
+    if (!formSubmission.activityLevel) return "Please select your activity level";
+    if (!formSubmission.exerciseDays) return "Please select your exercise days";
+    if (!formSubmission.difficultySwallowing) return "Please answer about difficulty swallowing";
+    if (!formSubmission.stressLevel) return "Please select your stress level";
+    if (!formSubmission.interestPleasure) return "Please answer about interest or pleasure";
+    if (!formSubmission.depression) return "Please answer about depression";
+    if (!formSubmission.sleepIssues) return "Please answer about sleep issues";
+    if (!formSubmission.supplementAdherence) return "Please select your supplement adherence";
+    if (!formSubmission.dosingPreference) return "Please select your dosing preference";
+    if (!formSubmission.budgetRange) return "Please select your budget range";
+    if (!formSubmission.healthGoals || formSubmission.healthGoals.length === 0) return "Please select your health goals";
 
-  formSubmission.weight = formSubmission.weight.toString();
-  formSubmission.height = formSubmission.height.toString();
-  formSubmission.age = formSubmission.age.toString();
-  formSubmission.supplements = formSubmission.supplements || "none";
-  formSubmission.allergies = formSubmission.allergies || "none";
-  return null;
+    // Convert data types
+    formSubmission.age = formSubmission.age.toString();
+    formSubmission.weight = formSubmission.weight.toString();
+    formSubmission.height = formSubmission.height.toString();
+    
+    return null;
+  } else {
+    // Legacy form validation (keeping for backward compatibility)
+    if (!formSubmission.weight) return "Please enter your weight";
+    if (!formSubmission.height) return "Please enter your height";
+    if (!formSubmission.gender) return "Please select your gender";
+    if (!formSubmission.age) return "Please enter your age";
+    if (!formSubmission.activeness) return "Please select your activity level";
+    if (!formSubmission.goals) return "Please enter your health goals";
+
+    formSubmission.weight = formSubmission.weight.toString();
+    formSubmission.height = formSubmission.height.toString();
+    formSubmission.age = formSubmission.age.toString();
+    formSubmission.supplements = formSubmission.supplements || "none";
+    formSubmission.allergies = formSubmission.allergies || "none";
+    return null;
+  }
 }
 
 export async function submitForm(formSubmission, router, error: string = "") {
@@ -427,42 +475,106 @@ export async function submitForm(formSubmission, router, error: string = "") {
       }
     }
 
-    sessionStorage.setItem("loading", "true"); //To flag for AI loading overlah
-    window.dispatchEvent(new Event("loading-change")); //Indicate change in event based of already logged in do AI mode
+    // Loading state commented out since AI processing is disabled
+    // sessionStorage.setItem("loading", "true"); //To flag for AI loading overlah
+    // window.dispatchEvent(new Event("loading-change")); //Indicate change in event based of already logged in do AI mode
 
-    console.log("getting session", sessionStorage.getItem("loading"));
+    // console.log("getting session", sessionStorage.getItem("loading"));
 
-    //push to quiz and load the ai page
-    //Else formsubmission is unchanged and contineus
-    const requestBody = {
-      role: "user",
-      action: "list",
-      weight: formSubmission.weight,
-      height: formSubmission.height,
-      gender: formSubmission.gender,
-      age: formSubmission.age,
-      activeness: formSubmission.activeness.toLowerCase(),
-      supplements: formSubmission.supplements,
-      allergies: formSubmission.allergies,
-      goals: formSubmission.goals,
-    };
+    // Construct request body based on form type
+    let requestBody;
+    
+    if (formSubmission.role === "user" && formSubmission.action === "list") {
+      // New comprehensive questionnaire format
+      requestBody = {
+        role: "user",
+        action: "list",
+        // Basic demographics
+        age: formSubmission.age,
+        biologicalSex: formSubmission.biologicalSex,
+        height: formSubmission.height,
+        weight: formSubmission.weight,
+        // Health status
+        generalHealth: formSubmission.generalHealth,
+        physicalWellness: formSubmission.physicalWellness,
+        painDiscomfort: formSubmission.painDiscomfort,
+        painDescription: formSubmission.painDescription,
+        // Symptoms and conditions
+        currentSymptoms: formSubmission.currentSymptoms,
+        medicalConditions: formSubmission.medicalConditions,
+        digestiveIssues: formSubmission.digestiveIssues,
+        concerningSymptoms: formSubmission.concerningSymptoms,
+        pregnancyStatus: formSubmission.pregnancyStatus,
+        allergies: formSubmission.allergies,
+        allergyDetails: formSubmission.allergyDetails,
+        // Medications and supplements
+        prescriptionMeds: formSubmission.prescriptionMeds,
+        prescriptionMedsList: formSubmission.prescriptionMedsList,
+        otcSupplements: formSubmission.otcSupplements,
+        otcSupplementsList: formSubmission.otcSupplementsList,
+        advisedNotToTake: formSubmission.advisedNotToTake,
+        bloodTests: formSubmission.bloodTests,
+        shareTestResults: formSubmission.shareTestResults,
+        // Diet and nutrition
+        specificDiet: formSubmission.specificDiet,
+        otherDiet: formSubmission.otherDiet,
+        mealsPerDay: formSubmission.mealsPerDay,
+        foodFrequency: formSubmission.foodFrequency,
+        alcoholConsumption: formSubmission.alcoholConsumption,
+        tobaccoUse: formSubmission.tobaccoUse,
+        // Lifestyle
+        sleepHours: formSubmission.sleepHours,
+        fatigueLevel: formSubmission.fatigueLevel,
+        activityLevel: formSubmission.activityLevel,
+        exerciseDays: formSubmission.exerciseDays,
+        difficultySwallowing: formSubmission.difficultySwallowing,
+        stressLevel: formSubmission.stressLevel,
+        // Mental health
+        interestPleasure: formSubmission.interestPleasure,
+        depression: formSubmission.depression,
+        sleepIssues: formSubmission.sleepIssues,
+        // Supplement preferences
+        pastSupplementExperience: formSubmission.pastSupplementExperience,
+        preferredFormats: formSubmission.preferredFormats,
+        supplementAdherence: formSubmission.supplementAdherence,
+        dosingPreference: formSubmission.dosingPreference,
+        budgetRange: formSubmission.budgetRange,
+        // Health goals
+        healthGoals: formSubmission.healthGoals,
+      };
+    } else {
+      // Legacy format for backward compatibility
+      requestBody = {
+        role: "user",
+        action: "list",
+        weight: formSubmission.weight,
+        height: formSubmission.height,
+        gender: formSubmission.gender,
+        age: formSubmission.age,
+        activeness: formSubmission.activeness.toLowerCase(),
+        supplements: formSubmission.supplements,
+        allergies: formSubmission.allergies,
+        goals: formSubmission.goals,
+      };
+    }
 
-    console.log("Storing quiz data");
+    console.log("Storing questionnaire data");
     try {
-      await submitUserData({ type: "quiz", data: formSubmission });
+      // Save the comprehensive questionnaire data to Firebase
+      await submitUserData({ type: "comprehensiveQuestionnaire", data: formSubmission });
+      console.log("Questionnaire data saved successfully to Firebase");
     } catch (err) {
-      if (err.type == "quiz") {
-        errors.quiz = err.message;
-        console.log("quiz error: ", err);
-        //Hanlde couldnt submit quiz, how to display erro emssage "...try again"
-        //
-        //
-        // eand redirect user to resubmit
+      if (err.type == "data") {
+        console.log("Error saving questionnaire data: ", err);
+        throw { type: "quiz", message: "Failed to save questionnaire data. Please try again." };
       } else {
         console.log("submitting user info error: ", err);
+        throw err;
       }
     }
 
+    // AI processing commented out for now - just saving data to database
+    /*
     console.log("Sending request with body:", requestBody);
 
     // First API call to get supplement recommendations
@@ -546,6 +658,11 @@ export async function submitForm(formSubmission, router, error: string = "") {
         supplementProducts: JSON.stringify(supplementProducts),
       },
     });
+    */
+
+    // For now, just redirect to dashboard after saving data
+    console.log("Data saved successfully. Redirecting to dashboard...");
+    router.push("/dashboard");
   } catch (error) {
     console.error("Error details:", error);
     error.value =
@@ -581,5 +698,31 @@ export async function retrieveUserInfo() {
     } else {
       console.log(err);
     }
+  }
+}
+
+export async function retrieveQuestionnaireData() {
+  try {
+    const user = await detectLoginState();
+    const userDocRef = doc(db, "users", user.uid);
+    const userSnap = await getDoc(userDocRef);
+
+    if (userSnap.exists()) {
+      const data = userSnap.data();
+      // Return the comprehensive questionnaire data if it exists
+      return data.comprehensiveQuestionnaire || null;
+    } else {
+      throw {
+        type: "database",
+        message: "User document not found in database",
+      };
+    }
+  } catch (err) {
+    if (err.type == "login") {
+      console.log("User needs to login: ", err);
+    } else {
+      console.log("Error retrieving questionnaire data: ", err);
+    }
+    return null;
   }
 }
