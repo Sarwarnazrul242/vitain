@@ -30,12 +30,13 @@
           <h3 class="text-2xl font-bold mb-4 text-gray-100">
             AI-Powered Analysis
           </h3>
-          <p class="text-gray-400 leading-relaxed">
+          <p class="text-gray-300 leading-relaxed">
             VitainAI is fueled by state-of-the-art technology and powerful algorithms to analyze your health profile alongside its 
             scientific and government sources.
           </p>
         </div>
-
+        
+  
         <!-- Personalized Plans -->
         <div class="feature-card-simple">
           <div class="icon-wrapper-simple mb-6">
@@ -45,51 +46,71 @@
           <h3 class="text-2xl font-bold mb-4 text-gray-100">
             Personalized Plans
           </h3>
-          <p class="text-gray-400 leading-relaxed">
-            Receive custom supplement suggestions that evolve with your changing health and goals.
+          <p class="text-gray-300 leading-relaxed">
+            Receive custom supplement suggestions and usage plans that evolve with changes in your body, routine, personal health and goals.
           </p>
         </div>
 
-        <!-- Quality Assurance -->
-        <div class="feature-card-simple">
+        <!-- Transparent Data -->
+                  <div class="feature-card-simple">
           <div class="icon-wrapper-simple mb-6">
-            <!-- Simple SVG icon: Shield/Check -->
+         <!-- Simple SVG icon: Shield/Check -->
             <svg width="36" height="36" fill="none" viewBox="0 0 36 36"><path d="M18 4l12 4v7c0 8-5.5 13.5-12 17-6.5-3.5-12-9-12-17V8l12-4z" stroke="#4ADE80" stroke-width="2" fill="none"/><path d="M13 18l3 3 5-5" stroke="#3B82F6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </div>
+           </div>
           <h3 class="text-2xl font-bold mb-4 text-gray-100">
-            Quality Assurance
+            Transparent Data
           </h3>
-          <p class="text-gray-400 leading-relaxed">
-            All supplements are thoroughly tested and certified for safety and effectiveness.
-          </p>
+          <p class="text-gray-300 leading-relaxed">
+             We provide thorough, transparent insight into every supplement and brand we suggest.
+             Our data comes from scientific research and government health databases. 
+            </p>
         </div>
 
-        <!-- Progress Tracking -->
-        <div class="feature-card-simple">
+        <!-- Business & Partnerships  -->
+          <div class="feature-card-simple">
           <div class="icon-wrapper-simple mb-6">
             <!-- Simple SVG icon: Chart -->
             <svg width="36" height="36" fill="none" viewBox="0 0 36 36"><rect x="8" y="20" width="4" height="8" rx="2" fill="#3B82F6"/><rect x="16" y="14" width="4" height="14" rx="2" fill="#4ADE80"/><rect x="24" y="10" width="4" height="18" rx="2" fill="#3B82F6"/></svg>
-          </div>
+           </div>
           <h3 class="text-2xl font-bold mb-4 text-gray-100">
-            Progress Tracking
+            Transparent Data
           </h3>
-          <p class="text-gray-400 leading-relaxed">
-            Monitor your health improvements with detailed analytics and progress reports.
-          </p>
+          <p class="text-gray-300 leading-relaxed">
+              Utilize our platform to connect with health-conscious users and assist us in transforming their health.
+              Whether you are a business, health provider, researcher or influencer we want to partner with you.
+            </p>
         </div>
 
-        <!-- Research Based -->
-        <div class="feature-card-simple">
+        <!-- Progress Tracking -->
+           <div class="feature-card-simple">
           <div class="icon-wrapper-simple mb-6">
             <!-- Simple SVG icon: DNA -->
             <svg width="36" height="36" fill="none" viewBox="0 0 36 36"><path d="M10 8c6 8 10 12 16 20" stroke="#3B82F6" stroke-width="2"/><path d="M26 8c-6 8-10 12-16 20" stroke="#4ADE80" stroke-width="2"/></svg>
+         </div>
+          <h3 class="text-2xl font-bold mb-4 text-gray-100">
+                 Health Tracking
+          </h3>
+          <p class="text-gray-300 leading-relaxed">
+             Our platform can record, track and monitor your health and supplement usage.
+              Receive insights and trends on how they complement each other. 
+            </p>
+        </div>
+
+        <!-- Research Based -->
+           <div class="feature-card-simple">
+          <div class="icon-wrapper-simple mb-6">
+             <!-- Simple SVG icon: DNA -->
+            <svg width="36" height="36" fill="none" viewBox="0 0 36 36"><path d="M10 8c6 8 10 12 16 20" stroke="#3B82F6" stroke-width="2"/><path d="M26 8c-6 8-10 12-16 20" stroke="#4ADE80" stroke-width="2"/></svg>
           </div>
           <h3 class="text-2xl font-bold mb-4 text-gray-100">
-            Research Based
+                  Developers
           </h3>
-          <p class="text-gray-400 leading-relaxed">
-            All recommendations are backed by the latest scientific research and studies.
-          </p>
+          <p class="text-gray-300 leading-relaxed">
+              Plug into our API to get programmatic access to VitainAI and well-organised supplement product data and ingredient details.
+              
+            </p>
+
+          
         </div>
       </div>
 

@@ -5,12 +5,16 @@
             <div class="flex-1 flex flex-col items-center md:items-start justify-center text-center md:text-left">
                 <h2 class="text-4xl md:text-5xl font-bold mb-4 animate-fade-in">
                     <span class="bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-transparent bg-clip-text">
-                        Unlock Your Personalized Wellness Plan
+                      Vitain App on iOS Coming Soon 
+                                    <!-- Get the Vitain app on iOS -->
                     </span>
                 </h2>
                 <p class="text-gray-300 text-lg md:text-xl mb-8 max-w-xl animate-fade-in-up">
-                    Discover which supplements are right for you. Take our quick, science-backed quiz and get instant, tailored recommendations—powered by AI.
-                </p>
+                     Provides you with instant access to your supplement plan, daily reminders, and wellness push notifications that keep you on track.   
+                     </p>
+                
+              <!-- Change to download iOS app -->
+               <!--
                 <button 
                     @click="navigateToQuiz"
                     class="relative group px-8 md:px-12 py-4 md:py-5 rounded-xl text-lg md:text-xl font-medium overflow-hidden animate-fade-in-up shadow-lg"
@@ -23,6 +27,8 @@
                         </svg>
                     </span>
                 </button>
+            </div>
+             -->
             </div>
             <!-- Phone Image with 3D effect -->
             <div class="flex-1 flex items-center justify-center">

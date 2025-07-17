@@ -37,7 +37,7 @@
                 </h1>
                 <p class="text-gray-300 text-lg md:text-xl mb-10 max-w-xl animate-fade-in-up delay-300 leading-relaxed">
                     We tailor supplements to your needs, help you monitor your progress, and give you full visibility into every ingredient 
-                    and brand we recommend.
+                    and brand we suggest.
                 </p>
                 <div class="flex flex-col sm:flex-row gap-4 animate-fade-in delay-400 mb-20">
                     <button 
@@ -63,18 +63,22 @@
                 </div>
                 
                 <!-- Stats -->
-                <div class="grid grid-cols-3 gap-8 animate-fade-in-up delay-500">
+                <div class="grid grid-cols-2 gap-8 animate-fade-in-up delay-600">
                     <div class="stats-card">
-                        <div class="text-3xl font-bold bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-transparent bg-clip-text">1000+</div>
-                        <div class="text-gray-400 text-sm">Users</div>
+                        <div class="text-3xl font-bold bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-transparent bg-clip-text">1</div>
+                        <div class="text-gray-300 text-sm">VitainAI</div>
                     </div>
                     <div class="stats-card">
-                        <div class="text-3xl font-bold bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-transparent bg-clip-text">50+</div>
-                        <div class="text-gray-400 text-sm">Products</div>
+                        <div class="text-3xl font-bold bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-transparent bg-clip-text">205,000+</div>
+                        <div class="text-gray-300 text-sm">Products</div>
                     </div>
                     <div class="stats-card">
-                        <div class="text-3xl font-bold bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-transparent bg-clip-text">24/7</div>
-                        <div class="text-gray-400 text-sm">Support</div>
+                        <div class="text-3xl font-bold bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-transparent bg-clip-text">110 million+</div>
+                        <div class="text-gray-300 text-sm">Chemical Ingredients</div>
+                    </div>
+                    <div class="stats-card">
+                        <div class="text-3xl font-bold bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-transparent bg-clip-text">1</div>
+                        <div class="text-gray-300 text-sm">New You! </div>
                     </div>
                 </div>
             </div>
