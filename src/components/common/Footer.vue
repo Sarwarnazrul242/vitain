@@ -20,15 +20,15 @@
                     <div class="flex flex-wrap gap-4 text-sm text-gray-400">
                         <span class="flex items-center gap-2">
                             <span class="text-[#4ADE80]">✓</span>
-                            AI-Powered Recommendations
+                            AI-Powered Analysis
                         </span>
                         <span class="flex items-center gap-2">
                             <span class="text-[#4ADE80]">✓</span>
-                            Science-Backed Supplements
+                            Personalized Supplement Plans
                         </span>
                         <span class="flex items-center gap-2">
                             <span class="text-[#4ADE80]">✓</span>
-                            Personalized Health Plans
+                            Transparent Data
                         </span>
                     </div>
                 </div>

@@ -44,10 +44,11 @@
             <svg width="36" height="36" fill="none" viewBox="0 0 36 36"><circle cx="18" cy="18" r="14" stroke="#3B82F6" stroke-width="3"/><circle cx="18" cy="18" r="7" stroke="#4ADE80" stroke-width="3"/><circle cx="18" cy="18" r="2" fill="#3B82F6"/></svg>
           </div>
           <h3 class="text-2xl font-bold mb-4 text-gray-100">
-            Personalized Plans
+            Personalized Supplement Plans
           </h3>
           <p class="text-gray-300 leading-relaxed">
-            Receive custom supplement suggestions and usage plans that evolve with changes in your body, routine, personal health and goals.
+            Receive custom supplement suggestions and usage plans that evolve with changes in personal health and goals.
+            The supplement brands suggested are scientifically verified or atleast recorded with the government. 
           </p>
         </div>
 

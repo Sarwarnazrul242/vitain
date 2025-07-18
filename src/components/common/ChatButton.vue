@@ -3,7 +3,7 @@
     <!-- Chat Button -->
     <button
       @click="toggleChat"
-      class="fixed bottom-8 right-8 z-50 group flex items-center gap-3 overflow-hidden rounded-full shadow-lg transition-all duration-300 hover:scale-105"
+      class="fixed bottom-8 right-8 z-50 group flex items-center gap-3 mb-14 overflow-hidden rounded-full shadow-lg transition-all duration-300 hover:scale-105"
     >
       <span
         class="absolute inset-0 bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] opacity-90 group-hover:opacity-100 transition-opacity"
