@@ -49,7 +49,7 @@
       </div>
     </div>
 
-    <div v-if="!profileComplete" class="onboarding-banner">
+    <div v-if="profileComplete" class="onboarding-banner">
       <div class="banner-content">
         <div class="banner-icon">⚡</div>
         <div class="banner-text">
@@ -67,14 +67,14 @@
 <script lang="ts" setup>
 import { ref, computed, ComputedRef, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { retrieveUserInfo } from "../../services/auth";
+import { retrieveUserInfo, retrieveQuestionnaireData } from "../../services/auth";
 
 const router = useRouter();
 
 // Notification state
 const showNotifications = ref(false);
 const notificationsPanel = ref();
-
+const profileComplete = ref(false);
 // Sidebar reference
 const sidebarRef = ref();
 
@@ -213,8 +213,28 @@ onMounted(async () => {
   document.addEventListener('click', handleClickOutside);
 });
 
-onUnmounted(() => {
+const retrieveQuestionnaireState = async  () => {
+
+  try{
+    const state = await retrieveQuestionnaireData();
+    return state
+  } catch (err)
+  {
+      throw err;
+  }
+}
+onUnmounted(async () => {
   // Remove click outside listener
+  const hasCompletedQuestions= await retrieveQuestionnaireState()
+  if (hasCompletedQuestions)
+  {
+     profileComplete.value = true;
+  }
+  
+  else {
+      profileComplete.value = false;
+  } 
+  
   document.removeEventListener('click', handleClickOutside);
 });
 </script>

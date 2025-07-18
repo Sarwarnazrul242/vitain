@@ -310,7 +310,7 @@
           <label class="font-semibold text-lg block mb-4 text-white"
             >Are you currently experiencing:</label
           >
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8 ">
             <button
               v-for="symptom in symptomsList"
               :key="symptom"
@@ -325,6 +325,11 @@
               <span>{{ symptom }}</span>
             </button>
           </div>
+            <input
+            v-model="formData.additionalSymptoms"
+            class="w-full p-3 border border-white/20 rounded-lg bg-white/5 text-white focus:outline-none focus:ring-2 focus:ring-[#4ADE80]/50 transition-all placeholder:text-white/50"
+            placeholder="Please specify any other symptoms you are experiencing not listed above"
+          />
         </div>
       </div>
 
@@ -374,7 +379,7 @@
           <label class="font-semibold text-lg block mb-4 text-white"
             >Do you have or have you been diagnosed with any of the following conditions?</label
           >
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8">
             <button
               v-for="condition in medicalConditionsList"
               :key="condition"
@@ -389,6 +394,12 @@
               <span>{{ condition }}</span>
             </button>
           </div>
+
+          <input
+            v-model="formData.additionalMedicalConditions"
+            class="w-full p-3 border border-white/20 rounded-lg bg-white/5 text-white focus:outline-none focus:ring-2 focus:ring-[#4ADE80]/50 transition-all placeholder:text-white/50"
+            placeholder="Please specify any other conditions you have been diagnosed with not listed above"
+          />
         </div>
 
         <!-- Digestive Issues -->
@@ -1324,7 +1335,7 @@
           <label class="font-semibold text-lg block mb-4 text-white"
             >What are your main health goals? (Select up to 3)</label
           >
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8">
             <button
               v-for="goal in healthGoalsList"
               :key="goal"
@@ -1338,7 +1349,27 @@
             >
               <span>{{ goal }}</span>
             </button>
+
+            <!-- For other goals to be inputed-->
+
+            <button @click="showOtherGoals = !showOtherGoals" 
+            :class="[ 
+              'py-3 px-4 rounded-lg transition-all duration-300 text-sm font-medium flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-white',
+                 showOtherGoals  && formData.healthGoals.length < 3
+                  ? 'bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-white shadow-lg scale-105'
+                   : 'bg-white/10 hover:bg-white/20 text-white'
+              ]"
+              :disabled = "formData.healthGoals.length >= 3">Other</button>
+
           </div>
+            
+          <input
+              v-if="showOtherGoals"
+            v-model="formData.otherHealthGoals"
+            :disabled = "formData.healthGoals.length >= 3"
+            class="w-full p-3 border border-white/20 rounded-lg bg-white/5 text-white focus:outline-none focus:ring-2 focus:ring-[#4ADE80]/50 transition-all placeholder:text-white/50"
+            placeholder="Please specify any other health goals you have not listed above"
+          />
         </div>
       </div>
 
@@ -1410,7 +1441,7 @@
 
 import { ref, computed, onMounted, onBeforeUnmount, watch } from "vue";
 import { useRouter, useRoute } from "vue-router";
-import { submitForm, login, signup, detectLoginState, submitUserData } from "../../services/auth";
+import { submitForm, login, signup, detectLoginState, submitUserData, retrieveQuestionnaireData } from "../../services/auth";
 import { reactive } from 'vue';
 import { 
   heightOptions, 
@@ -1420,8 +1451,10 @@ import {
   medicalConditionsList, 
   foodItems, 
   supplementFormats, 
-  healthGoalsList 
+  healthGoalsList, 
+  showOtherGoals
 } from './QuestionData';
+import { FacebookAuthProvider } from "firebase/auth/web-extension";
 
 const router = useRouter();
 const route = useRoute();
@@ -1441,18 +1474,27 @@ const finalButtonText = computed(() => {
 });
 
 // Check if user has already completed questions
-const checkIfAlreadyCompleted = () => {
+const checkIfAlreadyCompleted =  async () => {
   if (route.path === '/take-quiz') {
     // Check if user is logged in and has completed questions
-    const userState = sessionStorage.getItem("userState");
-    const hasCompletedQuestions = localStorage.getItem("userQuestionnaire") || sessionStorage.getItem("quizData");
-    
-    if (userState === "Signed In" && hasCompletedQuestions) {
-      showAlreadyCompletedPopup.value = true;
-      return true;
+    try{
+      const userState = sessionStorage.getItem("userState");
+      const hasCompletedQuestions = await retrieveQuestionnaireState();
+        
+        if (userState === "Signed In" && hasCompletedQuestions) 
+        {
+          showAlreadyCompletedPopup.value = true;
+          return true;
+    }
+  } catch (err)
+    {
+      
+      throw err;
     }
   }
+
   return false;
+  
 };
 
 const formData = ref({
@@ -1470,8 +1512,10 @@ const formData = ref({
   painDescription: "",
   // Section 3: Current Symptoms
   currentSymptoms: [] as string[],
+  additionalSymptoms: "",
   // Section 4: Medical History
   medicalConditions: [] as string[],
+  additionalMedicalConditions: "",
   digestiveIssues: "",
   concerningSymptoms: "",
   pregnancyStatus: "",
@@ -1511,6 +1555,7 @@ const formData = ref({
   budgetRange: "",
   // Section 10: Health Goals
   healthGoals: [] as string[],
+  otherHealthGoals:""
 });
 
 // Section completion checks
@@ -1530,7 +1575,7 @@ const isSection2Complete = computed(() => {
 });
 
 const isSection3Complete = computed(() => {
-  return formData.value.currentSymptoms.length > 0;
+  return formData.value.currentSymptoms.length > 0
 });
 
 const isSection4Complete = computed(() => {
@@ -1540,7 +1585,7 @@ const isSection4Complete = computed(() => {
          formData.value.pregnancyStatus &&
          formData.value.allergies &&
          (formData.value.allergies === 'no' || 
-          (formData.value.allergies === 'yes' && formData.value.allergyDetails));
+          (formData.value.allergies === 'yes' && formData.value.allergyDetails))
 });
 
 const isSection5Complete = computed(() => {
@@ -1582,11 +1627,21 @@ const isSection8Complete = computed(() => {
 const isSection9Complete = computed(() => {
   return formData.value.supplementAdherence &&
          formData.value.dosingPreference &&
+         formData.value.preferredFormats &&
          formData.value.budgetRange;
 });
 
 const isSection10Complete = computed(() => {
-  return formData.value.healthGoals.length > 0 && formData.value.healthGoals.length <= 3;
+  //Account for other health goal field
+  if (showOtherGoals.value)
+  {
+    return formData.value.healthGoals.length > 0 && formData.value.healthGoals.length < 3 && formData.value.otherHealthGoals;
+  }
+
+  else{
+    return formData.value.healthGoals.length > 0 && formData.value.healthGoals.length <= 3
+  }
+ 
 });
 
 const progress = computed(() => {
@@ -1698,11 +1753,15 @@ const togglePreferredFormat = (format: string) => {
 
 const toggleHealthGoal = (goal: string) => {
   const index = formData.value.healthGoals.indexOf(goal);
+
+  const hasOtherGoal = formData.value.otherHealthGoals.trim() != ''
+  const totalSelectedGoals = formData.value.healthGoals.length + (hasOtherGoal ? 1 : 0)
   if (index > -1) {
     formData.value.healthGoals.splice(index, 1);
+    formData.value.otherHealthGoals="";
   } else {
     // Limit to 3 goals
-    if (formData.value.healthGoals.length < 3) {
+    if (totalSelectedGoals < 3) {
       formData.value.healthGoals.push(goal);
     }
   }
@@ -1757,9 +1816,20 @@ const handleFormSubmission = async () => {
   }
 }
 
+const retrieveQuestionnaireState = async  () => {
+
+  try{
+    const state = await retrieveQuestionnaireData();
+    return state
+  } catch (err)
+  {
+      throw err;
+  }
+}
+
 const goToProfileSettings = () => {
   // Navigate to profile settings (you can update this path as needed)
-  router.push("/dashboard");
+  router.push("/profile");
   showAlreadyCompletedPopup.value = false;
 };
 
@@ -1768,9 +1838,18 @@ const closePopup = () => {
   router.push("/dashboard");
 };
 
-onMounted(() => {
+watch ( [()=> formData.value.healthGoals.length, ()=> showOtherGoals.value], ([len, goalFlag])  => 
+{
+  if (len >= 3 || !goalFlag) //If showother goals is false then it should clear the contents of healthgoals
+  {
+    formData.value.otherHealthGoals =''
+    showOtherGoals.value=false
+  }
+});
+
+onMounted(async () => {
   // Check if user has already completed questions
-  if (checkIfAlreadyCompleted()) {
+  if (await checkIfAlreadyCompleted()) {
     return;
   }
   
@@ -1943,3 +2022,4 @@ select::-webkit-scrollbar-thumb:hover {
   background: #3b82f6;
 }
 </style>
+

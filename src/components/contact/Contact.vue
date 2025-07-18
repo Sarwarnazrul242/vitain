@@ -15,7 +15,7 @@
                         </h1>
                         <p class="text-gray-300 text-lg md:text-xl max-w-3xl mx-auto">
                            We need your assistance to continuously improve the products and services we provide to you.
-                           So, do not hesistate to reach out to us with feedback, errors encountered, questions and inquiries
+                           So, do not hesistate to reach out to us with feedback, errors encountered, questions and inquiries.
                         </p>
                     </div>
 
