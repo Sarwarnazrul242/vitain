@@ -29,7 +29,7 @@
         </div>
 
         <!-- Responsive Flex Layout: Content Left, Image Right -->
-        <div class="relative z-10 w-full max-w-6xl mx-auto flex flex-col-reverse md:flex-row items-center justify-between gap-8 md:gap-16">
+        <div class="relative z-10 w-full max-w-6xl mx-auto flex flex-col-reverse md:flex-row items-center justify-between gap-8 md:gap-16 mt-24">
             <!-- Left: Text Content -->
             <div class="flex-1 max-w-3xl text-left animate-hero-text-pop-in">
                 <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-transparent bg-clip-text mb-6 animate-fade-in-down delay-200 leading-tight">
