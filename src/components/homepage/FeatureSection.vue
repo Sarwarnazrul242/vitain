@@ -73,7 +73,7 @@
             <svg width="36" height="36" fill="none" viewBox="0 0 36 36"><rect x="8" y="20" width="4" height="8" rx="2" fill="#3B82F6"/><rect x="16" y="14" width="4" height="14" rx="2" fill="#4ADE80"/><rect x="24" y="10" width="4" height="18" rx="2" fill="#3B82F6"/></svg>
            </div>
           <h3 class="text-2xl font-bold mb-4 text-gray-100">
-            Transparent Data
+             Businesses and Partnerships
           </h3>
           <p class="text-gray-300 leading-relaxed">
               Utilize our platform to connect with health-conscious users and assist us in transforming their health.

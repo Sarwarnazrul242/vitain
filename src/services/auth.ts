@@ -701,6 +701,7 @@ export async function retrieveUserInfo() {
   }
 }
 
+
 export async function retrieveQuestionnaireData() {
   try {
     const user = await detectLoginState();

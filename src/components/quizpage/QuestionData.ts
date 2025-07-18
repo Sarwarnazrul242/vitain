@@ -1,4 +1,4 @@
-
+import { ref } from "vue";
 export const heightOptions = (() => {
   const heights: string[] = [];
   for (let feet = 4; feet <= 7; feet++) {
@@ -71,3 +71,5 @@ export const healthGoalsList = [
   "Weight management",
   "General wellness"
 ];
+
+export const showOtherGoals= ref(false);
