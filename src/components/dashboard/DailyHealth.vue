@@ -1,12 +1,20 @@
 <template>
-    <div class="daily-health">
+    <div class="health-tracker">
       <div class="section-header">
         <h2 class="section-title">
           <span class="title-icon">📊</span>
-          Daily Health Tracker
+          Health Tracker & Goals
         </h2>
         <div class="date-display">
           {{ currentDate }}
+        </div>
+      </div>
+
+      <!-- Authentication Status -->
+      <div v-if="!auth.currentUser" class="auth-notice">
+        <div class="auth-notice-content">
+          <span class="auth-icon">🔐</span>
+          <span class="auth-text">Please log in to save your health data</span>
         </div>
       </div>
   
@@ -122,27 +130,80 @@
               </div>
             </div>
           </div>
-        </div>
-  
-        <!-- Supplements -->
-        <div class="supplements-section">
-          <h4 class="supplements-title">Supplements Taken Today</h4>
-          <div class="supplements-grid">
-            <div 
-              v-for="supplement in supplements" 
-              :key="supplement.id"
-              class="supplement-item"
-              :class="{ 'taken': todayData.supplements.includes(supplement.id) }"
-              @click="toggleSupplement(supplement.id)"
-            >
-              <div class="supplement-checkbox">
-                <svg v-if="todayData.supplements.includes(supplement.id)" class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                </svg>
+
+          <!-- Muscle Gain Tracking -->
+          <div class="tracker-card">
+            <div class="tracker-header">
+              <span class="tracker-icon">💪</span>
+              <h4 class="tracker-title">Workout</h4>
+            </div>
+            <div class="workout-tracker">
+              <div class="workout-status">
+                <div class="workout-indicator" :class="{ 'completed': todayData.workoutCompleted }">
+                  <svg v-if="todayData.workoutCompleted" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                  </svg>
+                  <span v-else class="workout-icon">💪</span>
+                </div>
+                <div class="workout-info">
+                  <span class="workout-label">{{ todayData.workoutCompleted ? 'Workout Done' : 'No Workout' }}</span>
+                  <div class="workout-stats" v-if="todayData.workoutCompleted">
+                    <span class="workout-type" v-if="todayData.workoutType && todayData.workoutType !== 'quick'">{{ getWorkoutTypeLabel(todayData.workoutType) }}</span>
+                    <span class="workout-time">{{ todayData.workoutDuration }} min</span>
+                    <span class="workout-calories" v-if="todayData.caloriesBurned">{{ todayData.caloriesBurned }} cal</span>
+                  </div>
+                </div>
               </div>
-              <div class="supplement-info">
-                <span class="supplement-name">{{ supplement.name }}</span>
-                <span class="supplement-dose">{{ supplement.dose }}</span>
+              <div class="workout-actions">
+                <button @click="openWorkoutModal" class="workout-btn log" v-if="!todayData.workoutCompleted">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
+                  Log
+                </button>
+                <button @click="undoWorkout" class="workout-btn undo" v-if="todayData.workoutCompleted">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+                  </svg>
+                  Undo
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Weight Tracking -->
+          <div class="tracker-card">
+            <div class="tracker-header">
+              <span class="tracker-icon">⚖️</span>
+              <h4 class="tracker-title">Weight</h4>
+            </div>
+            <div class="weight-tracker">
+              <div class="weight-display">
+                <div class="weight-input-section">
+                  <input 
+                    v-model.number="todayData.weight" 
+                    type="number" 
+                    min="50" 
+                    max="500" 
+                    step="0.1"
+                    class="weight-field"
+                    placeholder="0.0"
+                    @change="saveWeight"
+                  />
+                  <span class="weight-unit">lbs</span>
+                </div>
+                <div class="weight-status" v-if="todayData.weight">
+                  <span class="weight-value">{{ todayData.weight }} lbs</span>
+                  <span class="weight-date">{{ currentDate }}</span>
+                </div>
+              </div>
+              <div class="weight-actions">
+                <button @click="clearWeight" class="weight-btn clear" v-if="todayData.weight">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                  Clear
+                </button>
               </div>
             </div>
           </div>
@@ -150,18 +211,39 @@
   
         <!-- Save Button -->
         <div class="save-section">
-          <button @click="saveTodayData" class="save-button">
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <button @click="saveTodayData" class="save-button" :disabled="isSaving">
+            <svg v-if="!isSaving" class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
             </svg>
-            Save Today's Data
+            <svg v-else class="w-5 h-5 mr-2 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            {{ isSaving ? 'Saving...' : 'Save Today\'s Data' }}
           </button>
         </div>
       </div>
-  
-      <!-- Weekly Summary -->
-      <div class="weekly-summary">
-        <h3 class="subsection-title">Weekly Summary</h3>
+
+      <!-- Summary Section -->
+      <div class="summary-section">
+        <div class="summary-header">
+          <h3 class="subsection-title">Health Summary</h3>
+          <div class="summary-toggle">
+            <button 
+              @click="summaryView = 'weekly'" 
+              class="toggle-btn"
+              :class="{ 'active': summaryView === 'weekly' }"
+            >
+              Weekly
+            </button>
+            <button 
+              @click="summaryView = 'monthly'" 
+              class="toggle-btn"
+              :class="{ 'active': summaryView === 'monthly' }"
+            >
+              Monthly
+            </button>
+          </div>
+        </div>
         
         <div class="summary-charts">
           <!-- Mood Chart -->
@@ -170,7 +252,7 @@
             <div class="chart-container">
               <div class="chart-bars">
                 <div 
-                  v-for="(day, index) in weeklyData" 
+                  v-for="(day, index) in currentSummaryData" 
                   :key="index"
                   class="chart-bar mood-bar"
                   :style="{ height: (day.mood / 5) * 100 + '%' }"
@@ -180,18 +262,18 @@
                 </div>
               </div>
               <div class="chart-labels">
-                <span v-for="day in ['M', 'T', 'W', 'T', 'F', 'S', 'S']" :key="day" class="chart-label">{{ day }}</span>
+                <span v-for="label in currentSummaryLabels" :key="label" class="chart-label">{{ label }}</span>
               </div>
             </div>
           </div>
-  
+
           <!-- Energy Chart -->
           <div class="chart-card">
             <h4 class="chart-title">Energy Trend</h4>
             <div class="chart-container">
               <div class="chart-bars">
                 <div 
-                  v-for="(day, index) in weeklyData" 
+                  v-for="(day, index) in currentSummaryData" 
                   :key="index"
                   class="chart-bar energy-bar"
                   :style="{ height: (day.energy / 5) * 100 + '%' }"
@@ -201,18 +283,18 @@
                 </div>
               </div>
               <div class="chart-labels">
-                <span v-for="day in ['M', 'T', 'W', 'T', 'F', 'S', 'S']" :key="day" class="chart-label">{{ day }}</span>
+                <span v-for="label in currentSummaryLabels" :key="label" class="chart-label">{{ label }}</span>
               </div>
             </div>
           </div>
-  
+
           <!-- Sleep Chart -->
           <div class="chart-card">
             <h4 class="chart-title">Sleep Hours</h4>
             <div class="chart-container">
               <div class="chart-bars">
                 <div 
-                  v-for="(day, index) in weeklyData" 
+                  v-for="(day, index) in currentSummaryData" 
                   :key="index"
                   class="chart-bar sleep-bar"
                   :style="{ height: (day.sleep / 10) * 100 + '%' }"
@@ -222,18 +304,18 @@
                 </div>
               </div>
               <div class="chart-labels">
-                <span v-for="day in ['M', 'T', 'W', 'T', 'F', 'S', 'S']" :key="day" class="chart-label">{{ day }}</span>
+                <span v-for="label in currentSummaryLabels" :key="label" class="chart-label">{{ label }}</span>
               </div>
             </div>
           </div>
-  
+
           <!-- Water Chart -->
           <div class="chart-card">
             <h4 class="chart-title">Water Intake</h4>
             <div class="chart-container">
               <div class="chart-bars">
                 <div 
-                  v-for="(day, index) in weeklyData" 
+                  v-for="(day, index) in currentSummaryData" 
                   :key="index"
                   class="chart-bar water-bar"
                   :style="{ height: (day.water / 8) * 100 + '%' }"
@@ -243,7 +325,28 @@
                 </div>
               </div>
               <div class="chart-labels">
-                <span v-for="day in ['M', 'T', 'W', 'T', 'F', 'S', 'S']" :key="day" class="chart-label">{{ day }}</span>
+                <span v-for="label in currentSummaryLabels" :key="label" class="chart-label">{{ label }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Weight Chart --> 
+          <div class="chart-card">
+            <h4 class="chart-title">Weight Trend</h4>
+            <div class="chart-container">
+              <div class="chart-bars">
+                <div 
+                  v-for="(day, index) in currentSummaryData" 
+                  :key="index"
+                  class="chart-bar weight-bar"
+                  :style="{ height: day.weight ? ((day.weight - 140) / 20) * 100 + '%' : '8px' }"
+                  :class="getWeightClass(day.weight)"
+                >
+                  <span class="bar-value">{{ day.weight || '-' }}</span>
+                </div>
+              </div>
+              <div class="chart-labels">
+                <span v-for="label in currentSummaryLabels" :key="label" class="chart-label">{{ label }}</span>
               </div>
             </div>
           </div>
@@ -253,7 +356,16 @@
   </template>
   
   <script lang="ts" setup>
-  import { ref, computed, onMounted } from 'vue';
+  import { ref, computed, onMounted, watch } from 'vue';
+  import { 
+    saveDailyHealthData, 
+    getDailyHealthData, 
+    getWeeklyHealthData, 
+    getMonthlyHealthData,
+    type DailyHealthData,
+    type HealthSummaryData 
+  } from '../../services/dailyHealth';
+  import { getAuth } from 'firebase/auth';
   
   // Current date
   const currentDate = computed(() => {
@@ -265,6 +377,9 @@
     });
   });
   
+  // Firebase auth instance
+  const auth = getAuth();
+  
   // Today's data
   const todayData = ref({
     mood: 0,
@@ -272,29 +387,119 @@
     sleep: 0,
     sleepQuality: '',
     water: 0,
-    supplements: [] as number[]
+    workoutCompleted: false,
+    workoutDuration: 0,
+    workoutDate: '',
+    caloriesBurned: 0,
+    workoutType: '',
+    workoutNotes: '',
+    weight: 0, // Added weight tracking
+    weightDate: '' // Added weight tracking
   });
   
-  // Supplements list
-  const supplements = ref([
-    { id: 1, name: 'Vitamin D3', dose: '2000 IU' },
-    { id: 2, name: 'Omega-3', dose: '1000mg' },
-    { id: 3, name: 'Magnesium', dose: '400mg' },
-    { id: 4, name: 'B-Complex', dose: '1 capsule' },
-    { id: 5, name: 'Probiotic', dose: '1 capsule' },
-    { id: 6, name: 'Zinc', dose: '15mg' }
-  ]);
+  // Weekly data from Firebase
+  const weeklyData = ref<HealthSummaryData[]>([]);
+
+  // Monthly data from Firebase
+  const monthlyData = ref<HealthSummaryData[]>([]);
+
+  // Loading states
+  const isLoading = ref(false);
+  const isSaving = ref(false);
+
+  // Summary view state
+  const summaryView = ref('weekly');
+
+  // Function to load real data from Firebase
+  const loadRealData = async () => {
+    if (!auth.currentUser) {
+      console.log("User not authenticated, skipping data load");
+      return;
+    }
+
+    try {
+      isLoading.value = true;
+      
+      // Load weekly data
+      const weeklyDataFromFirebase = await getWeeklyHealthData();
+      weeklyData.value = weeklyDataFromFirebase;
+      
+      // Load monthly data
+      const monthlyDataFromFirebase = await getMonthlyHealthData();
+      monthlyData.value = monthlyDataFromFirebase;
+      
+      console.log("Health data loaded from Firebase");
+    } catch (error) {
+      console.error("Error loading health data:", error);
+    } finally {
+      isLoading.value = false;
+    }
+  };
+
+  // Computed properties for summary data
+  const currentSummaryData = computed(() => {
+    return summaryView.value === 'weekly' ? weeklyData.value : monthlyData.value;
+  });
+
+  const currentSummaryLabels = computed(() => {
+    if (summaryView.value === 'weekly') {
+      return ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+    } else {
+      // Monthly labels - show week numbers or dates
+      return Array.from({ length: 30 }, (_, i) => i + 1);
+    }
+  });
   
-  // Weekly data (mock data for now)
-  const weeklyData = ref([
-    { mood: 4, energy: 3, sleep: 7.5, water: 6 },
-    { mood: 3, energy: 4, sleep: 8, water: 7 },
-    { mood: 5, energy: 5, sleep: 7, water: 8 },
-    { mood: 4, energy: 3, sleep: 6.5, water: 5 },
-    { mood: 3, energy: 4, sleep: 8.5, water: 6 },
-    { mood: 5, energy: 4, sleep: 9, water: 7 },
-    { mood: 4, energy: 3, sleep: 7.5, water: 6 }
-  ]);
+  // Modal states
+  const showWeightModal = ref(false);
+  const showWorkoutModal = ref(false);
+
+  // Emit events for modal management
+  const emit = defineEmits(['showWorkoutModal']);
+
+  // Methods to show modals
+  const openWorkoutModal = () => {
+    emit('showWorkoutModal', { 
+      workoutDurationInput: workoutDurationInput.value,
+      caloriesInput: caloriesInput.value,
+      workoutType: workoutType.value,
+      workoutNotes: workoutNotes.value
+    });
+  };
+  
+  // Input values
+  const workoutDurationInput = ref('');
+  const caloriesInput = ref('');
+  const workoutNotes = ref('');
+  const workoutType = ref('');
+
+  // Calorie calculation helper
+  const calculateCalories = (duration: number, type: string) => {
+    const calorieRates = {
+      cardio: 8,
+      strength: 6,
+      yoga: 3,
+      pilates: 4,
+      hiit: 10,
+      walking: 4,
+      running: 12,
+      cycling: 8,
+      swimming: 9,
+      other: 6
+    };
+    
+    const rate = calorieRates[type as keyof typeof calorieRates] || 6;
+    return Math.round(duration * rate);
+  };
+
+  // Auto-calculate calories when duration or type changes
+  const updateCalories = () => {
+    if (workoutDurationInput.value && workoutType.value) {
+      const duration = Number(workoutDurationInput.value);
+      const calories = calculateCalories(duration, workoutType.value);
+      caloriesInput.value = calories.toString();
+    }
+  };
   
   // Methods
   const getMoodEmoji = (rating: number) => {
@@ -318,34 +523,126 @@
       todayData.value.water--;
     }
   };
-  
-  const toggleSupplement = (supplementId: number) => {
-    const index = todayData.value.supplements.indexOf(supplementId);
-    if (index > -1) {
-      todayData.value.supplements.splice(index, 1);
-    } else {
-      todayData.value.supplements.push(supplementId);
+
+  const saveWeight = async () => {
+    if (!auth.currentUser) {
+      alert('Please log in to save your weight data');
+      return;
+    }
+
+    const today = new Date().toISOString().split('T')[0];
+    todayData.value.weightDate = today;
+    
+    try {
+      await saveDailyHealthData(today, todayData.value as DailyHealthData);
+      await loadRealData(); // Update charts
+      console.log('Weight saved to Firebase:', todayData.value.weight);
+    } catch (error) {
+      console.error('Error saving weight:', error);
+      alert('Failed to save weight data. Please try again.');
+    }
+  };
+
+  const clearWeight = async () => {
+    if (!auth.currentUser) {
+      alert('Please log in to clear your weight data');
+      return;
+    }
+
+    todayData.value.weight = 0;
+    todayData.value.weightDate = '';
+    
+    const today = new Date().toISOString().split('T')[0];
+    try {
+      await saveDailyHealthData(today, todayData.value as DailyHealthData);
+      await loadRealData(); // Update charts
+      console.log('Weight cleared from Firebase');
+    } catch (error) {
+      console.error('Error clearing weight:', error);
+      alert('Failed to clear weight data. Please try again.');
     }
   };
   
-  const saveTodayData = () => {
-    // Save to localStorage
-    const today = new Date().toISOString().split('T')[0];
-    localStorage.setItem(`dailyHealth_${today}`, JSON.stringify(todayData.value));
+  const saveTodayData = async () => {
+    if (!auth.currentUser) {
+      alert('Please log in to save your daily health data');
+      return;
+    }
+
+    if (isSaving.value) return; // Prevent multiple saves
+
+    try {
+      isSaving.value = true;
+      
+      // Save to Firebase
+      const today = new Date().toISOString().split('T')[0];
+      await saveDailyHealthData(today, todayData.value as DailyHealthData);
+      
+      // Reload real data to update charts
+      await loadRealData();
+      
+      console.log('Daily health data saved to Firebase:', todayData.value);
+      alert('Daily health data saved successfully!');
+    } catch (error) {
+      console.error('Error saving daily health data:', error);
+      alert('Failed to save daily health data. Please try again.');
+    } finally {
+      isSaving.value = false;
+    }
+  };
+
+  const submitWorkout = async (workoutData: any) => {
+    if (!auth.currentUser) {
+      alert('Please log in to log your workout');
+      return;
+    }
+
+    if (workoutData.duration && !isNaN(Number(workoutData.duration))) {
+      todayData.value.workoutDuration = Number(workoutData.duration);
+      todayData.value.workoutCompleted = true;
+      todayData.value.workoutDate = new Date().toISOString().split('T')[0];
+      todayData.value.caloriesBurned = Number(workoutData.calories) || 0;
+      todayData.value.workoutType = workoutData.type || '';
+      todayData.value.workoutNotes = workoutData.notes || '';
+      
+      try {
+        await saveDailyHealthData(todayData.value.workoutDate, todayData.value as DailyHealthData);
+        await loadRealData(); // Update charts
+        console.log('Workout logged to Firebase:', workoutData);
+      } catch (error) {
+        console.error('Error logging workout:', error);
+        alert('Failed to log workout. Please try again.');
+      }
+      
+      workoutDurationInput.value = '';
+      caloriesInput.value = '';
+      workoutNotes.value = '';
+      workoutType.value = '';
+    }
+  };
+  
+  const undoWorkout = async () => {
+    if (!auth.currentUser) {
+      alert('Please log in to undo your workout');
+      return;
+    }
+
+    todayData.value.workoutCompleted = false;
+    todayData.value.workoutDuration = 0;
+    todayData.value.workoutDate = '';
+    todayData.value.caloriesBurned = 0;
+    todayData.value.workoutType = '';
+    todayData.value.workoutNotes = '';
     
-    // Update weekly data
-    const dayOfWeek = new Date().getDay();
-    weeklyData.value[dayOfWeek] = {
-      mood: todayData.value.mood,
-      energy: todayData.value.energy,
-      sleep: todayData.value.sleep,
-      water: todayData.value.water
-    };
-    
-    localStorage.setItem('weeklyHealthData', JSON.stringify(weeklyData.value));
-    
-    console.log('Daily health data saved:', todayData.value);
-    alert('Daily health data saved successfully!');
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      await saveDailyHealthData(today, todayData.value as DailyHealthData);
+      await loadRealData(); // Update charts
+      console.log('Workout undone in Firebase');
+    } catch (error) {
+      console.error('Error undoing workout:', error);
+      alert('Failed to undo workout. Please try again.');
+    }
   };
   
   // Chart helper methods
@@ -372,25 +669,70 @@
     if (water >= 6) return 'fair-water';
     return 'poor-water';
   };
+
+  const getWeightClass = (weight: number) => {
+    if (weight > 160) return 'high-weight';
+    if (weight > 140) return 'medium-weight';
+    return 'low-weight';
+  };
+
+  const getWorkoutTypeLabel = (type: string) => {
+    switch (type) {
+      case 'cardio':
+        return 'Cardio';
+      case 'strength':
+        return 'Strength';
+      case 'yoga':
+        return 'Yoga';
+      case 'pilates':
+        return 'Pilates';
+      case 'hiit':
+        return 'HIIT';
+      case 'walking':
+        return 'Walking';
+      case 'running':
+        return 'Running';
+      case 'cycling':
+        return 'Cycling';
+      case 'swimming':
+        return 'Swimming';
+      default:
+        return type;
+    }
+  };
   
-  onMounted(() => {
+  onMounted(async () => {
     // Load today's data if exists
     const today = new Date().toISOString().split('T')[0];
-    const savedData = localStorage.getItem(`dailyHealth_${today}`);
-    if (savedData) {
-      todayData.value = JSON.parse(savedData);
+    
+    if (auth.currentUser) {
+      try {
+        const savedData = await getDailyHealthData(today);
+        if (savedData) {
+          todayData.value = savedData;
+        }
+      } catch (error) {
+        console.error('Error loading today\'s data:', error);
+      }
     }
     
-    // Load weekly data
-    const savedWeekly = localStorage.getItem('weeklyHealthData');
-    if (savedWeekly) {
-      weeklyData.value = JSON.parse(savedWeekly);
-    }
+    // Load real data for charts
+    await loadRealData();
+
+    // Listen for modal submissions
+    window.addEventListener('workoutSubmitted', (event: any) => {
+      submitWorkout(event.detail);
+    });
+  });
+
+  // Watch for summary view changes to refresh data
+  watch(summaryView, async () => {
+    await loadRealData();
   });
   </script>
   
   <style scoped>
-  .daily-health {
+  .health-tracker {
     @apply mb-8;
   }
   
@@ -420,11 +762,11 @@
   }
   
   .checkin-grid {
-    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6;
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-6;
   }
   
   .tracker-card {
-    @apply bg-white/5 backdrop-blur-sm p-6 rounded-xl border border-white/10 hover:border-white/20 transition-all duration-300;
+    @apply bg-white/5 backdrop-blur-sm p-4 rounded-xl border border-white/10 hover:border-white/20 transition-all duration-300 min-h-[200px] flex flex-col;
   }
   
   .tracker-card:hover {
@@ -432,24 +774,24 @@
   }
   
   .tracker-header {
-    @apply flex items-center gap-3 mb-4;
+    @apply flex items-center gap-2 mb-3;
   }
   
   .tracker-icon {
-    @apply text-2xl;
+    @apply text-xl;
   }
   
   .tracker-title {
-    @apply text-white font-semibold;
+    @apply text-white font-semibold text-sm;
   }
   
   /* Mood Scale */
   .mood-scale {
-    @apply flex justify-between;
+    @apply flex justify-between flex-wrap gap-1;
   }
   
   .mood-option {
-    @apply flex flex-col items-center gap-2 cursor-pointer p-3 rounded-lg transition-all duration-300 hover:bg-white/10;
+    @apply flex flex-col items-center gap-1 cursor-pointer p-2 rounded-lg transition-all duration-300 hover:bg-white/10 flex-1;
   }
   
   .mood-option.selected {
@@ -457,20 +799,20 @@
   }
   
   .mood-emoji {
-    @apply text-xl;
+    @apply text-lg;
   }
   
   .mood-label {
-    @apply text-xs text-gray-400;
+    @apply text-xs text-gray-400 text-center;
   }
   
   /* Energy Scale */
   .energy-scale {
-    @apply flex justify-between items-end h-24;
+    @apply flex justify-between items-end h-20;
   }
   
   .energy-option {
-    @apply flex flex-col items-center gap-2 cursor-pointer p-2 rounded-lg transition-all duration-300 hover:bg-white/10;
+    @apply flex flex-col items-center gap-1 cursor-pointer p-1 rounded-lg transition-all duration-300 hover:bg-white/10;
   }
   
   .energy-option.selected {
@@ -478,7 +820,7 @@
   }
   
   .energy-bar {
-    @apply w-6 bg-gradient-to-t from-[#3B82F6] to-[#60A5FA] rounded-t;
+    @apply w-4 bg-gradient-to-t from-[#3B82F6] to-[#60A5FA] rounded-t;
     min-height: 8px;
   }
   
@@ -488,31 +830,31 @@
   
   /* Sleep Input */
   .sleep-input {
-    @apply flex items-center gap-3 mb-4;
+    @apply flex items-center gap-2 mb-3;
   }
   
   .sleep-field {
-    @apply bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-[#4ADE80] w-24 transition-colors duration-300;
+    @apply bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-[#4ADE80] w-20 transition-colors duration-300 text-sm;
   }
   
   .sleep-unit {
-    @apply text-gray-400 text-sm;
+    @apply text-gray-400 text-xs;
   }
   
   .sleep-quality {
-    @apply flex items-center gap-3;
+    @apply flex flex-col gap-2;
   }
   
   .quality-label {
-    @apply text-gray-400 text-sm;
+    @apply text-gray-400 text-xs;
   }
   
   .quality-buttons {
-    @apply flex gap-2;
+    @apply flex flex-wrap gap-1;
   }
   
   .quality-btn {
-    @apply px-3 py-1 text-xs rounded-lg border border-white/20 text-gray-400 hover:bg-white/10 transition-all duration-300;
+    @apply px-2 py-1 text-xs rounded-lg border border-white/20 text-gray-400 hover:bg-white/10 transition-all duration-300;
   }
   
   .quality-btn.selected {
@@ -521,27 +863,27 @@
   
   /* Water Tracker */
   .water-tracker {
-    @apply flex items-center justify-between mb-4;
+    @apply flex items-center justify-between mb-3;
   }
   
   .water-display {
-    @apply flex items-baseline gap-2;
+    @apply flex items-baseline gap-1;
   }
   
   .water-amount {
-    @apply text-3xl font-bold text-[#3B82F6];
+    @apply text-2xl font-bold text-[#3B82F6];
   }
   
   .water-unit {
-    @apply text-gray-400 text-sm;
+    @apply text-gray-400 text-xs;
   }
   
   .water-buttons {
-    @apply flex gap-2;
+    @apply flex gap-1;
   }
   
   .water-btn {
-    @apply w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300;
+    @apply w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300;
   }
   
   .water-btn.add {
@@ -557,52 +899,121 @@
   }
   
   .water-bar {
-    @apply w-full h-3 bg-white/10 rounded-full overflow-hidden;
+    @apply w-full h-2 bg-white/10 rounded-full overflow-hidden;
   }
   
   .water-fill {
     @apply h-full bg-gradient-to-r from-[#3B82F6] to-[#4ADE80] transition-all duration-500;
   }
   
-  /* Supplements */
-  .supplements-section {
-    @apply mb-6;
+  /* Workout Tracking */
+  .workout-tracker {
+    @apply flex flex-col gap-3;
   }
   
-  .supplements-title {
-    @apply text-lg font-semibold text-white mb-4;
+  .workout-status {
+    @apply flex items-center gap-2;
   }
   
-  .supplements-grid {
-    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4;
+  .workout-indicator {
+    @apply w-10 h-10 rounded-full flex items-center justify-center bg-white/10 text-xl;
   }
   
-  .supplement-item {
-    @apply flex items-center gap-4 p-4 rounded-xl border border-white/10 cursor-pointer transition-all duration-300 hover:bg-white/5 hover:border-white/20;
+  .workout-indicator.completed {
+    @apply bg-[#4ADE80] text-white;
   }
   
-  .supplement-item.taken {
-    @apply bg-[#4ADE80]/10 border-[#4ADE80]/30;
+  .workout-icon {
+    @apply text-xl;
   }
   
-  .supplement-checkbox {
-    @apply w-6 h-6 rounded-lg border-2 border-white/30 flex items-center justify-center transition-all duration-300;
-  }
-  
-  .supplement-item.taken .supplement-checkbox {
-    @apply bg-[#4ADE80] border-[#4ADE80] text-white;
-  }
-  
-  .supplement-info {
+  .workout-info {
     @apply flex flex-col;
   }
   
-  .supplement-name {
-    @apply text-white font-medium;
+  .workout-label {
+    @apply text-white font-medium text-xs;
   }
   
-  .supplement-dose {
-    @apply text-gray-400 text-sm;
+  .workout-stats {
+    @apply flex items-baseline gap-2 text-gray-400 text-xs;
+  }
+  
+  .workout-type {
+    @apply font-medium text-gray-400 text-xs;
+  }
+  
+  .workout-time {
+    @apply font-medium;
+  }
+  
+  .workout-calories {
+    @apply font-medium;
+  }
+  
+  .workout-actions {
+    @apply flex gap-1;
+  }
+  
+  .workout-btn {
+    @apply flex items-center px-2 py-1 text-xs rounded-lg transition-colors duration-300 hover:scale-105;
+  }
+  
+  .workout-btn.complete {
+    @apply bg-[#4ADE80] text-white hover:bg-[#3B82F6] shadow-sm;
+  }
+  
+  .workout-btn.log {
+    @apply bg-[#3B82F6] text-white hover:bg-[#2563EB] shadow-sm;
+  }
+  
+  .workout-btn.undo {
+    @apply bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30 hover:text-red-300;
+  }
+
+  /* Weight Tracking */
+  .weight-tracker {
+    @apply flex flex-col gap-3;
+  }
+
+  .weight-display {
+    @apply flex flex-col gap-2;
+  }
+
+  .weight-input-section {
+    @apply flex items-center gap-2;
+  }
+
+  .weight-field {
+    @apply bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-[#4ADE80] w-20 transition-colors duration-300 text-sm;
+  }
+
+  .weight-unit {
+    @apply text-gray-400 text-xs;
+  }
+
+  .weight-status {
+    @apply flex items-center gap-2 text-gray-400 text-xs;
+  }
+
+  .weight-value {
+    @apply font-medium;
+  }
+
+  .weight-date {
+    @apply text-gray-500;
+  }
+
+  .weight-actions {
+    @apply flex justify-end;
+  }
+
+  .weight-btn {
+    @apply flex items-center px-3 py-1 text-xs rounded-lg border border-white/20 text-gray-400 hover:bg-white/10 transition-all duration-300;
+  }
+
+  .weight-btn.clear {
+    @apply bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30;
   }
   
   /* Save Button */
@@ -614,9 +1025,46 @@
     @apply flex items-center px-8 py-4 bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-white font-semibold rounded-xl hover:scale-105 transition-all duration-300 shadow-lg;
   }
   
+  .save-button:disabled {
+    @apply opacity-50 cursor-not-allowed hover:scale-100;
+  }
+
+  /* Authentication Notice */
+  .auth-notice {
+    @apply mb-6;
+  }
+  
+  .auth-notice-content {
+    @apply flex items-center gap-3 bg-yellow-500/20 border border-yellow-500/30 rounded-lg p-4 text-yellow-300;
+  }
+  
+  .auth-icon {
+    @apply text-xl;
+  }
+  
+  .auth-text {
+    @apply font-medium;
+  }
+  
   /* Weekly Summary */
-  .weekly-summary {
+  .summary-section {
     @apply mt-8;
+  }
+  
+  .summary-header {
+    @apply flex items-center justify-between mb-6;
+  }
+  
+  .summary-toggle {
+    @apply flex gap-2;
+  }
+  
+  .toggle-btn {
+    @apply px-4 py-2 text-sm font-medium rounded-lg border border-white/20 text-gray-400 hover:bg-white/10 transition-colors duration-300;
+  }
+  
+  .toggle-btn.active {
+    @apply bg-[#3B82F6] text-white border-[#3B82F6];
   }
   
   .summary-charts {
@@ -708,6 +1156,18 @@
   .water-bar.poor-water {
     @apply bg-yellow-500;
   }
+
+  .weight-bar.high-weight {
+    @apply bg-[#4ADE80];
+  }
+
+  .weight-bar.medium-weight {
+    @apply bg-[#3B82F6];
+  }
+
+  .weight-bar.low-weight {
+    @apply bg-red-500;
+  }
   
   /* Responsive */
   @media (max-width: 768px) {
@@ -715,8 +1175,8 @@
       @apply grid-cols-1 gap-4;
     }
     
-    .supplements-grid {
-      @apply grid-cols-1;
+    .goals-grid {
+      @apply grid-cols-1 gap-4;
     }
     
     .summary-charts {
@@ -733,6 +1193,47 @@
     
     .chart-label {
       @apply w-8;
+    }
+    
+    .tracker-card {
+      @apply min-h-[180px];
+    }
+    
+    .mood-scale {
+      @apply gap-0;
+    }
+    
+    .mood-option {
+      @apply p-1;
+    }
+    
+    .energy-scale {
+      @apply h-16;
+    }
+    
+    .energy-bar {
+      @apply w-3;
+    }
+
+    /* Modal responsive */
+    .modal-overlay {
+      @apply p-2;
+    }
+
+    .modal-content {
+      @apply max-w-sm p-4;
+    }
+
+    .form-row {
+      @apply flex-col gap-3;
+    }
+
+    .modal-actions {
+      @apply flex-col gap-2;
+    }
+
+    .modal-button {
+      @apply w-full;
     }
   }
   </style>
