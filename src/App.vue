@@ -43,30 +43,43 @@
 
 <script lang='ts' setup>
 import { ref, onMounted, onBeforeUnmount, defineAsyncComponent, computed } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { loading, updateLoading } from "./composables/featureCtrl";
 import { errors, ErrorType, AppError, isAppError, pastError, detectLoginState } from "./services/auth";
 
 const NavBar = defineAsyncComponent(() => import('./components/common/NavBar.vue'));
 
 const route = useRoute();
+const router = useRouter();
 
 // Check if current route is dashboard
 const isDashboardRoute = computed(() => {
   return route.name === 'Dashboard' || route.path === '/dashboard' || route.path === '/profile';
 });
 
+const isDashboardRouted = ()=>
+{
+  return route.name === 'Dashboard' || route.path === '/dashboard' || route.path === '/profile';
+}
 const handleLoginState = async () => {
   try{
+
    await detectLoginState();
    sessionStorage.setItem("userState","Signed In"); //So that user specific NavBar pops up
-
-  } catch(err)
+  }
+   catch(err)
   {
 
   if (err.type =="login")
-  {
+  {  
     sessionStorage.setItem("userState","Signed Out"); //So that user specific NavBar pops up
+    
+    //Ensures user must log in to access dashboard
+    if (isDashboardRouted()) 
+      {
+         router.push("/log-in")
+      }
+    
   }
 
   else
@@ -81,6 +94,7 @@ const handleLoginState = async () => {
 onMounted(async() => {
   await handleLoginState();
   window.addEventListener("loading-change", updateLoading);
+
 });
 
 onBeforeUnmount(() => {
