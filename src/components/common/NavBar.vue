@@ -76,6 +76,14 @@
             @click="toggleMobileMenu"
             v-if="userState === 'Signed Out'" 
             >Log In</router-link>
+
+            <router-link
+            to="/dashboard"
+            class="mobile-nav-link"
+            @click="toggleMobileMenu"
+            v-if="userState === 'Signed In'" 
+            >Dashboard</router-link>
+            
         </div>
       </div>
 
