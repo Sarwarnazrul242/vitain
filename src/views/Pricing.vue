@@ -2,7 +2,8 @@
     <div class="relative min-h-screen bg-gradient-to-b from-[#0e0e10] to-[#1c1c1e] overflow-hidden">
     <BackgroundGradient />
 
-    <div class="px-6 py-12 pt-32 max-w-7xl mx-auto min-h-screen relative z-10 text-white">
+    <div class="px-6 py-12 pt-32  mx-auto min-h-screen relative z-10 text-white">
+
       <h1 class="text-4xl md:text-6xl font-bold mb-10 text-center">
         <span class="bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-transparent bg-clip-text">
         Subscription & API Pricing
@@ -48,9 +49,11 @@
       </div>
 
       <!-- Tab Content -->
-      <transition name="fade-slide" mode="out-in">
-        <component :is="currentComponent" />
-      </transition>
+      <div class="flex justify-center">
+        <transition class="w-full max-w-7xl" name="fade-slide" mode="out-in">
+            <component :is="currentComponent" />
+        </transition>
+      </div>
     </div>
     <Footer />
     <ChatButton />
@@ -66,8 +69,8 @@ import VitainPricing from '@/components/pricing/vitainPricing.vue'
 
 import { ref, computed, onMounted, nextTick } from 'vue'
 
-const tabs = ['API Pricing', 'Subscription Pricing']
-const currentTab = ref('API Pricing')
+const tabs = ['Subscription Pricing', 'API Pricing']
+const currentTab = ref('Subscription Pricing')
 const tabRefs = ref([])
 const tabList = ref(null)
 const tabRects = ref([])
