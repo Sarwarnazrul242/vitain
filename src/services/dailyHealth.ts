@@ -45,6 +45,7 @@ export interface DailyHealthData {
   workoutNotes: string;
   weight: number;
   weightDate: string;
+  stress: 0;
   createdAt?: Timestamp;
   updatedAt?: Timestamp;
 }
@@ -56,6 +57,7 @@ export interface HealthSummaryData {
   sleep: number;
   water: number;
   weight: number;
+  stress: number;
 }
 
 //Testing purposes
@@ -211,6 +213,7 @@ export async function getHealthSummaryData(startDate, endDate): Promise<HealthSu
       summaryData.push({
         date: doc.id,
         mood: data.mood || 0,
+        stress: data.stress || 0,
         energy: data.energy || 0,
         sleep: data.sleep || 0,
         water: data.water || 0,

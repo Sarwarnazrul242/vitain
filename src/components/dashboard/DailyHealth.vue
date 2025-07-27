@@ -207,6 +207,27 @@
               </div>
             </div>
           </div>
+
+          <!-- Stress Level -->
+          <div class="tracker-card">
+            <div class="tracker-header">
+              <span class="tracker-icon">💢</span>
+              <h4 class="tracker-title">Stress Level</h4>
+            </div>
+            <div class="energy-scale">
+              <div 
+                v-for="rating in 5" 
+                :key="rating"
+                class="energy-option"
+                :class="{ 'selected': todayData.stress === rating }"
+                @click="todayData.stress = rating"
+              >
+                <div class="energy-bar" :style="{ height: rating * 8 + 'px' }"></div>
+                <span class="energy-label">{{ rating }}</span>
+              </div>
+            </div>
+          </div>
+
         </div>
   
         <!-- Save Button -->
@@ -266,6 +287,29 @@
               </div>
             </div>
           </div>
+
+          <!-- Stress Chart -->
+          <div class="chart-card">
+            <h4 class="chart-title">Stress Trend</h4>
+            <div class="chart-container">
+              <div class="chart-bars">
+                <!-- Reusing mood chart classes-->
+                <div 
+                  v-for="(day, index) in currentSummaryData" 
+                  :key="index"
+                  class="chart-bar mood-bar"  
+                  :style="{ height: (day.stress / 5) * 100 + '%' }"
+                  :class="getStressClass(day.stress)"
+                >
+                  <span class="bar-value">{{ day.stress }}</span>
+                </div>
+              </div>
+              <div class="chart-labels">
+                <span v-for="label in currentSummaryLabels" :key="label" class="chart-label">{{ label }}</span>
+              </div>
+            </div>
+          </div>
+       
 
           <!-- Energy Chart -->
           <div class="chart-card">
@@ -339,7 +383,8 @@
                   v-for="(day, index) in currentSummaryData" 
                   :key="index"
                   class="chart-bar weight-bar"
-                  :style="{ height: day.weight ? ((day.weight - 140) / 20) * 100 + '%' : '8px' }"
+                  :style="{height: day.weight && questionnaireData.weight ? 75 + 
+                    ((day.weight - questionnaireData.weight) / questionnaireData.weight) * 75 + 'px': '75px' }"
                   :class="getWeightClass(day.weight)"
                 >
                   <span class="bar-value">{{ day.weight || '-' }}</span>
@@ -367,7 +412,7 @@
   } from '../../services/dailyHealth';
   import { getAuth } from 'firebase/auth';
 
-  import { errors, clearError, ErrorType, AppError, isAppError, pastError, } from '../../services/auth';
+  import { errors, clearError, ErrorType, AppError, isAppError, pastError, retrieveQuestionnaireData } from '../../services/auth';
   // Current date
   const currentDate = computed(() => {
     return new Date().toLocaleDateString('en-US', { 
@@ -381,9 +426,11 @@
   // Firebase auth instance
   const auth = getAuth();
   
+  const questionnaireData = ref<any>(null);
   // Today's data
   const todayData = ref({
     mood: 0,
+    stress: 0,
     energy: 0,
     sleep: 0,
     sleepQuality: '',
@@ -395,7 +442,8 @@
     workoutType: '',
     workoutNotes: '',
     weight: 0, // Added weight tracking
-    weightDate: '' // Added weight tracking
+    weightDate: '', // Added weight tracking
+  
   });
   
   // Weekly data from Firebase
@@ -420,7 +468,7 @@
       // Load weekly data
       const weeklyDataFromFirebase = await getWeeklyHealthData();
       weeklyData.value = weeklyDataFromFirebase;
-      
+      console.log(weeklyData.value);
       // Load monthly data
       const monthlyDataFromFirebase = await getMonthlyHealthData();
       monthlyData.value = monthlyDataFromFirebase;
@@ -522,44 +570,16 @@
   };
 
   const saveWeight = async () => {
-    // if (!auth.currentUser) {
-    //   alert('Please log in to save your weight data');
-    //   return;
-    // }
 
     const today = new Date().toISOString().split('T')[0];
     todayData.value.weightDate = today;
-    
-    //Should not save here but in saveDailyHealthData
-    // try {
-    //   await saveDailyHealthData(today, todayData.value as DailyHealthData);
-    //   await loadRealData(); // Update charts
-    //   console.log('Weight saved to Firebase:', todayData.value.weight);
-    // } catch (error) {
-    //   console.error('Error saving weight:', error);
-    //   alert('Failed to save weight data. Please try again.');
-    // }
+
   };
 
   const clearWeight = async () => {
-    // if (!auth.currentUser) {
-    //   alert('Please log in to clear your weight data');
-    //   return;
-    // }
-
     todayData.value.weight = 0;
     todayData.value.weightDate = '';
-    
-    //Clear then hit submituserdata, clear should just clear what they typed
-  //   const today = new Date().toISOString().split('T')[0];
-  //  try {
-  //     await saveDailyHealthData(today, todayData.value as DailyHealthData);
-  //     await loadRealData(); // Update charts
-  //     console.log('Weight cleared from Firebase');
-  //   } catch (error) {
-  //     console.error('Error clearing weight:', error);
-  //     alert('Failed to clear weight data. Please try again.');
-  //   } 
+
   };
   
   const saveTodayData = async () => {
@@ -589,11 +609,6 @@
   };
 
   const submitWorkout = async (workoutData: any) => {
-    // if (!auth.currentUser) {
-    //   alert('Please log in to log your workout');
-    //   return;
-    // }
-
     if (workoutData.duration && !isNaN(Number(workoutData.duration))) {
       todayData.value.workoutDuration = Number(workoutData.duration);
       todayData.value.workoutCompleted = true;
@@ -601,16 +616,6 @@
       todayData.value.caloriesBurned = Number(workoutData.calories) || 0;
       todayData.value.workoutType = workoutData.type || '';
       todayData.value.workoutNotes = workoutData.notes || '';
-      
-      //Should not submit here but in saveDailyHealthData
-      // try {
-      //   await saveDailyHealthData(todayData.value.workoutDate, todayData.value as DailyHealthData);
-      //   await loadRealData(); // Update charts
-      //   console.log('Workout logged to Firebase:', workoutData);
-      // } catch (error) {
-      //   console.error('Error logging workout:', error);
-      //   alert('Failed to log workout. Please try again.');
-      // }
       
       workoutDurationInput.value = '';
       caloriesInput.value = '';
@@ -620,10 +625,6 @@
   };
   
   const undoWorkout = async () => {
-    // if (!auth.currentUser) {
-    //   alert('Please log in to undo your workout');
-    //   return;
-    // }
 
     todayData.value.workoutCompleted = false;
     todayData.value.workoutDuration = 0;
@@ -631,17 +632,7 @@
     todayData.value.caloriesBurned = 0;
     todayData.value.workoutType = '';
     todayData.value.workoutNotes = '';
-    
-    //Clear but not database, in submit in saveDailyHealthData it will update record for the day
-    // try {
-    //   const today = new Date().toISOString().split('T')[0];
-    //   await saveDailyHealthData(today, todayData.value as DailyHealthData);
-    //   await loadRealData(); // Update charts
-    //   console.log('Workout undone in Firebase');
-    // } catch (error) {
-    //   console.error('Error undoing workout:', error);
-    //   alert('Failed to undo workout. Please try again.');
-    // }
+
   };
   
   // Chart helper methods
@@ -657,6 +648,12 @@
     return 'low-energy';
   };
   
+  const getStressClass = (stress: number) => {
+    if (stress >= 4) return 'high-stress';
+    if (stress >= 3) return 'medium-stress';
+    return 'low-stress';
+  };
+
   const getSleepClass = (sleep: number) => {
     if (sleep >= 8) return 'good-sleep';
     if (sleep >= 7) return 'fair-sleep';
@@ -699,6 +696,21 @@
         return type;
     }
   };
+
+  const loadUserData = async () => {
+  try {
+  
+    // Load questionnaire data
+    const questionnaire = await retrieveQuestionnaireData();
+    if (questionnaire) {
+      questionnaireData.value = questionnaire;
+    }
+    
+  } catch (error) {
+    console.error('Error loading user data:', error);
+  } 
+  
+};
   
   onMounted(async () => {
     // Load today's data if exists
@@ -716,6 +728,7 @@
     
     
     // Load real data for charts
+    await loadUserData();
     await loadRealData();
 
     // Listen for modal submissions
@@ -1117,6 +1130,18 @@
   }
   
   .mood-bar.low-mood {
+    @apply bg-red-500;
+  }
+
+    .mood-bar.low-stress {
+    @apply bg-[#4ADE80];
+  }
+  
+  .mood-bar.medium-stress {
+    @apply bg-[#3B82F6];
+  }
+  
+  .mood-bar.high-stress {
     @apply bg-red-500;
   }
   

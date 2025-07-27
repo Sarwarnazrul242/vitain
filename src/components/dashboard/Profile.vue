@@ -497,8 +497,8 @@ const loadUserData = async () => {
   }
 };
 
-onMounted(() => {
-  loadUserData();
+onMounted(async () => {
+  await loadUserData();
 });
 </script>
 
