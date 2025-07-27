@@ -25,26 +25,26 @@
       </div>
       
       <div class="stat-card">
-        <div class="stat-icon">🎯</div>
-        <div class="stat-content">
-          <div class="stat-value">{{ activeGoals }}</div>
-          <div class="stat-label">Active goals</div>
-        </div>
-      </div>
-      
-      <div class="stat-card">
         <div class="stat-icon">💊</div>
         <div class="stat-content">
           <div class="stat-value">{{ currentSupplements }}</div>
           <div class="stat-label">Supplements</div>
         </div>
       </div>
-      
+
       <div class="stat-card">
-        <div class="stat-icon">📊</div>
+        <div class="stat-icon">✅</div>
         <div class="stat-content">
-          <div class="stat-value">{{ checkInStreak }}</div>
-          <div class="stat-label">Day streak</div>
+          <div class="stat-value">{{ todayProgress }}</div>
+          <div class="stat-label">Today's Progress</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">🏆</div>
+        <div class="stat-content">
+          <div class="stat-value">{{ healthScore }}</div>
+          <div class="stat-label">Health Score</div>
         </div>
       </div>
     </div>
@@ -144,6 +144,90 @@ const daysSinceJoining = computed(() => {
   const diffTime = 0;//Math.abs(today.getTime() - joinDate.getTime());
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   return diffDays;
+});
+
+const currentSupplements = computed(() => {
+  // For now, return a default value. In a real app, this would come from user data
+  return 3;
+});
+
+const todayProgress = computed(() => {
+  // Check if user has completed today's health check-in
+  const today = new Date().toISOString().split('T')[0];
+  const savedData = localStorage.getItem(`dailyHealth_${today}`);
+  
+  if (savedData) {
+    const data = JSON.parse(savedData);
+    // Count completed items (mood, energy, sleep, water, weight, workout)
+    let completed = 0;
+    if (data.mood > 0) completed++;
+    if (data.energy > 0) completed++;
+    if (data.sleep > 0) completed++;
+    if (data.water > 0) completed++;
+    if (data.weight > 0) completed++;
+    if (data.workoutCompleted) completed++;
+    
+    return `${completed}/6`;
+  }
+  
+  return "0/6";
+});
+
+const healthScore = computed(() => {
+  // Calculate overall health score based on recent data
+  const today = new Date().toISOString().split('T')[0];
+  const savedData = localStorage.getItem(`dailyHealth_${today}`);
+  
+  if (savedData) {
+    const data = JSON.parse(savedData);
+    let score = 0;
+    let totalPossible = 0;
+    
+    // Mood score (1-5 scale)
+    if (data.mood > 0) {
+      score += (data.mood / 5) * 20; // 20 points max
+      totalPossible += 20;
+    }
+    
+    // Energy score (1-5 scale)
+    if (data.energy > 0) {
+      score += (data.energy / 5) * 20; // 20 points max
+      totalPossible += 20;
+    }
+    
+    // Sleep score (target 8 hours)
+    if (data.sleep > 0) {
+      const sleepScore = Math.min((data.sleep / 8) * 20, 20); // 20 points max
+      score += sleepScore;
+      totalPossible += 20;
+    }
+    
+    // Water score (target 8 glasses)
+    if (data.water > 0) {
+      const waterScore = Math.min((data.water / 8) * 20, 20); // 20 points max
+      score += waterScore;
+      totalPossible += 20;
+    }
+    
+    // Workout bonus (10 points)
+    if (data.workoutCompleted) {
+      score += 10;
+      totalPossible += 10;
+    }
+    
+    // Weight tracking bonus (10 points)
+    if (data.weight > 0) {
+      score += 10;
+      totalPossible += 10;
+    }
+    
+    if (totalPossible > 0) {
+      const percentage = Math.round((score / totalPossible) * 100);
+      return `${percentage}%`;
+    }
+  }
+  
+  return "0%";
 });
 
 // const activeGoals = computed(() => userData.value.activeGoals);

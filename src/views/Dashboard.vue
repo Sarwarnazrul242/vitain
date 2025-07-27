@@ -9,12 +9,91 @@
           <div class="dashboard">
             <WelcomeSection />
             <SupplementRecommendation />
-            <HealthGoalsProgress />
-            <DailyHealthCheckin />
+            <DailyHealthCheckin 
+              @showWorkoutModal="showWorkoutModal = true; workoutModalData = $event"
+            />
             <RecentActivity />
           </div>
         </div>
       </section>
+    </div>
+
+    <!-- Global Modals -->
+    <!-- Workout Modal -->
+    <div v-if="showWorkoutModal" class="modal-overlay" @click="showWorkoutModal = false">
+      <div class="modal-content" @click.stop>
+        <div class="modal-header">
+          <h3 class="modal-title">Log Workout</h3>
+          <button @click="showWorkoutModal = false" class="modal-close">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="workout-form">
+            <div class="form-group">
+              <label class="input-label">Workout Type</label>
+              <select v-model="workoutType" class="modal-input" @change="updateCalories">
+                <option value="">Select workout type</option>
+                <option value="cardio">Cardio</option>
+                <option value="strength">Strength Training</option>
+                <option value="yoga">Yoga</option>
+                <option value="pilates">Pilates</option>
+                <option value="hiit">HIIT</option>
+                <option value="walking">Walking</option>
+                <option value="running">Running</option>
+                <option value="cycling">Cycling</option>
+                <option value="swimming">Swimming</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label class="input-label">Duration (minutes)</label>
+                <input 
+                  v-model.number="workoutDurationInput" 
+                  type="number" 
+                  min="1"
+                  max="300"
+                  class="modal-input"
+                  placeholder="30"
+                  @keyup.enter="submitWorkout"
+                  @change="updateCalories"
+                />
+              </div>
+              
+              <div class="form-group">
+                <label class="input-label">Calories Burned</label>
+                <input 
+                  v-model.number="caloriesInput" 
+                  type="number" 
+                  min="1"
+                  max="2000"
+                  class="modal-input"
+                  placeholder="300"
+                  @keyup.enter="submitWorkout"
+                />
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label class="input-label">Notes (optional)</label>
+              <textarea 
+                v-model="workoutNotes" 
+                class="modal-input"
+                rows="3"
+                placeholder="How was your workout?"
+              ></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button @click="showWorkoutModal = false" class="modal-button secondary">Cancel</button>
+          <button @click="submitWorkout" class="modal-button primary">Save Workout</button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -25,9 +104,70 @@ import BackgroundGradient from '@/components/homepage/BackgroundGradient.vue';
 import DashboardNavbar from '@/components/dashboard/DashboardNavbar.vue';
 import WelcomeSection from '@/components/dashboard/WelcomeSection.vue';
 import SupplementRecommendation from '@/components/dashboard/SupplimentRecommendation.vue';
-import HealthGoalsProgress from '@/components/dashboard/Healthgoals.vue';
 import DailyHealthCheckin from '@/components/dashboard/DailyHealth.vue';
 import RecentActivity from '@/components/dashboard/RecentActivity.vue';
+
+// Modal states
+const showWorkoutModal = ref(false);
+
+// Modal data
+const workoutModalData = ref({});
+
+// Form inputs
+const workoutDurationInput = ref('');
+const caloriesInput = ref('');
+const workoutNotes = ref('');
+const workoutType = ref('');
+
+// Calorie calculation helper
+const calculateCalories = (duration, type) => {
+  const calorieRates = {
+    cardio: 8,
+    strength: 6,
+    yoga: 3,
+    pilates: 4,
+    hiit: 10,
+    walking: 4,
+    running: 12,
+    cycling: 8,
+    swimming: 9,
+    other: 6
+  };
+  
+  const rate = calorieRates[type] || 6;
+  return Math.round(duration * rate);
+};
+
+// Auto-calculate calories when duration or type changes
+const updateCalories = () => {
+  if (workoutDurationInput.value && workoutType.value) {
+    const duration = Number(workoutDurationInput.value);
+    const calories = calculateCalories(duration, workoutType.value);
+    caloriesInput.value = calories.toString();
+  }
+};
+
+// Modal methods
+const submitWorkout = () => {
+  if (workoutDurationInput.value && !isNaN(Number(workoutDurationInput.value))) {
+    // Emit to DailyHealth component
+    const event = new CustomEvent('workoutSubmitted', { 
+      detail: { 
+        duration: Number(workoutDurationInput.value),
+        calories: Number(caloriesInput.value) || 0,
+        type: workoutType.value,
+        notes: workoutNotes.value
+      }
+    });
+    window.dispatchEvent(event);
+    
+    showWorkoutModal.value = false;
+    workoutDurationInput.value = '';
+    caloriesInput.value = '';
+    workoutNotes.value = '';
+    workoutType.value = '';
+  }
+};
 </script>
 
 <style scoped>
@@ -38,5 +178,152 @@ import RecentActivity from '@/components/dashboard/RecentActivity.vue';
 /* Ensure consistent styling with other pages */
 .dashboard > * {
   @apply backdrop-blur-sm;
+}
+
+/* Modals */
+.modal-overlay {
+  @apply fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[9999] p-4;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.modal-content {
+  @apply bg-white/10 backdrop-blur-md p-6 rounded-2xl border border-white/20 shadow-2xl max-w-md w-full mx-auto relative;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.modal-header {
+  @apply flex items-center justify-between mb-4;
+}
+
+.modal-title {
+  @apply text-xl font-bold text-white;
+}
+
+.modal-close {
+  @apply w-8 h-8 text-gray-400 hover:text-white hover:bg-white/10 rounded-full flex items-center justify-center transition-all duration-300;
+}
+
+.modal-body {
+  @apply mb-6;
+}
+
+.input-label {
+  @apply block text-sm font-medium text-white mb-2;
+}
+
+.modal-input {
+  @apply w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-[#4ADE80] transition-colors duration-300;
+}
+
+.modal-input:focus {
+  @apply ring-2 ring-[#4ADE80]/20;
+}
+
+select.modal-input {
+  @apply cursor-pointer;
+}
+
+select.modal-input option {
+  @apply bg-gray-800 text-white;
+}
+
+/* Additional styling for better cross-browser compatibility */
+select.modal-input {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+select.modal-input option {
+  background-color: #1f2937;
+  color: white;
+  padding: 8px;
+}
+
+select.modal-input option:hover {
+  background-color: #374151;
+}
+
+select.modal-input:focus {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+textarea.modal-input {
+  @apply resize-none;
+}
+
+.workout-form {
+  @apply flex flex-col gap-4;
+}
+
+.form-group {
+  @apply flex flex-col;
+}
+
+.form-row {
+  @apply flex gap-4;
+}
+
+.form-row .form-group {
+  @apply flex-1;
+}
+
+.modal-actions {
+  @apply flex justify-end gap-2;
+}
+
+.modal-button {
+  @apply px-4 py-2 text-sm rounded-lg border border-white/20 text-gray-400 hover:bg-white/10 transition-all duration-300;
+}
+
+.modal-button.primary {
+  @apply bg-[#4ADE80] text-white border-[#4ADE80] hover:bg-[#3B82F6] hover:border-[#3B82F6];
+}
+
+.modal-button.secondary {
+  @apply bg-gray-600 text-white border-gray-600 hover:bg-gray-700 hover:border-gray-700;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .modal-overlay {
+    @apply p-2;
+  }
+
+  .modal-content {
+    @apply max-w-sm p-4;
+  }
+
+  .form-row {
+    @apply flex-col gap-3;
+  }
+
+  .modal-actions {
+    @apply flex-col gap-2;
+  }
+
+  .modal-button {
+    @apply w-full;
+  }
 }
 </style>
