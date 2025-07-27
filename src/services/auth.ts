@@ -68,6 +68,7 @@ export const errors = reactive<{
   login: string;
   quiz: string;
   verify: string;
+  database: string;
 }>({
   general: "",
   fill: "",
@@ -75,6 +76,7 @@ export const errors = reactive<{
   login: "",
   quiz: "",
   verify: "",
+  database: ""
 });
 
 type SubmissionType = "quiz" | "supplement" | "comprehensiveQuestionnaire";
@@ -84,6 +86,12 @@ interface SubmissionPayload {
   data: any;
 }
 
+ export function clearError ()
+  {  
+    console.log("Past error is ", pastError.value)
+     errors[pastError.value] = ""
+  }
+  
 export function isAppError(err: any): err is AppError {
   return err && typeof err.type === "string" && typeof err.message === "string";
 }

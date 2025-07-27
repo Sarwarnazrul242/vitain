@@ -233,7 +233,7 @@
   import BackgroundGradient from "../../components/homepage/BackgroundGradient.vue";
   import Footer from "../../components/common/Footer.vue";
   import { watch, onMounted, ref } from "vue";
-  import { errors, ErrorType, AppError, isAppError, pastError, login, signup, submitForm } from "../../services/auth";
+  import { errors, ErrorType, AppError, clearError, isAppError, pastError, login, signup, submitForm } from "../../services/auth";
   import { useRoute, useRouter } from "vue-router";
   import { reactive } from 'vue';
 
@@ -255,11 +255,7 @@
   state.value = status;
   clearError();
 }
-  const clearError = () =>
-  {  
-    console.log("Past error is ", pastError.value)
-     errors[pastError.value] = ""
-  }
+ 
   const createAccount = async () => {
     try {
       //Clears the error when user trys again to fill

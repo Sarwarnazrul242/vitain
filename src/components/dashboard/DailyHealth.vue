@@ -10,8 +10,8 @@
         </div>
       </div>
 
-      <!-- Authentication Status -->
-      <div v-if="!auth.currentUser" class="auth-notice">
+       <!-- Authentication Status -->
+      <div v-if="errors.database" class="auth-notice">
         <div class="auth-notice-content">
           <span class="auth-icon">🔐</span>
           <span class="auth-text">Please log in to save your health data</span>
@@ -363,10 +363,11 @@
     getWeeklyHealthData, 
     getMonthlyHealthData,
     type DailyHealthData,
-    type HealthSummaryData 
+    type HealthSummaryData, duplicateDailyHealthRecords 
   } from '../../services/dailyHealth';
   import { getAuth } from 'firebase/auth';
-  
+
+  import { errors, clearError, ErrorType, AppError, isAppError, pastError, } from '../../services/auth';
   // Current date
   const currentDate = computed(() => {
     return new Date().toLocaleDateString('en-US', { 
@@ -412,10 +413,6 @@
 
   // Function to load real data from Firebase
   const loadRealData = async () => {
-    if (!auth.currentUser) {
-      console.log("User not authenticated, skipping data load");
-      return;
-    }
 
     try {
       isLoading.value = true;
@@ -525,50 +522,51 @@
   };
 
   const saveWeight = async () => {
-    if (!auth.currentUser) {
-      alert('Please log in to save your weight data');
-      return;
-    }
+    // if (!auth.currentUser) {
+    //   alert('Please log in to save your weight data');
+    //   return;
+    // }
 
     const today = new Date().toISOString().split('T')[0];
     todayData.value.weightDate = today;
     
-    try {
-      await saveDailyHealthData(today, todayData.value as DailyHealthData);
-      await loadRealData(); // Update charts
-      console.log('Weight saved to Firebase:', todayData.value.weight);
-    } catch (error) {
-      console.error('Error saving weight:', error);
-      alert('Failed to save weight data. Please try again.');
-    }
+    //Should not save here but in saveDailyHealthData
+    // try {
+    //   await saveDailyHealthData(today, todayData.value as DailyHealthData);
+    //   await loadRealData(); // Update charts
+    //   console.log('Weight saved to Firebase:', todayData.value.weight);
+    // } catch (error) {
+    //   console.error('Error saving weight:', error);
+    //   alert('Failed to save weight data. Please try again.');
+    // }
   };
 
   const clearWeight = async () => {
-    if (!auth.currentUser) {
-      alert('Please log in to clear your weight data');
-      return;
-    }
+    // if (!auth.currentUser) {
+    //   alert('Please log in to clear your weight data');
+    //   return;
+    // }
 
     todayData.value.weight = 0;
     todayData.value.weightDate = '';
     
-    const today = new Date().toISOString().split('T')[0];
-    try {
-      await saveDailyHealthData(today, todayData.value as DailyHealthData);
-      await loadRealData(); // Update charts
-      console.log('Weight cleared from Firebase');
-    } catch (error) {
-      console.error('Error clearing weight:', error);
-      alert('Failed to clear weight data. Please try again.');
-    }
+    //Clear then hit submituserdata, clear should just clear what they typed
+  //   const today = new Date().toISOString().split('T')[0];
+  //  try {
+  //     await saveDailyHealthData(today, todayData.value as DailyHealthData);
+  //     await loadRealData(); // Update charts
+  //     console.log('Weight cleared from Firebase');
+  //   } catch (error) {
+  //     console.error('Error clearing weight:', error);
+  //     alert('Failed to clear weight data. Please try again.');
+  //   } 
   };
   
   const saveTodayData = async () => {
-    if (!auth.currentUser) {
-      alert('Please log in to save your daily health data');
-      return;
-    }
+    
+    //Clears errors
 
+    clearError();
     if (isSaving.value) return; // Prevent multiple saves
 
     try {
@@ -581,21 +579,20 @@
       // Reload real data to update charts
       await loadRealData();
       
-      console.log('Daily health data saved to Firebase:', todayData.value);
-      alert('Daily health data saved successfully!');
+      
     } catch (error) {
       console.error('Error saving daily health data:', error);
-      alert('Failed to save daily health data. Please try again.');
+
     } finally {
       isSaving.value = false;
     }
   };
 
   const submitWorkout = async (workoutData: any) => {
-    if (!auth.currentUser) {
-      alert('Please log in to log your workout');
-      return;
-    }
+    // if (!auth.currentUser) {
+    //   alert('Please log in to log your workout');
+    //   return;
+    // }
 
     if (workoutData.duration && !isNaN(Number(workoutData.duration))) {
       todayData.value.workoutDuration = Number(workoutData.duration);
@@ -605,14 +602,15 @@
       todayData.value.workoutType = workoutData.type || '';
       todayData.value.workoutNotes = workoutData.notes || '';
       
-      try {
-        await saveDailyHealthData(todayData.value.workoutDate, todayData.value as DailyHealthData);
-        await loadRealData(); // Update charts
-        console.log('Workout logged to Firebase:', workoutData);
-      } catch (error) {
-        console.error('Error logging workout:', error);
-        alert('Failed to log workout. Please try again.');
-      }
+      //Should not submit here but in saveDailyHealthData
+      // try {
+      //   await saveDailyHealthData(todayData.value.workoutDate, todayData.value as DailyHealthData);
+      //   await loadRealData(); // Update charts
+      //   console.log('Workout logged to Firebase:', workoutData);
+      // } catch (error) {
+      //   console.error('Error logging workout:', error);
+      //   alert('Failed to log workout. Please try again.');
+      // }
       
       workoutDurationInput.value = '';
       caloriesInput.value = '';
@@ -622,10 +620,10 @@
   };
   
   const undoWorkout = async () => {
-    if (!auth.currentUser) {
-      alert('Please log in to undo your workout');
-      return;
-    }
+    // if (!auth.currentUser) {
+    //   alert('Please log in to undo your workout');
+    //   return;
+    // }
 
     todayData.value.workoutCompleted = false;
     todayData.value.workoutDuration = 0;
@@ -634,15 +632,16 @@
     todayData.value.workoutType = '';
     todayData.value.workoutNotes = '';
     
-    try {
-      const today = new Date().toISOString().split('T')[0];
-      await saveDailyHealthData(today, todayData.value as DailyHealthData);
-      await loadRealData(); // Update charts
-      console.log('Workout undone in Firebase');
-    } catch (error) {
-      console.error('Error undoing workout:', error);
-      alert('Failed to undo workout. Please try again.');
-    }
+    //Clear but not database, in submit in saveDailyHealthData it will update record for the day
+    // try {
+    //   const today = new Date().toISOString().split('T')[0];
+    //   await saveDailyHealthData(today, todayData.value as DailyHealthData);
+    //   await loadRealData(); // Update charts
+    //   console.log('Workout undone in Firebase');
+    // } catch (error) {
+    //   console.error('Error undoing workout:', error);
+    //   alert('Failed to undo workout. Please try again.');
+    // }
   };
   
   // Chart helper methods
@@ -703,18 +702,18 @@
   
   onMounted(async () => {
     // Load today's data if exists
+    clearError();
     const today = new Date().toISOString().split('T')[0];
-    
-    if (auth.currentUser) {
-      try {
-        const savedData = await getDailyHealthData(today);
-        if (savedData) {
-          todayData.value = savedData;
-        }
-      } catch (error) {
-        console.error('Error loading today\'s data:', error);
+
+    try {
+      const savedData = await getDailyHealthData(today);
+      if (savedData) {
+        todayData.value = savedData;
       }
+    } catch (error) {
+      console.error('Error loading today\'s data:', error);
     }
+    
     
     // Load real data for charts
     await loadRealData();

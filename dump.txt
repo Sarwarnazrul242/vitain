@@ -1074,5 +1074,13 @@ export async function retrieveQuestionnaireData() {
   }
 }
 
-﻿
+
+///Duplicate buttton
+
+  <div class="save-section">
+          <button @click="duplicateDailyHealthRecords" class="save-button" >
+            <p> Duplicate records</p>
+           
+          </button>
+        </div>
 

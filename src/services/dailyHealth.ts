@@ -7,13 +7,15 @@ import {
   query, 
   where, 
   orderBy, 
+  limit,
   serverTimestamp,
   Timestamp,
   getFirestore
 } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { initializeApp } from "firebase/app";
-
+import { detectLoginState, errors, clearError, ErrorType, AppError, isAppError, pastError} from "./auth";
+import { useRoute, useRouter } from 'vue-router';
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_APIKEY,
   authDomain: import.meta.env.VITE_FIREBASE_AUTHDOMAIN,
@@ -23,10 +25,12 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APPID,
 };
 
+const route = useRoute();
+const router = useRouter();
+
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth();
-
 export interface DailyHealthData {
   mood: number;
   energy: number;
@@ -54,6 +58,56 @@ export interface HealthSummaryData {
   weight: number;
 }
 
+//Testing purposes
+export async function duplicateDailyHealthRecords() {
+  const numDays =29;
+   const today = new Date();
+  const sevenDaysAgo = new Date(today);
+  sevenDaysAgo.setDate(today.getDate() - numDays);
+
+  // Normalize times
+  sevenDaysAgo.setHours(0, 0, 0, 0);  // Start of day
+  today.setHours(23, 59, 59, 999);    // End of day
+
+  const user = await detectLoginState();
+  const userId = user.uid;
+
+  const healthCollectionRef = collection(db, "users", userId, "dailyHealth");
+
+  // Step 1: Get the first health log (by createdAt)
+  const q = query(healthCollectionRef, orderBy("createdAt", "asc"), limit(1));
+  const querySnapshot = await getDocs(q);
+
+  if (querySnapshot.empty) {
+    console.warn("No health log found to duplicate.");
+    return;
+  }
+
+  const firstDoc = querySnapshot.docs[0];
+  const sourceData = firstDoc.data();
+
+  // Get the original date
+  const baseDate = sourceData.createdAt.toDate(); // assuming it's a Firestore Timestamp
+
+  // Step 2: Duplicate this log for `numDays` additional days
+  for (let i = numDays; i >= 1; i--) {
+    const newDate = new Date(baseDate);
+    newDate.setDate(baseDate.getDate() - i);
+
+    const dateStr = newDate.toISOString().split("T")[0]; // use YYYY-MM-DD format as doc ID
+
+    const newData = {
+      ...sourceData,
+      createdAt: newDate,
+      updatedAt: new Date()
+    };
+
+    const newDocRef = doc(db, "users", userId, "dailyHealth", dateStr);
+    await setDoc(newDocRef, newData);
+
+    console.log(`✔️ Duplicated health log for ${dateStr}`);
+  }
+}
 /**
  * Save daily health data to Firebase
  * @param date - Date in YYYY-MM-DD format
@@ -61,10 +115,8 @@ export interface HealthSummaryData {
  */
 export async function saveDailyHealthData(date: string, data: DailyHealthData): Promise<void> {
   try {
-    const user = auth.currentUser;
-    if (!user) {
-      throw new Error("User not authenticated");
-    }
+
+    const user = await detectLoginState()
 
     const userId = user.uid;
     const healthDataRef = doc(db, "users", userId, "dailyHealth", date);
@@ -77,22 +129,43 @@ export async function saveDailyHealthData(date: string, data: DailyHealthData): 
 
     await setDoc(healthDataRef, dataToSave);
     console.log("Daily health data saved successfully:", date);
-  } catch (error) {
-    console.error("Error saving daily health data:", error);
-    throw error;
+  } catch (err) {
+    
+   
+    console.error("Error saving daily health data:", err);
+    pastError.value = "login"
+    errors["login"]= err.message;
+    console.log(err);
+      
+    
+  
   }
 }
 
+export async function handleLoginState()
+{
+try{
+     const user = await detectLoginState();
+  } catch (err) {
+     if (err.type == "login")
+      { 
+        //Routes user to log in page before they can access dashboard
+        console.error(err)
+        router.push("/log-in");
+      }
+      else
+      {
+        throw err;
+      }
+}
+}
 /**
  * Get daily health data from Firebase
  * @param date - Date in YYYY-MM-DD format
  */
-export async function getDailyHealthData(date: string): Promise<DailyHealthData | null> {
+export async function getDailyHealthData(date: string): Promise<DailyHealthData | null | undefined> {
   try {
-    const user = auth.currentUser;
-    if (!user) {
-      throw new Error("User not authenticated");
-    }
+    const user = await detectLoginState();
 
     const userId = user.uid;
     const healthDataRef = doc(db, "users", userId, "dailyHealth", date);
@@ -102,9 +175,12 @@ export async function getDailyHealthData(date: string): Promise<DailyHealthData 
       return healthDataSnap.data() as DailyHealthData;
     }
     return null;
-  } catch (error) {
-    console.error("Error getting daily health data:", error);
-    throw error;
+  } catch (err) {
+     
+    console.error("Error getting daily health data:", err);
+    
+
+   
   }
 }
 
@@ -113,21 +189,18 @@ export async function getDailyHealthData(date: string): Promise<DailyHealthData 
  * @param startDate - Start date in YYYY-MM-DD format
  * @param endDate - End date in YYYY-MM-DD format
  */
-export async function getHealthSummaryData(startDate: string, endDate: string): Promise<HealthSummaryData[]> {
+export async function getHealthSummaryData(startDate, endDate): Promise<HealthSummaryData[]> {
   try {
-    const user = auth.currentUser;
-    if (!user) {
-      throw new Error("User not authenticated");
-    }
+    const user = await detectLoginState();
 
     const userId = user.uid;
     const healthCollectionRef = collection(db, "users", userId, "dailyHealth");
     
     const q = query(
       healthCollectionRef,
+      orderBy("createdAt", "asc"),
       where("createdAt", ">=", new Date(startDate)),
-      where("createdAt", "<=", new Date(endDate)),
-      orderBy("createdAt", "asc")
+      where("createdAt", "<=", new Date(endDate))
     );
 
     const querySnapshot = await getDocs(q);
@@ -144,7 +217,7 @@ export async function getHealthSummaryData(startDate: string, endDate: string): 
         weight: data.weight || 0
       });
     });
-
+    
     return summaryData;
   } catch (error) {
     console.error("Error getting health summary data:", error);
@@ -160,10 +233,11 @@ export async function getWeeklyHealthData(): Promise<HealthSummaryData[]> {
   const sevenDaysAgo = new Date(today);
   sevenDaysAgo.setDate(today.getDate() - 6);
 
-  const startDate = sevenDaysAgo.toISOString().split('T')[0];
-  const endDate = today.toISOString().split('T')[0];
+  // Normalize times
+  sevenDaysAgo.setHours(0, 0, 0, 0);  // Start of day
+  today.setHours(23, 59, 59, 999);    // End of day
 
-  return await getHealthSummaryData(startDate, endDate);
+  return await getHealthSummaryData(sevenDaysAgo, today);
 }
 
 /**
@@ -174,10 +248,11 @@ export async function getMonthlyHealthData(): Promise<HealthSummaryData[]> {
   const thirtyDaysAgo = new Date(today);
   thirtyDaysAgo.setDate(today.getDate() - 29);
 
-  const startDate = thirtyDaysAgo.toISOString().split('T')[0];
-  const endDate = today.toISOString().split('T')[0];
+  // Normalize times
+  thirtyDaysAgo.setHours(0, 0, 0, 0);  // Start of day
+  today.setHours(23, 59, 59, 999);    // End of day
 
-  return await getHealthSummaryData(startDate, endDate);
+  return await getHealthSummaryData(thirtyDaysAgo, today);
 }
 
 /**
