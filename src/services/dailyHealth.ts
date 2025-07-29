@@ -46,6 +46,10 @@ export interface DailyHealthData {
   weight: number;
   weightDate: string;
   stress: 0;
+  mentalWellness: string;
+  mentalWellnessCompleted: boolean;
+  physicalWellness: string;
+  physicalWellnessCompleted: boolean;
   createdAt?: Timestamp;
   updatedAt?: Timestamp;
 }

@@ -228,6 +228,90 @@
             </div>
           </div>
 
+          <!-- Mental Wellness Tracking -->
+          <div class="tracker-card">
+            <div class="tracker-header">
+              <span class="tracker-icon">💆</span>
+              <h4 class="wellness-title">Mental & Emotional Wellness</h4>
+            </div>
+            <div class="workout-tracker">
+              <div class="workout-status">
+                <!-- Reusing workout-info classs-->
+                <div class="workout-info">
+                  <span  class="workout-label"> How are you mentally & emotionally?</span> 
+                  
+                  <span class="wellness-info"> Use this as a platform to review your mental and emotional health.
+                  </span>
+                </div>
+              </div>
+
+              <div class="workout-actions">
+                <button @click="openMentalWellnessModal" class="workout-btn log" v-if="!todayData.mentalWellnessCompleted">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
+                  Log
+                </button>
+
+                <div  class="wellness-info full-wrap"v-if="todayData.mentalWellnessCompleted">  
+                   <span  class="workout-label">  Your response: </span>  
+                  <span> {{ todayData.mentalWellness }} </span>
+            
+                
+                <button @click="undoMentalWellness" class="workout-btn undo w-[70px] h-[25px] mt-1 sm:mt-2 md:mt-3">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+                  </svg>
+                  Undo
+                </button>
+              </div>
+              </div>
+            </div>
+          </div>
+
+              <!-- Physical Wellness Tracking -->
+          <div class="tracker-card">
+            <div class="tracker-header">
+              <span class="tracker-icon">🧘</span>
+              <h4 class="tracker-title">Physical Wellness</h4>
+            </div>
+            <div class="workout-tracker">
+              <div class="workout-status">
+                <!-- Reusing workout-info classs-->
+                <div class="workout-info">
+                  <span  class="workout-label"> 
+                    How is your body feeling today?</span>
+                    <span class="wellness-info"> Let us know if you are experiencing any pain or discomfort.
+                    This may include symptoms such as a headache, fever etc.
+                  </span>
+                </div>
+              </div>
+
+              <div class="workout-actions">
+                <button @click="openPhysicalWellnessModal" class="workout-btn log" v-if="!todayData.physicalWellnessCompleted">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
+                  Log
+                </button>
+
+                <div  class="wellness-info full-wrap"v-if="todayData.physicalWellnessCompleted">  
+                   <span  class="workout-label">  Your response: </span> 
+                  <span> {{ todayData.physicalWellness }} </span>
+            
+                
+                <button @click="undoPhysicalWellness" class="workout-btn undo w-[70px] h-[25px] mt-1 sm:mt-2 md:mt-3">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+                  </svg>
+                  Undo
+                </button>
+              </div>
+              </div>
+            </div>
+          </div>
+
+
         </div>
   
         <!-- Save Button -->
@@ -443,6 +527,10 @@
     workoutNotes: '',
     weight: 0, // Added weight tracking
     weightDate: '', // Added weight tracking
+    mentalWellness: '',
+    mentalWellnessCompleted: false, 
+    physicalWellness: '',
+    physicalWellnessCompleted: false
   
   });
   
@@ -468,7 +556,7 @@
       // Load weekly data
       const weeklyDataFromFirebase = await getWeeklyHealthData();
       weeklyData.value = weeklyDataFromFirebase;
-      console.log(weeklyData.value);
+      //console.log(weeklyData.value);
       // Load monthly data
       const monthlyDataFromFirebase = await getMonthlyHealthData();
       monthlyData.value = monthlyDataFromFirebase;
@@ -498,9 +586,37 @@
   // Modal states
   const showWeightModal = ref(false);
   const showWorkoutModal = ref(false);
+  const showMentalWellnessModal = ref(false);
+  const showPhysicalWellnessModal = ref(false);
+
 
   // Emit events for modal management
-  const emit = defineEmits(['showWorkoutModal']);
+  const emit = defineEmits(['showWorkoutModal','showMentalWellnessModal','showPhysicalWellnessModal']);
+
+
+    // Input values
+  const workoutDurationInput = ref('');
+  const caloriesInput = ref('');
+  const workoutNotes = ref('');
+  const workoutType = ref('');
+  const mentalWellness = ref('');
+  const physicalWellness = ref('');
+
+    // Methods to show modals
+  const openMentalWellnessModal = () => {
+    emit('showMentalWellnessModal', { 
+      mentalWellness: mentalWellness.value
+    });
+  };
+
+  const openPhysicalWellnessModal = () => {
+    emit('showPhysicalWellnessModal', { 
+      physicalWellness: physicalWellness.value
+    });
+  };
+ 
+
+
 
   // Methods to show modals
   const openWorkoutModal = () => {
@@ -512,12 +628,6 @@
     });
   };
   
-  // Input values
-  const workoutDurationInput = ref('');
-  const caloriesInput = ref('');
-  const workoutNotes = ref('');
-  const workoutType = ref('');
-
   // Calorie calculation helper
   const calculateCalories = (duration: number, type: string) => {
     const calorieRates = {
@@ -608,6 +718,29 @@
     }
   };
 
+  const submitMentalWellness = async (mentalWellnessData: any) => {
+
+    if (mentalWellnessData) {
+        todayData.value.mentalWellness = mentalWellnessData;
+        todayData.value.mentalWellnessCompleted = true;
+
+        mentalWellness.value='';
+
+  }
+};
+
+  const submitPhysicalWellness= async (physicalWellnessData: any) => {
+
+    if (physicalWellnessData) {
+        todayData.value.physicalWellness = physicalWellnessData;
+        todayData.value.physicalWellnessCompleted = true;
+
+        physicalWellness.value='';
+
+  }
+};
+
+
   const submitWorkout = async (workoutData: any) => {
     if (workoutData.duration && !isNaN(Number(workoutData.duration))) {
       todayData.value.workoutDuration = Number(workoutData.duration);
@@ -624,6 +757,16 @@
     }
   };
   
+  const undoMentalWellness  = async () => { 
+    todayData.value.mentalWellnessCompleted = false;
+    todayData.value.mentalWellness= '';
+  }
+
+  const undoPhysicalWellness  = async () => { 
+    todayData.value.physicalWellnessCompleted = false;
+    todayData.value.physicalWellness= '';
+  }
+
   const undoWorkout = async () => {
 
     todayData.value.workoutCompleted = false;
@@ -735,6 +878,16 @@
     window.addEventListener('workoutSubmitted', (event: any) => {
       submitWorkout(event.detail);
     });
+
+    window.addEventListener('mentalWellnessSubmitted', (event: any) => {
+    submitMentalWellness(event.detail);
+         
+    });
+
+    window.addEventListener('physicalWellnessSubmitted', (event: any) => {
+    submitPhysicalWellness(event.detail);
+         
+    });
   });
 
   // Watch for summary view changes to refresh data
@@ -795,6 +948,10 @@
   
   .tracker-title {
     @apply text-white font-semibold text-sm;
+  }
+
+  .wellness-title {
+    @apply text-center text-white font-semibold text-sm block;
   }
   
   /* Mood Scale */
@@ -1192,6 +1349,10 @@
   .weight-bar.low-weight {
     @apply bg-red-500;
   }
+
+  .wellness-info {
+    @apply text-gray-400 text-xs;
+  }
   
   /* Responsive */
   @media (max-width: 768px) {
@@ -1260,4 +1421,15 @@
       @apply w-full;
     }
   }
+
+
+.full-wrap {
+  display: block;
+  white-space: pre-wrap; /* Preserve line breaks and wrap text */
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  max-width: 100%;
+  margin-top: 0.5rem;
+  line-height: 1.5;
+}
   </style>
