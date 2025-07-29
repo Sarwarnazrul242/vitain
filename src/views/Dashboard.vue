@@ -11,6 +11,8 @@
             <SupplementRecommendation />
             <DailyHealthCheckin 
               @showWorkoutModal="showWorkoutModal = true; workoutModalData = $event"
+              @showMentalWellnessModal="showMentalWellnessModal = true; mentalWellnessModalData=$event"
+              @showPhysicalWellnessModal="showPhysicalWellnessModal = true; physicalWellnessModalData=$event"
             />
             <RecentActivity />
           </div>
@@ -95,6 +97,72 @@
         </div>
       </div>
     </div>
+
+
+     <!-- Mental Wellness Modal -->
+    <div v-if="showMentalWellnessModal" class="modal-overlay" @click="showMentalWellnessModal = false">
+      <div class="modal-content" @click.stop>
+        <div class="modal-header">
+          <h3 class="modal-title">Log Mental & Emotional Wellness</h3>
+          <button @click="showMentalWellnessModal = false" class="modal-close">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="workout-form">
+            
+            <div class="form-group">
+              <label class="input-label">Notes</label>
+              <textarea 
+                v-model="mentalWellness" 
+                class="modal-input"
+                rows="3"
+                placeholder="How have you been mentally and emotionally?"
+              ></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button @click="showMentalWellnessModal = false" class="modal-button secondary">Cancel</button>
+          <button @click="submitMentalWellness" class="modal-button primary">Save</button>
+        </div>
+      </div>
+    </div>
+
+
+      <!-- Physical Wellness Modal -->
+    <div v-if="showPhysicalWellnessModal" class="modal-overlay" @click="showPhysicalWellnessModal = false">
+      <div class="modal-content" @click.stop>
+        <div class="modal-header">
+          <h3 class="modal-title">Log Physical Wellness</h3>
+          <button @click="showPhysicalWellnessModal = false" class="modal-close">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="workout-form">
+            
+            <div class="form-group">
+              <label class="input-label">Notes</label>
+              <textarea 
+                v-model="physicalWellness" 
+                class="modal-input"
+                rows="3"
+                placeholder="How is your body feeling today?"
+              ></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button @click="showPhysicalWellnessModal = false" class="modal-button secondary">Cancel</button>
+          <button @click="submitPhysicalWellness" class="modal-button primary">Save</button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -109,10 +177,17 @@ import RecentActivity from '@/components/dashboard/RecentActivity.vue';
 
 // Modal states
 const showWorkoutModal = ref(false);
+const showMentalWellnessModal = ref(false);
+const showPhysicalWellnessModal = ref(false);
+
+//User data
+const mentalWellness = ref('');
+const physicalWellness = ref('');
 
 // Modal data
 const workoutModalData = ref({});
-
+const mentalWellnessModalData=ref('');
+const physicalWellnessModalData=ref('');
 // Form inputs
 const workoutDurationInput = ref('');
 const caloriesInput = ref('');
@@ -148,7 +223,36 @@ const updateCalories = () => {
 };
 
 // Modal methods
-const submitWorkout = () => {
+const submitMentalWellness = () => {
+  if (mentalWellness.value) {
+    // Emit to DailyHealth component
+    const event = new CustomEvent('mentalWellnessSubmitted', { 
+      detail: mentalWellness.value
+    });
+
+    window.dispatchEvent(event);
+    showMentalWellnessModal.value = false;
+    mentalWellness.value = '';
+
+  }
+};
+
+const submitPhysicalWellness = () => {
+  if (physicalWellness.value) {
+    // Emit to DailyHealth component
+    const event = new CustomEvent('physicalWellnessSubmitted', { 
+      detail: physicalWellness.value
+    });
+
+    window.dispatchEvent(event);
+    showPhysicalWellnessModal.value = false;
+    physicalWellness.value = '';
+
+  }
+};
+
+const  submitWorkout  = () => {
+
   if (workoutDurationInput.value && !isNaN(Number(workoutDurationInput.value))) {
     // Emit to DailyHealth component
     const event = new CustomEvent('workoutSubmitted', { 
@@ -159,6 +263,7 @@ const submitWorkout = () => {
         notes: workoutNotes.value
       }
     });
+
     window.dispatchEvent(event);
     
     showWorkoutModal.value = false;
@@ -166,8 +271,12 @@ const submitWorkout = () => {
     caloriesInput.value = '';
     workoutNotes.value = '';
     workoutType.value = '';
+    
   }
 };
+
+
+
 </script>
 
 <style scoped>
