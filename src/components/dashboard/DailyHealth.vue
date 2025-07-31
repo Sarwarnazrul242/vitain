@@ -21,7 +21,10 @@
       <!-- Today's Check-in -->
       <div class="checkin-section">
         <h3 class="subsection-title">Today's Check-in</h3>
-        
+        <div class="tip-card">
+          <h6 class="tip-title"> ViTip:</h6>
+         <h6 class="tip-display"> You can always update your logs throughout the day.<br> We'll remind you ⏰</h6>
+         </div>
         <div class="checkin-grid">
           <!-- Mood Tracker -->
           <div class="tracker-card">
@@ -127,6 +130,48 @@
                   class="water-fill"
                   :style="{ width: (todayData.water / 8) * 100 + '%' }"
                 ></div>
+              </div>
+            </div>
+          </div>
+          
+         <!-- Meal Tracking -->
+          <div class="tracker-card">
+            <div class="tracker-header">
+              <span class="tracker-icon">🍽️🥤</span>
+              <h4 class="tracker-title">Meals</h4>
+            </div>
+            <div class="workout-tracker">
+              <div class="workout-status">
+                <!-- Reusing workout-info classs-->
+                <div class="workout-info">
+                  <span  class="workout-label"> 
+                    What did you eat today?</span>
+                    <span class="wellness-info"> Let us know the meals, snacks and beverages you took today.
+                  </span>
+                </div>
+              </div>
+
+              <div class="workout-actions">
+                <button @click="openMealModal" class="workout-btn log" v-if="!todayData.mealCompleted">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
+                  Log
+                </button>
+          
+                <div  class="wellness-info full-wrap"v-if="todayData.mealCompleted">  
+                  
+                  <button @click="openMealModal" class="workout-btn log">
+                    View log
+                  </button>
+
+                  <button @click="undoMeal" class="workout-btn undo w-[70px] h-[25px] mt-1 sm:mt-2 md:mt-3">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+                    </svg>
+                    Undo
+                  </button>
+              </div>
               </div>
             </div>
           </div>
@@ -255,15 +300,18 @@
 
                 <div  class="wellness-info full-wrap"v-if="todayData.mentalWellnessCompleted">  
                    <span  class="workout-label">  Your response: </span>  
-                  <span> {{ todayData.mentalWellness }} </span>
-            
+                  <span class="truncate-multiline"> {{ todayData.mentalWellness }} </span>
+
+                  <button @click="openMentalWellnessModal" class="workout-btn log">
+                    View log
+                  </button>
                 
-                <button @click="undoMentalWellness" class="workout-btn undo w-[70px] h-[25px] mt-1 sm:mt-2 md:mt-3">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
-                  </svg>
-                  Undo
-                </button>
+                  <button @click="undoMentalWellness" class="workout-btn undo w-[70px] h-[25px] mt-1 sm:mt-2 md:mt-3">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+                    </svg>
+                    Undo
+                  </button>
               </div>
               </div>
             </div>
@@ -294,18 +342,21 @@
                   </svg>
                   Log
                 </button>
-
+          
                 <div  class="wellness-info full-wrap"v-if="todayData.physicalWellnessCompleted">  
-                   <span  class="workout-label">  Your response: </span> 
-                  <span> {{ todayData.physicalWellness }} </span>
+                  <span  class="workout-label">  Your response: </span> 
+                  <span class="truncate-multiline"> {{ todayData.physicalWellness }} </span>
             
-                
-                <button @click="undoPhysicalWellness" class="workout-btn undo w-[70px] h-[25px] mt-1 sm:mt-2 md:mt-3">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
-                  </svg>
-                  Undo
-                </button>
+                  <button @click="openPhysicalWellnessModal" class="workout-btn log">
+                    View log
+                  </button>
+
+                  <button @click="undoPhysicalWellness" class="workout-btn undo w-[70px] h-[25px] mt-1 sm:mt-2 md:mt-3">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+                    </svg>
+                    Undo
+                  </button>
               </div>
               </div>
             </div>
@@ -494,7 +545,9 @@
     type DailyHealthData,
     type HealthSummaryData, duplicateDailyHealthRecords 
   } from '../../services/dailyHealth';
+
   import { getAuth } from 'firebase/auth';
+  import { todayData } from '../../services/dailyHealth';
 
   import { errors, clearError, ErrorType, AppError, isAppError, pastError, retrieveQuestionnaireData } from '../../services/auth';
   // Current date
@@ -511,28 +564,6 @@
   const auth = getAuth();
   
   const questionnaireData = ref<any>(null);
-  // Today's data
-  const todayData = ref({
-    mood: 0,
-    stress: 0,
-    energy: 0,
-    sleep: 0,
-    sleepQuality: '',
-    water: 0,
-    workoutCompleted: false,
-    workoutDuration: 0,
-    workoutDate: '',
-    caloriesBurned: 0,
-    workoutType: '',
-    workoutNotes: '',
-    weight: 0, // Added weight tracking
-    weightDate: '', // Added weight tracking
-    mentalWellness: '',
-    mentalWellnessCompleted: false, 
-    physicalWellness: '',
-    physicalWellnessCompleted: false
-  
-  });
   
   // Weekly data from Firebase
   const weeklyData = ref<HealthSummaryData[]>([]);
@@ -591,10 +622,18 @@
 
 
   // Emit events for modal management
-  const emit = defineEmits(['showWorkoutModal','showMentalWellnessModal','showPhysicalWellnessModal']);
+  const emit = defineEmits(['showWorkoutModal','showMentalWellnessModal','showPhysicalWellnessModal',
+                            'showMealModal']);
 
 
     // Input values
+  const breakfast = ref('');
+  const lunch = ref('');
+  const dinner = ref('');
+  const snacks = ref('');
+  const beverages = ref('');
+  const otherMeal = ref('');
+  const mealCompleted = ref('');
   const workoutDurationInput = ref('');
   const caloriesInput = ref('');
   const workoutNotes = ref('');
@@ -603,6 +642,18 @@
   const physicalWellness = ref('');
 
     // Methods to show modals
+  const openMealModal = () => {
+    emit('showMealModal', { 
+       breakfast : breakfast.value,
+       lunch : lunch.value,
+       dinner : dinner.value,
+       snacks : snacks.value,
+       beverages : beverages.value,
+       otherMeal :otherMeal.value,
+       mealCompleted : mealCompleted.value,
+      });
+  };
+ 
   const openMentalWellnessModal = () => {
     emit('showMentalWellnessModal', { 
       mentalWellness: mentalWellness.value
@@ -610,14 +661,10 @@
   };
 
   const openPhysicalWellnessModal = () => {
-    emit('showPhysicalWellnessModal', { 
-      physicalWellness: physicalWellness.value
-    });
+    emit('showPhysicalWellnessModal', {  physicalWellness: physicalWellness.value});
   };
- 
 
-
-
+  
   // Methods to show modals
   const openWorkoutModal = () => {
     emit('showWorkoutModal', { 
@@ -718,7 +765,7 @@
     }
   };
 
-  const submitMentalWellness = async (mentalWellnessData: any) => {
+  const submitMentalWellness =  (mentalWellnessData: any) => {
 
     if (mentalWellnessData) {
         todayData.value.mentalWellness = mentalWellnessData;
@@ -729,19 +776,39 @@
   }
 };
 
-  const submitPhysicalWellness= async (physicalWellnessData: any) => {
+const submitPhysicalWellness =  (physicalWellnessData: any) => {
 
     if (physicalWellnessData) {
         todayData.value.physicalWellness = physicalWellnessData;
         todayData.value.physicalWellnessCompleted = true;
 
         physicalWellness.value='';
-
   }
 };
 
+const submitMeal=  (mealData: any) =>
+{
+   if (mealData)
+   {
+      todayData.value.breakfast = mealData.breakfast;
+      todayData.value.lunch = mealData.lunch;
+      todayData.value.dinner = mealData.dinner;
+      todayData.value.snacks = mealData.snacks;
+      todayData.value.beverages = mealData.beverages;
+      todayData.value.otherMeal = mealData.otherMeal;
+      todayData.value.mealCompleted = true;
 
-  const submitWorkout = async (workoutData: any) => {
+      breakfast.value ='';
+      lunch.value ='';
+      dinner.value ='';
+      snacks.value = '';
+      beverages.value = '';
+      otherMeal.value = '';
+
+   }
+};
+
+const submitWorkout = (workoutData: any) => {
     if (workoutData.duration && !isNaN(Number(workoutData.duration))) {
       todayData.value.workoutDuration = Number(workoutData.duration);
       todayData.value.workoutCompleted = true;
@@ -757,17 +824,30 @@
     }
   };
   
-  const undoMentalWellness  = async () => { 
+  const undoMeal =  () =>
+{
+  
+    todayData.value.breakfast = '';
+    todayData.value.lunch = '';
+    todayData.value.dinner = '';
+    todayData.value.snacks = '';
+    todayData.value.beverages = '';
+    todayData.value.otherMeal = '';
+    todayData.value.mealCompleted = false;
+
+   
+};
+  const undoMentalWellness  =  () => { 
     todayData.value.mentalWellnessCompleted = false;
     todayData.value.mentalWellness= '';
   }
 
-  const undoPhysicalWellness  = async () => { 
+  const undoPhysicalWellness  =  () => { 
     todayData.value.physicalWellnessCompleted = false;
     todayData.value.physicalWellness= '';
   }
 
-  const undoWorkout = async () => {
+  const undoWorkout =  () => {
 
     todayData.value.workoutCompleted = false;
     todayData.value.workoutDuration = 0;
@@ -875,18 +955,20 @@
     await loadRealData();
 
     // Listen for modal submissions
+    window.addEventListener('mealSubmitted', (event: any) => {
+      submitMeal(event.detail);   
+    });
+
     window.addEventListener('workoutSubmitted', (event: any) => {
       submitWorkout(event.detail);
     });
 
     window.addEventListener('mentalWellnessSubmitted', (event: any) => {
-    submitMentalWellness(event.detail);
-         
+    submitMentalWellness(event.detail);   
     });
 
     window.addEventListener('physicalWellnessSubmitted', (event: any) => {
-    submitPhysicalWellness(event.detail);
-         
+    submitPhysicalWellness(event.detail);   
     });
   });
 
@@ -916,10 +998,18 @@
   .date-display {
     @apply text-gray-400 font-medium;
   }
+
+   .tip-display {
+    @apply text-gray-300 mb-4;
+  }
   
   .subsection-title {
     @apply text-xl font-bold text-white mb-4;
   }
+  .tip-title {
+    @apply text-xl font-bold text-white;
+  }
+  
   
   /* Check-in Section */
   .checkin-section {
@@ -929,7 +1019,10 @@
   .checkin-grid {
     @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-6;
   }
-  
+
+  .tip-card {
+    @apply bg-white/5 backdrop-blur-sm p-4 rounded-xl border border-white/10 hover:border-white/20 transition-all duration-300 mb-6 h-[120px] min-h-[40px] w-[500px];
+  }
   .tracker-card {
     @apply bg-white/5 backdrop-blur-sm p-4 rounded-xl border border-white/10 hover:border-white/20 transition-all duration-300 min-h-[200px] flex flex-col;
   }
@@ -1125,7 +1218,7 @@
   }
   
   .workout-btn {
-    @apply flex items-center px-2 py-1 text-xs rounded-lg transition-colors duration-300 hover:scale-105;
+    @apply flex items-center px-2 py-1 text-xs rounded-lg transition-colors duration-300 hover:scale-105 mt-2;
   }
   
   .workout-btn.complete {
@@ -1431,5 +1524,14 @@
   max-width: 100%;
   margin-top: 0.5rem;
   line-height: 1.5;
+}
+
+.truncate-multiline {
+  @apply ml-1;
+  display: -webkit-box;
+  -webkit-line-clamp: 1; /* Number of lines */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
   </style>
