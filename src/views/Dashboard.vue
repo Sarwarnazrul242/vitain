@@ -10,6 +10,7 @@
             <WelcomeSection />
             <SupplementRecommendation />
             <DailyHealthCheckin 
+              @showMealModal="showMealModal = true; mealModalData=$event"
               @showWorkoutModal="showWorkoutModal = true; workoutModalData = $event"
               @showMentalWellnessModal="showMentalWellnessModal = true; mentalWellnessModalData=$event"
               @showPhysicalWellnessModal="showPhysicalWellnessModal = true; physicalWellnessModalData=$event"
@@ -21,6 +22,136 @@
     </div>
 
     <!-- Global Modals -->
+
+      <!-- Meal Modal -->
+    <div v-if="showMealModal" class="modal-overlay" @click="showMealModal = false">
+      <div class="modal-content" @click.stop>
+        <div class="modal-header">
+          <h3 class="modal-title">Log Your Food Intake</h3>
+          <button @click="showMealModal = false" class="modal-close">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="workout-form"> 
+       
+             
+              <div class="form-group">
+                <label class="input-label">Breakfast</label>
+                <textarea 
+                  v-if="!todayData.mealCompleted"
+                  v-model="breakfast" 
+                  type="string" 
+                  class="log-input"
+                ></textarea>
+
+                <span 
+                v-if="todayData.mealCompleted"
+                class="log-input full-wrap"
+              >
+              {{ todayData.breakfast }} 
+             </span>
+
+              </div>
+               <div class="form-group">
+                <label class="input-label">Lunch</label>
+                <textarea 
+                  v-if="!todayData.mealCompleted"
+                  v-model="lunch" 
+                  type="string" 
+                  class="log-input"
+                ></textarea>
+             
+                  
+                <span 
+                v-if="todayData.mealCompleted"
+                class="log-input full-wrap"
+              >
+              {{ todayData.lunch }} 
+             </span>
+              </div>
+
+              <div class="form-group">
+                <label class="input-label">Dinner</label>
+                <textarea 
+                  v-if="!todayData.mealCompleted"
+                  v-model="dinner" 
+                  type="string" 
+                  class="log-input"
+                  placeholder=""
+                ></textarea>
+
+                <span 
+                v-if="todayData.mealCompleted"
+                class="log-input full-wrap"
+              >
+              {{ todayData.dinner }} 
+             </span>
+              </div>
+              
+               <div class="form-group">
+                <label class="input-label">Snacks</label>
+                <textarea 
+                  v-if="!todayData.mealCompleted"
+                  v-model="snacks" 
+                  type="string" 
+                  class="log-input"
+                ></textarea>
+
+                  <span 
+                v-if="todayData.mealCompleted"
+                class="log-input full-wrap"
+              >
+              {{ todayData.snacks }} 
+             </span>
+              </div>
+
+              <div class="form-group">
+                <label class="input-label">Beverages</label>
+                <textarea 
+                  v-if="!todayData.mealCompleted"
+                  v-model="beverages" 
+                  type="string" 
+                  class="log-input"
+
+                ></textarea>
+
+                   <span 
+                v-if="todayData.mealCompleted"
+                class="log-input full-wrap"
+              >
+              {{ todayData.beverages }} 
+             </span>
+              </div>
+              
+               <div class="form-group">
+                <label class="input-label">Other Meals (Optional)</label>
+                <textarea 
+                  v-if="!todayData.mealCompleted"
+                  v-model="otherMeal" 
+                  type="string" 
+                  class="log-input"
+                > </textarea>
+
+                 <span 
+                v-if="todayData.mealCompleted"
+                class="log-input full-wrap"
+              >
+              {{ todayData.otherMeal }} 
+             </span>
+            </div>
+          </div>
+
+        </div>
+        <div class="modal-actions">
+          <button @click="showMealModal = false" class="modal-button secondary"  v-if="!todayData.mealCompleted">Cancel</button>
+          <button @click="submitMeal" class="modal-button primary" v-if="!todayData.mealCompleted">Save</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Workout Modal -->
     <div v-if="showWorkoutModal" class="modal-overlay" @click="showWorkoutModal = false">
       <div class="modal-content" @click.stop>
@@ -116,17 +247,25 @@
             <div class="form-group">
               <label class="input-label">Notes</label>
               <textarea 
+                v-if="!todayData.mentalWellnessCompleted"
                 v-model="mentalWellness" 
-                class="modal-input"
+                class="log-input"
                 rows="3"
                 placeholder="How have you been mentally and emotionally?"
               ></textarea>
+
+               <span 
+                v-if="todayData.mentalWellnessCompleted"
+                class="log-input full-wrap"
+              >
+              {{ todayData.mentalWellness }} 
+            </span>
             </div>
           </div>
         </div>
         <div class="modal-actions">
-          <button @click="showMentalWellnessModal = false" class="modal-button secondary">Cancel</button>
-          <button @click="submitMentalWellness" class="modal-button primary">Save</button>
+          <button @click="showMentalWellnessModal = false" class="modal-button secondary"  v-if="!todayData.mentalWellnessCompleted">Cancel</button>
+          <button @click="submitMentalWellness" class="modal-button primary" v-if="!todayData.mentalWellnessCompleted">Save</button>
         </div>
       </div>
     </div>
@@ -149,17 +288,27 @@
             <div class="form-group">
               <label class="input-label">Notes</label>
               <textarea 
+                v-if="!todayData.physicalWellnessCompleted"
                 v-model="physicalWellness" 
-                class="modal-input"
+                class="log-input"
                 rows="3"
                 placeholder="How is your body feeling today?"
-              ></textarea>
+              >
+              </textarea>
+
+               <span 
+                v-if="todayData.physicalWellnessCompleted"
+                class="log-input full-wrap"
+              >
+              {{ todayData.physicalWellness }} 
+            </span>
+
             </div>
           </div>
         </div>
         <div class="modal-actions">
-          <button @click="showPhysicalWellnessModal = false" class="modal-button secondary">Cancel</button>
-          <button @click="submitPhysicalWellness" class="modal-button primary">Save</button>
+          <button @click="showPhysicalWellnessModal  = false" class="modal-button secondary"  v-if="!todayData.physicalWellnessCompleted">Cancel</button>
+          <button @click="submitPhysicalWellness" class="modal-button primary"  v-if="!todayData.physicalWellnessCompleted">Save</button>
         </div>
       </div>
     </div>
@@ -174,17 +323,27 @@ import WelcomeSection from '@/components/dashboard/WelcomeSection.vue';
 import SupplementRecommendation from '@/components/dashboard/SupplimentRecommendation.vue';
 import DailyHealthCheckin from '@/components/dashboard/DailyHealth.vue';
 import RecentActivity from '@/components/dashboard/RecentActivity.vue';
+import { todayData } from '../services/dailyHealth';
 
 // Modal states
+const showMealModal = ref(false);
 const showWorkoutModal = ref(false);
 const showMentalWellnessModal = ref(false);
 const showPhysicalWellnessModal = ref(false);
 
 //User data
+const breakfast = ref('');
+const lunch = ref('');
+const dinner = ref('');
+const snacks = ref('');
+const beverages = ref('');
+const otherMeal = ref('');
+const mealCompleted = ref('');
 const mentalWellness = ref('');
 const physicalWellness = ref('');
 
 // Modal data
+const mealModalData = ref({});
 const workoutModalData = ref({});
 const mentalWellnessModalData=ref('');
 const physicalWellnessModalData=ref('');
@@ -222,6 +381,34 @@ const updateCalories = () => {
   }
 };
 
+const  submitMeal  = () => {
+
+  if (breakfast.value || lunch.value || dinner.value || snacks.value || beverages.value || otherMeal.value) {
+    // Emit to DailyHealth component
+    const event = new CustomEvent('mealSubmitted', { 
+      detail: { 
+      breakfast : breakfast.value,
+       lunch : lunch.value,
+       dinner : dinner.value,
+       snacks : snacks.value,
+       beverages : beverages.value,
+       otherMeal : otherMeal.value,
+       mealCompleted : mealCompleted.value,
+      }
+    });
+
+    window.dispatchEvent(event);
+    
+    showMealModal.value = false;
+    breakfast.value = '';
+    lunch.value = '';
+    dinner.value = '';
+    snacks.value = '';
+    beverages.value = '';
+    otherMeal.value = '';
+    mealCompleted.value = '';
+  }
+};
 // Modal methods
 const submitMentalWellness = () => {
   if (mentalWellness.value) {
@@ -334,17 +521,47 @@ const  submitWorkout  = () => {
 }
 
 .modal-body {
-  @apply mb-6;
+  @apply mb-6 max-h-[400px] overflow-y-auto pr-4;
 }
 
 .input-label {
   @apply block text-sm font-medium text-white mb-2;
 }
+.log-input {
+  @apply w-full min-h-[64px] max-w-full resize-none break-words whitespace-pre-wrap
+         bg-white/10 border border-white/20 rounded-lg px-4 py-2 text-white
+         placeholder-gray-400 focus:outline-none focus:border-[#4ADE80]
+         transition-colors duration-300;
+  box-sizing: border-box;
+  line-height: 1.3;
+  font-size: 1rem;
+}
+
+
+/*next after original*/
+/* .modal-input {
+  @apply w-full min-h-[64px] max-w-full resize-none break-words whitespace-pre-wrap
+         bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white 
+         placeholder-gray-400 focus:outline-none focus:border-[#4ADE80] 
+         transition-colors duration-300;
+}
+
+.log-input {
+  @apply w-full min-h-[64px] max-w-full resize-none break-words whitespace-pre-wrap overflow-hidden 
+         px-4 py-3  bg-white/10 border border-white/20 rounded-lg text-white 
+         transition-colors duration-300;
+} */
+
+/*original*/
 
 .modal-input {
   @apply w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-[#4ADE80] transition-colors duration-300;
 }
-
+/*
+.log-input {
+  @apply w-full   min-h-[48px] max-w-full break-words p-3 bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-white focus:outline-none focus:border-[#4ADE80] transition-colors duration-300;
+}
+  */
 .modal-input:focus {
   @apply ring-2 ring-[#4ADE80]/20;
 }
@@ -387,6 +604,11 @@ textarea.modal-input {
 
 .form-group {
   @apply flex flex-col;
+}
+
+.log-row {
+  @apply flex gap-4;
+
 }
 
 .form-row {
@@ -434,5 +656,15 @@ textarea.modal-input {
   .modal-button {
     @apply w-full;
   }
+}
+
+.full-wrap {
+  display: block;
+  white-space: pre-wrap; /* Preserve line breaks and wrap text */
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  max-width: 100%;
+  margin-top: 0.5rem;
+  line-height: 1.5;
 }
 </style>

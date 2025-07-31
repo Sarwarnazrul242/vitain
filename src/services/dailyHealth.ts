@@ -16,6 +16,7 @@ import { getAuth } from "firebase/auth";
 import { initializeApp } from "firebase/app";
 import { detectLoginState, errors, clearError, ErrorType, AppError, isAppError, pastError} from "./auth";
 import { useRoute, useRouter } from 'vue-router';
+import { ref, computed, onMounted, watch } from 'vue';
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_APIKEY,
   authDomain: import.meta.env.VITE_FIREBASE_AUTHDOMAIN,
@@ -31,12 +32,49 @@ const router = useRouter();
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth();
+
+// Today's data
+export const todayData = ref({
+    mood: 0,
+    stress: 0,
+    energy: 0,
+    sleep: 0,
+    sleepQuality: '',
+    water: 0,
+    breakfast: '',
+    lunch: '',
+    dinner: '',
+    snacks: '',
+    beverages: '',
+    otherMeal: '',
+    mealCompleted: false,
+    workoutCompleted: false,
+    workoutDuration: 0,
+    workoutDate: '',
+    caloriesBurned: 0,
+    workoutType: '',
+    workoutNotes: '',
+    weight: 0, // Added weight tracking
+    weightDate: '', // Added weight tracking
+    mentalWellness: '',
+    mentalWellnessCompleted: false, 
+    physicalWellness: '',
+    physicalWellnessCompleted: false
+  
+  });
 export interface DailyHealthData {
   mood: number;
   energy: number;
   sleep: number;
   sleepQuality: string;
   water: number;
+  breakfast: string;
+  lunch: string;
+  dinner: string;
+  snacks: string;
+  beverages: string;
+  otherMeal: string;
+  mealCompleted: boolean;
   workoutCompleted: boolean;
   workoutDuration: number;
   workoutDate: string;
