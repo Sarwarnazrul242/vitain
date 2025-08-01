@@ -137,8 +137,9 @@
          <!-- Meal Tracking -->
           <div class="tracker-card">
             <div class="tracker-header">
-              <span class="tracker-icon">🍽️🥤</span>
+              <span class="tracker-icon">🍽️</span>
               <h4 class="tracker-title">Meals</h4>
+                   <span class="tracker-icon">🥤</span>
             </div>
             <div class="workout-tracker">
               <div class="workout-status">
@@ -547,7 +548,9 @@
   } from '../../services/dailyHealth';
 
   import { getAuth } from 'firebase/auth';
-  import { todayData } from '../../services/dailyHealth';
+  import { todayData, loadRealData, weeklyData, monthlyData, isSaving, isLoading, questionnaireData, getMoodEmoji, getMoodLabel,
+           summaryView, loadActivity
+  } from '../../services/dailyHealth';
 
   import { errors, clearError, ErrorType, AppError, isAppError, pastError, retrieveQuestionnaireData } from '../../services/auth';
   // Current date
@@ -562,43 +565,8 @@
   
   // Firebase auth instance
   const auth = getAuth();
-  
-  const questionnaireData = ref<any>(null);
-  
-  // Weekly data from Firebase
-  const weeklyData = ref<HealthSummaryData[]>([]);
 
-  // Monthly data from Firebase
-  const monthlyData = ref<HealthSummaryData[]>([]);
 
-  // Loading states
-  const isLoading = ref(false);
-  const isSaving = ref(false);
-
-  // Summary view state
-  const summaryView = ref('weekly');
-
-  // Function to load real data from Firebase
-  const loadRealData = async () => {
-
-    try {
-      isLoading.value = true;
-      
-      // Load weekly data
-      const weeklyDataFromFirebase = await getWeeklyHealthData();
-      weeklyData.value = weeklyDataFromFirebase;
-      //console.log(weeklyData.value);
-      // Load monthly data
-      const monthlyDataFromFirebase = await getMonthlyHealthData();
-      monthlyData.value = monthlyDataFromFirebase;
-      
-      console.log("Health data loaded from Firebase");
-    } catch (error) {
-      console.error("Error loading health data:", error);
-    } finally {
-      isLoading.value = false;
-    }
-  };
 
   // Computed properties for summary data
   const currentSummaryData = computed(() => {
@@ -704,15 +672,7 @@
   };
   
   // Methods
-  const getMoodEmoji = (rating: number) => {
-    const emojis = ['😞', '😐', '🙂', '😊', '😄'];
-    return emojis[rating - 1] || '😐';
-  };
   
-  const getMoodLabel = (rating: number) => {
-    const labels = ['', 'Poor', 'Fair', 'Good', 'Great', 'Excellent'];
-    return labels[rating] || '';
-  };
   
   const addWater = () => {
     if (todayData.value.water < 12) {
@@ -755,6 +715,9 @@
       
       // Reload real data to update charts
       await loadRealData();
+      
+      //Reload activity
+      loadActivity();
       
       
     } catch (error) {
@@ -975,7 +938,9 @@ const submitWorkout = (workoutData: any) => {
   // Watch for summary view changes to refresh data
   watch(summaryView, async () => {
     await loadRealData();
+    loadActivity();
   });
+
   </script>
   
   <style scoped>
