@@ -81,51 +81,11 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
+import { todayData, getMoodEmoji, getMoodLabel, loadRealData, summaryView,
+  recentActivities, todayActivities, thisWeekActivities, streakDays, addActivity, loadActivity
+} from '../../services/dailyHealth';
 
-// Recent activities data
-const recentActivities = ref([
-  {
-    id: 1,
-    type: 'order',
-    description: 'Ordered Vitamin D supplement',
-    timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
-    status: 'completed'
-  },
-  {
-    id: 2,
-    type: 'sleep',
-    description: 'Logged 7 hours of sleep',
-    timestamp: new Date(Date.now() - 4 * 60 * 60 * 1000), // 4 hours ago
-    status: 'completed'
-  },
-  {
-    id: 3,
-    type: 'weight',
-    description: 'Updated weight: 165 lbs',
-    timestamp: new Date(Date.now() - 6 * 60 * 60 * 1000), // 6 hours ago
-    status: 'completed'
-  },
-  {
-    id: 4,
-    type: 'checkin',
-    description: 'Completed daily check-in',
-    timestamp: new Date(Date.now() - 8 * 60 * 60 * 1000), // 8 hours ago
-    status: 'completed'
-  },
-  {
-    id: 5,
-    type: 'supplement',
-    description: 'Took Omega-3 supplement',
-    timestamp: new Date(Date.now() - 12 * 60 * 60 * 1000), // 12 hours ago
-    status: 'completed'
-  }
-]);
-
-// Activity summary stats
-const todayActivities = ref(4);
-const thisWeekActivities = ref(18);
-const streakDays = ref(7);
 
 // Format timestamp
 const formatTime = (timestamp: Date) => {
@@ -146,35 +106,6 @@ const formatTime = (timestamp: Date) => {
   }
 };
 
-// Add new activity
-const addActivity = (type: string, description: string) => {
-  const newActivity = {
-    id: Date.now(),
-    type,
-    description,
-    timestamp: new Date(),
-    status: 'completed'
-  };
-  
-  recentActivities.value.unshift(newActivity);
-  
-  // Keep only last 5 activities
-  if (recentActivities.value.length > 5) {
-    recentActivities.value = recentActivities.value.slice(0, 5);
-  }
-  
-  // Update stats
-  todayActivities.value++;
-  thisWeekActivities.value++;
-  
-  // Save to localStorage
-  localStorage.setItem('recentActivities', JSON.stringify(recentActivities.value));
-  localStorage.setItem('activityStats', JSON.stringify({
-    today: todayActivities.value,
-    week: thisWeekActivities.value,
-    streak: streakDays.value
-  }));
-};
 
 // Expose addActivity method for other components
 defineExpose({
@@ -182,25 +113,26 @@ defineExpose({
 });
 
 onMounted(() => {
+  loadActivity();
   // Load saved activities from localStorage
-  const savedActivities = localStorage.getItem('recentActivities');
-  const savedStats = localStorage.getItem('activityStats');
+  // const savedActivities = localStorage.getItem('recentActivities');
+  // const savedStats = localStorage.getItem('activityStats');
   
-  if (savedActivities) {
-    const activities = JSON.parse(savedActivities);
-    // Convert timestamp strings back to Date objects
-    activities.forEach((activity: any) => {
-      activity.timestamp = new Date(activity.timestamp);
-    });
-    recentActivities.value = activities;
-  }
+  // if (savedActivities) {
+  //   const activities = JSON.parse(savedActivities);
+  //   // Convert timestamp strings back to Date objects
+  //   activities.forEach((activity: any) => {
+  //     activity.timestamp = new Date(activity.timestamp);
+  //   });
+  //   recentActivities.value = activities;
+  // }
   
-  if (savedStats) {
-    const stats = JSON.parse(savedStats);
-    todayActivities.value = stats.today;
-    thisWeekActivities.value = stats.week;
-    streakDays.value = stats.streak;
-  }
+  // if (savedStats) {
+  //   const stats = JSON.parse(savedStats);
+  //   todayActivities.value = stats.today;
+  //   thisWeekActivities.value = stats.week;
+  //   streakDays.value = stats.streak;
+  // }
 });
 </script>
 

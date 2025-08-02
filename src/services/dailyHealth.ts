@@ -16,6 +16,7 @@ import { getAuth } from "firebase/auth";
 import { initializeApp } from "firebase/app";
 import { detectLoginState, errors, clearError, ErrorType, AppError, isAppError, pastError} from "./auth";
 import { useRoute, useRouter } from 'vue-router';
+import { ref, computed, onMounted, watch } from 'vue';
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_APIKEY,
   authDomain: import.meta.env.VITE_FIREBASE_AUTHDOMAIN,
@@ -31,12 +32,86 @@ const router = useRouter();
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth();
+  
+  // Summary view state
+export const summaryView = ref('weekly');
+export const questionnaireData = ref<any>(null);
+  
+// Weekly data from Firebase
+export const weeklyData = ref<HealthSummaryData[]>([]);
+
+// Monthly data from Firebase
+export const monthlyData = ref<HealthSummaryData[]>([]);
+
+// Loading states
+export const isLoading = ref(false);
+export const isSaving = ref(false);
+
+export const getMoodEmoji = (rating: number) => {
+    const emojis = ['😞', '😐', '🙂', '😊', '😄'];
+    return emojis[rating - 1] || '😐';
+  };
+
+export const getMoodLabel = (rating: number) => {
+    const labels = ['', 'Poor', 'Fair', 'Good', 'Great', 'Excellent'];
+    return labels[rating] || '';
+  };
+
+const getEnergyLabel = (energy: number) => {
+    if (energy >= 4) return 'high energy ⚡⚡';
+    if (energy >= 3) return 'medium energy ⚡';
+    return 'low energy';
+  };
+
+const getStressLabel= (stress: number) => {
+    if (stress >= 4) return 'high stress 💢💢';
+    if (stress >= 3) return 'medium stress 💢';
+    return 'low stress';
+  };
+  
+
+// Today's data
+export const todayData = ref({
+    mood: 0,
+    stress: 0,
+    energy: 0,
+    sleep: 0,
+    sleepQuality: '',
+    water: 0,
+    breakfast: '',
+    lunch: '',
+    dinner: '',
+    snacks: '',
+    beverages: '',
+    otherMeal: '',
+    mealCompleted: false,
+    workoutCompleted: false,
+    workoutDuration: 0,
+    workoutDate: '',
+    caloriesBurned: 0,
+    workoutType: '',
+    workoutNotes: '',
+    weight: 0, // Added weight tracking
+    weightDate: '', // Added weight tracking
+    mentalWellness: '',
+    mentalWellnessCompleted: false, 
+    physicalWellness: '',
+    physicalWellnessCompleted: false
+  
+  });
 export interface DailyHealthData {
   mood: number;
   energy: number;
   sleep: number;
   sleepQuality: string;
   water: number;
+  breakfast: string;
+  lunch: string;
+  dinner: string;
+  snacks: string;
+  beverages: string;
+  otherMeal: string;
+  mealCompleted: boolean;
   workoutCompleted: boolean;
   workoutDuration: number;
   workoutDate: string;
@@ -63,6 +138,57 @@ export interface HealthSummaryData {
   weight: number;
   stress: number;
 }
+
+export const recentActivities = ref([]);
+// Recent activities data todayData
+export const recentActivitiess = ref([
+  {
+    id: 1,
+    type: 'order',
+    description: 'Ordered Vitamin D supplement',
+    timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
+    status: 'completed'
+  },
+  {
+    id: 2,
+    type: 'sleep',
+    description: 'Logged 7 hours of sleep',
+    timestamp: new Date(Date.now() - 4 * 60 * 60 * 1000), // 4 hours ago
+    status: 'completed'
+  },
+  {
+    id: 3,
+    type: 'weight',
+    description: 'Updated weight: 165 lbs',
+    timestamp: new Date(Date.now() - 6 * 60 * 60 * 1000), // 6 hours ago
+    status: 'completed'
+  },
+  {
+    id: 4,
+    type: 'checkin',
+    description: 'Completed daily check-in',
+    timestamp: new Date(Date.now() - 8 * 60 * 60 * 1000), // 8 hours ago
+    status: 'completed'
+  },
+  {
+    id: 5,
+    type: 'supplement',
+    description: 'Took Omega-3 supplement',
+    timestamp: new Date(Date.now() - 12 * 60 * 60 * 1000), // 12 hours ago
+    status: 'completed'
+  },{
+    id: 6,
+    type: 'supplement',
+    description: 'yursky',
+    timestamp: new Date(Date.now() - 12 * 60 * 60 * 1000), // 12 hours ago
+    status: 'completed'
+  }
+]);
+
+// Activity summary stats
+export const todayActivities = ref(4);
+export const thisWeekActivities = ref(18);
+export const streakDays = ref(7);
 
 //Testing purposes
 export async function duplicateDailyHealthRecords() {
@@ -266,7 +392,7 @@ export async function getMonthlyHealthData(): Promise<HealthSummaryData[]> {
  * Check if user has data for a specific date
  * @param date - Date in YYYY-MM-DD format
  */
-export async function hasDataForDate(date: string): Promise<boolean> {
+export async function hasDataForDate(date): Promise<boolean> {
   try {
     const data = await getDailyHealthData(date);
     return data !== null;
@@ -274,4 +400,124 @@ export async function hasDataForDate(date: string): Promise<boolean> {
     console.error("Error checking data for date:", error);
     return false;
   }
-} 
+};
+
+// Function to load real data from Firebase
+export const loadRealData = async () => {
+
+    try {
+      isLoading.value = true;
+      
+      // Load weekly data
+      const weeklyDataFromFirebase = await getWeeklyHealthData();
+      weeklyData.value = weeklyDataFromFirebase;
+      //console.log(weeklyData.value);
+      // Load monthly data
+      const monthlyDataFromFirebase = await getMonthlyHealthData();
+      monthlyData.value = monthlyDataFromFirebase;
+      
+      console.log("Health data loaded from Firebase");
+    } catch (error) {
+      console.error("Error loading health data:", error);
+    } finally {
+      isLoading.value = false;
+    }
+  };
+
+  export const addActivity = (type: string, description: string, timestamp) => {
+    const newActivity = {
+      id: Date.now(),
+      type,
+      description,
+      timestamp: timestamp,
+      status: 'completed'
+    };
+    
+    recentActivities.value.unshift(newActivity);
+    
+    // Keep only last 5 activities
+    if (recentActivities.value.length > 5) {
+      recentActivities.value = recentActivities.value.slice(0, 5);
+    }
+    
+    // Update stats
+    todayActivities.value++;
+    thisWeekActivities.value++;
+    
+    // Save to localStorage
+    localStorage.setItem('recentActivities', JSON.stringify(recentActivities.value));
+    localStorage.setItem('activityStats', JSON.stringify({
+      today: todayActivities.value,
+      week: thisWeekActivities.value,
+      streak: streakDays.value
+    }));
+};
+
+const duration = ref('hours');
+const amount = ref('glasses');
+export const loadActivity = async ()=> {
+  const today = new Date().toISOString().split('T')[0];
+  try {
+    const savedData = await getDailyHealthData(today);
+    const timestamp = savedData?.createdAt;
+     if (todayData.value.mood){
+    addActivity('mood','You have a ' + getMoodLabel(todayData.value.mood).toLowerCase() + ' mood ' + getMoodEmoji(todayData.value.mood) + ' today', timestamp.toDate()  );
+    }
+
+    if (todayData.value.energy){
+      addActivity('energy','You have ' + getEnergyLabel(todayData.value.energy), timestamp.toDate());
+    }
+
+    if (todayData.value.sleep){
+      if (todayData.value.sleep <= 1)
+      {
+         duration.value='hour';
+      }
+       addActivity('sleep','You slept for ' + todayData.value.sleep + ' ' + duration.value, timestamp.toDate());
+    }
+
+    if (todayData.value.water){
+      if (todayData.value.water <= 1)
+      {
+         amount.value='glass';
+      }
+      addActivity('water','You drank ' + todayData.value.water + ' ' + amount.value + ' of water today', timestamp.toDate());
+    }
+
+    if (todayData.value.mealCompleted){
+    
+      addActivity('food','You logged your food intake for the day', timestamp.toDate());
+    }
+
+    if (todayData.value.workoutCompleted){
+    
+      addActivity('workout','You logged your workout for today', timestamp.toDate());
+    }
+
+     if (todayData.value.weight){
+    
+      addActivity('weight','You checked your weight', timestamp.toDate());
+    }
+
+    if (todayData.value.stress){
+    
+      addActivity('stress','You have ' + getStressLabel(todayData.value.energy), timestamp.toDate());
+    }
+
+    if (todayData.value.mentalWellness){
+    
+      addActivity('stress','You logged your mental and emotional wellness', timestamp.toDate());
+    }
+
+    if (todayData.value.physicalWellness){
+    
+      addActivity('stress','You logged your physical wellness', timestamp.toDate());
+    }
+
+
+  } catch (error) {
+      console.error('Error loading today\'s data:', error);
+  }
+
+ 
+};
