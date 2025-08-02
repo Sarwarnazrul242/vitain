@@ -1027,7 +1027,7 @@
   }
   
   .quality-btn.selected {
-    @apply bg-[#4ADE80] text-white border-[#4ADE80];
+    @apply bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-white border-[#4ADE80];
   }
   
   /* Water Tracker */
@@ -1056,7 +1056,7 @@
   }
   
   .water-btn.add {
-    @apply bg-[#3B82F6] text-white hover:bg-[#2563EB] hover:scale-105;
+    @apply bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-white hover:from-[#3B82F6] hover:to-[#4ADE80] hover:scale-105;
   }
   
   .water-btn.remove {
@@ -1129,11 +1129,11 @@
   }
   
   .workout-btn.complete {
-    @apply bg-[#4ADE80] text-white hover:bg-[#3B82F6] shadow-sm;
+    @apply bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-white hover:from-[#3B82F6] hover:to-[#4ADE80] shadow-sm;
   }
   
   .workout-btn.log {
-    @apply bg-[#3B82F6] text-white hover:bg-[#2563EB] shadow-sm;
+    @apply bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-white hover:from-[#3B82F6] hover:to-[#4ADE80] shadow-sm;
   }
   
   .workout-btn.undo {
@@ -1191,7 +1191,7 @@
   }
   
   .save-button {
-    @apply flex items-center px-8 py-4 bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-white font-semibold rounded-xl hover:scale-105 transition-all duration-300 shadow-lg;
+    @apply flex items-center px-8 py-4 bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-white font-semibold rounded-xl hover:scale-105 transition-all duration-300 shadow-lg hover:from-[#3B82F6] hover:to-[#4ADE80];
   }
   
   .save-button:disabled {
@@ -1233,7 +1233,7 @@
   }
   
   .toggle-btn.active {
-    @apply bg-[#3B82F6] text-white border-[#3B82F6];
+    @apply bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-white border-[#4ADE80];
   }
   
   .summary-charts {

@@ -21,9 +21,18 @@
       >
         <div class="supplement-image">
           <img :src="supplement.image" :alt="supplement.name" class="product-image" />
-          <div class="supplement-badge" :class="supplement.priority">
-            {{ supplement.priority }}
-          </div>
+          <button 
+            @click="addToCart(supplement)"
+            class="add-button"
+            :disabled="supplement.ordered"
+          >
+            <svg v-if="!supplement.ordered" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+            <svg v-else class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+            </svg>
+          </button>
         </div>
         
         <div class="supplement-content">
@@ -51,16 +60,14 @@
           </div>
           
           <div class="supplement-actions">
-            <button 
-              @click="orderSupplement(supplement)"
-              class="order-button"
-              :disabled="supplement.ordered"
-            >
-              <span v-if="supplement.ordered" class="ordered-text">✓ Ordered</span>
-              <span v-else>Order Now</span>
-            </button>
             <button @click="viewDetails(supplement)" class="details-button">
-              Details
+              More Details
+            </button>
+            <button @click="searchVerified(supplement)" class="verified-button">
+              Verified Search
+            </button>
+            <button @click="searchGeneral(supplement)" class="general-button">
+              General Search
             </button>
           </div>
         </div>
@@ -99,7 +106,6 @@ const recommendations = ref([
     frequency: 'Once daily',
     price: 24.99,
     image: vitaminImage,
-    priority: 'high',
     ordered: false
   },
   {
@@ -111,7 +117,6 @@ const recommendations = ref([
     frequency: 'Twice daily',
     price: 32.99,
     image: vitaminImage,
-    priority: 'medium',
     ordered: false
   },
   {
@@ -123,7 +128,6 @@ const recommendations = ref([
     frequency: 'Once daily',
     price: 18.99,
     image: magnesiumImage,
-    priority: 'medium',
     ordered: false
   },
   {
@@ -135,19 +139,45 @@ const recommendations = ref([
     frequency: 'Once daily',
     price: 28.99,
     image: vitaminImage,
-    priority: 'low',
     ordered: false
   }
 ]);
 
 // Methods
-const orderSupplement = (supplement: any) => {
+const searchVerified = (supplement: any) => {
+  console.log('Searching verified sources for:', supplement.name);
+  // In real app, this would search verified supplement sources
+  // For now, just show a message
+  alert(`Searching verified sources for ${supplement.name}`);
+};
+
+const searchGeneral = (supplement: any) => {
+  console.log('Searching general sources for:', supplement.name);
+  // In real app, this would search general supplement sources
+  // For now, just show a message
+  alert(`Searching general sources for ${supplement.name}`);
+};
+
+const addToCart = (supplement: any) => {
   supplement.ordered = true;
-  console.log('Ordering supplement:', supplement.name);
+  console.log('Adding supplement to cart:', supplement.name);
   
-  // In real app, this would trigger an order flow
+  // Emit event for YourSuppliment component to listen to
+  window.dispatchEvent(new CustomEvent('supplementAdded', {
+    detail: {
+      id: supplement.id,
+      name: supplement.name,
+      description: supplement.description,
+      dosage: supplement.dosage,
+      frequency: supplement.frequency,
+      price: supplement.price,
+      image: supplement.image
+    }
+  }));
+  
+  // In real app, this would add to cart
   // For now, just show a success message
-  alert(`${supplement.name} added to cart!`);
+  alert(`${supplement.name} added to your supplements!`);
 };
 
 const viewDetails = (supplement: any) => {
@@ -210,20 +240,16 @@ onMounted(() => {
   @apply w-full h-full object-contain;
 }
 
-.supplement-badge {
-  @apply absolute top-3 right-3 px-2 py-1 rounded-full text-xs font-medium text-white;
+.add-button {
+  @apply absolute top-3 right-3 w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white/30 transition-all duration-300 hover:scale-110;
 }
 
-.supplement-badge.high {
-  @apply bg-red-500;
+.add-button:disabled {
+  @apply bg-green-500/80 cursor-not-allowed hover:scale-100;
 }
 
-.supplement-badge.medium {
-  @apply bg-yellow-500;
-}
-
-.supplement-badge.low {
-  @apply bg-green-500;
+.add-button svg {
+  @apply w-4 h-4;
 }
 
 .supplement-content {
@@ -271,23 +297,19 @@ onMounted(() => {
 }
 
 .supplement-actions {
-  @apply flex gap-3;
-}
-
-.order-button {
-  @apply flex-1 py-2 px-4 bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-white font-medium rounded-lg hover:scale-105 transition-all duration-300;
-}
-
-.order-button:disabled {
-  @apply bg-green-600 cursor-not-allowed hover:scale-100;
-}
-
-.ordered-text {
-  @apply flex items-center justify-center gap-1;
+  @apply flex gap-2;
 }
 
 .details-button {
-  @apply py-2 px-4 border border-white/20 text-white font-medium rounded-lg hover:bg-white/10 transition-all duration-300;
+  @apply flex-1 py-2 px-3 bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-white font-medium rounded-lg hover:scale-105 transition-all duration-300 text-sm border border-white/10 hover:from-[#3B82F6] hover:to-[#4ADE80];
+}
+
+.verified-button {
+  @apply flex-1 py-2 px-3 bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-white font-medium rounded-lg hover:scale-105 transition-all duration-300 text-sm hover:from-[#3B82F6] hover:to-[#4ADE80];
+}
+
+.general-button {
+  @apply flex-1 py-2 px-3 bg-gradient-to-r from-[#4ADE80] to-[#3B82F6] text-white font-medium rounded-lg hover:scale-105 transition-all duration-300 text-sm hover:from-[#3B82F6] hover:to-[#4ADE80];
 }
 
 .empty-state {

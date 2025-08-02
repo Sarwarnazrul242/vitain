@@ -735,3 +735,46 @@ export async function retrieveQuestionnaireData() {
     return null;
   }
 }
+
+export async function updateQuestionnaireData(updatedData: any) {
+  try {
+    const user = await detectLoginState();
+    const userDocRef = doc(db, "users", user.uid);
+    
+    // Get current questionnaire data
+    const userSnap = await getDoc(userDocRef);
+    if (!userSnap.exists()) {
+      throw {
+        type: "database",
+        message: "User document not found in database",
+      };
+    }
+
+    const currentData = userSnap.data();
+    const currentQuestionnaire = currentData.comprehensiveQuestionnaire || {};
+    
+    // Merge the updated data with existing questionnaire data
+    const updatedQuestionnaire = {
+      ...currentQuestionnaire,
+      ...updatedData
+    };
+
+    // Update the document with merged data
+    await setDoc(
+      userDocRef,
+      {
+        comprehensiveQuestionnaire: updatedQuestionnaire,
+      },
+      { merge: true }
+    );
+
+    console.log("Questionnaire data updated successfully");
+    return updatedQuestionnaire;
+  } catch (err) {
+    console.error("Error updating questionnaire data: ", err);
+    throw {
+      type: "database",
+      message: "Failed to update questionnaire data. Please try again.",
+    };
+  }
+}

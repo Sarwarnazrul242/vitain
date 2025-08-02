@@ -9,6 +9,7 @@
           <div class="dashboard">
             <WelcomeSection />
             <SupplementRecommendation />
+            <YourSuppliment />
             <DailyHealthCheckin 
               @showWorkoutModal="showWorkoutModal = true; workoutModalData = $event"
               @showMentalWellnessModal="showMentalWellnessModal = true; mentalWellnessModalData=$event"
@@ -174,6 +175,7 @@ import WelcomeSection from '@/components/dashboard/WelcomeSection.vue';
 import SupplementRecommendation from '@/components/dashboard/SupplimentRecommendation.vue';
 import DailyHealthCheckin from '@/components/dashboard/DailyHealth.vue';
 import RecentActivity from '@/components/dashboard/RecentActivity.vue';
+import YourSuppliment from '@/components/dashboard/YourSuppliment.vue'; 
 
 // Modal states
 const showWorkoutModal = ref(false);
